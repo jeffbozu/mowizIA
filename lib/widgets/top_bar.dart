@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../i18n/strings.dart';
+import '../modals/language_modal.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   const TopBar({super.key});
@@ -20,18 +22,20 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: () {
-            // TODO: Abrir modal de idioma
-            context.push('/idioma');
+            showDialog(
+              context: context,
+              builder: (context) => const LanguageModal(),
+            );
           },
           icon: const Icon(Icons.language, color: Color(0xFF7F7F7F)),
-          tooltip: 'Idioma',
+          tooltip: AppStrings.t('lang.title'),
         ),
         IconButton(
           onPressed: () {
             context.push('/accesibilidad');
           },
           icon: const Icon(Icons.accessibility, color: Color(0xFF7F7F7F)),
-          tooltip: 'Accesibilidad',
+          tooltip: AppStrings.t('access.title'),
         ),
       ],
     );
