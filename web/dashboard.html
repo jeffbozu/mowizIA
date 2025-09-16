@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYPARK Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h1>MEYPARK</h1>
+                <p>Dashboard de Gestión</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Resumen General
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="companies">
+                        <i class="fas fa-building"></i>
+                        Empresas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="zones">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Zonas de Estacionamiento
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="kiosks">
+                        <i class="fas fa-desktop"></i>
+                        Kioscos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="sessions">
+                        <i class="fas fa-car"></i>
+                        Sesiones Activas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="payments">
+                        <i class="fas fa-credit-card"></i>
+                        Pagos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="tickets">
+                        <i class="fas fa-receipt"></i>
+                        Tickets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        Reportes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="tech">
+                        <i class="fas fa-tools"></i>
+                        Modo Técnico
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="operators">
+                        <i class="fas fa-users"></i>
+                        Operadores
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        Configuración
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <h2 id="page-title">Resumen General</h2>
+                <div class="status-indicator">
+                    <div class="status-item" id="websocket-status">
+                        <i class="fas fa-wifi"></i>
+                        <span>Conectado</span>
+                    </div>
+                    <div class="status-item" id="kiosk-status">
+                        <i class="fas fa-desktop"></i>
+                        <span>Kiosco Online</span>
+                    </div>
+                    <div class="status-item" id="last-update">
+                        <i class="fas fa-clock"></i>
+                        <span>Última actualización: <span id="update-time">--:--</span></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview Section -->
+            <section id="overview-section" class="content-section">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Estadísticas Generales
+                </h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Empresas Activas</h4>
+                            <span class="card-value" id="total-companies">0</span>
+                        </div>
+                        <p class="card-description">Total de empresas registradas en el sistema</p>
+                        <button class="btn btn-primary" onclick="showSection(companies)">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Zonas de Estacionamiento</h4>
+                            <span class="card-value" id="total-zones">0</span>
+                        </div>
+                        <p class="card-description">Zonas disponibles para estacionamiento</p>
+                        <button class="btn btn-primary" onclick="showSection(zones)">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Sesiones Activas</h4>
+                            <span class="card-value" id="active-sessions">0</span>
+                        </div>
+                        <p class="card-description">Estacionamientos actualmente activos</p>
+                        <button class="btn btn-primary" onclick="showSection(sessions)">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Ingresos Hoy</h4>
+                            <span class="card-value" id="today-income">0.00€</span>
+                        </div>
+                        <p class="card-description">Total de ingresos del día actual</p>
+                        <button class="btn btn-primary" onclick="showSection(payments)">
+                            <i class="fas fa-eye"></i> Ver Detalles
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Companies Section -->
+            <section id="companies-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-building"></i>
+                    Gestión de Empresas
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showAddCompanyModal()">
+                        <i class="fas fa-plus"></i> Nueva Empresa
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Color Primario</th>
+                                <th>Zonas</th>
+                                <th>Operadores</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="companies-table">
+                            <!-- Companies will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Zones Section -->
+            <section id="zones-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Zonas de Estacionamiento
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showAddZoneModal()">
+                        <i class="fas fa-plus"></i> Nueva Zona
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Empresa</th>
+                                <th>Precio/Hora</th>
+                                <th>Máx. Horas</th>
+                                <th>Color</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="zones-table">
+                            <!-- Zones will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Kiosks Section -->
+            <section id="kiosks-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-desktop"></i>
+                    Monitoreo de Kioscos
+                </h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Estado del Kiosco</h4>
+                            <span class="badge badge-success" id="kiosk-status-badge">Online</span>
+                        </div>
+                        <div class="kiosk-screen" id="kiosk-screen">
+                            <div class="kiosk-header">
+                                <span>MEYPARK - Kiosco Principal</span>
+                                <span id="kiosk-time">--:--</span>
+                            </div>
+                            <div class="kiosk-content" id="kiosk-content">
+                                <div class="loading">
+                                    <i class="fas fa-spinner"></i>
+                                    Conectando con el kiosco...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Diagnósticos Técnicos</h4>
+                        </div>
+                        <div id="tech-diagnostics">
+                            <!-- Technical diagnostics will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sessions Section -->
+            <section id="sessions-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-car"></i>
+                    Sesiones Activas
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showExtendSessionModal()">
+                        <i class="fas fa-clock"></i> Extender Sesión
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                    <button class="btn btn-warning" onclick="exportSessions()">
+                        <i class="fas fa-download"></i> Exportar Excel
+                    </button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="session-search" placeholder="Buscar por matrícula..." onkeyup="searchSessions()">
+                    <button class="btn btn-secondary" onclick="clearSessionSearch()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Matrícula</th>
+                                <th>Zona</th>
+                                <th>Inicio</th>
+                                <th>Válido Hasta</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-table">
+                            <!-- Sessions will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Payments Section -->
+            <section id="payments-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    Gestión de Pagos
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showPaymentModal()">
+                        <i class="fas fa-plus"></i> Simular Pago
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Ingresos Hoy</h4>
+                            <span class="card-value" id="today-income-detail">0.00€</span>
+                        </div>
+                        <p class="card-description">Total de ingresos del día actual</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Pagos por Método</h4>
+                        </div>
+                        <div id="payment-methods-chart">
+                            <!-- Payment methods chart will be loaded here -->
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Simulador de Pagos</h4>
+                        </div>
+                        <div class="payment-simulator">
+                            <div class="form-group">
+                                <label class="form-label">Matrícula</label>
+                                <input type="text" id="payment-plate" class="form-control" placeholder="1234ABC">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Monto</label>
+                                <input type="number" id="payment-amount" class="form-control" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Método</label>
+                                <select id="payment-method" class="form-control">
+                                    <option value="cash">Monedas</option>
+                                    <option value="chip">Chip+PIN</option>
+                                    <option value="contactless">Contactless</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="simulatePayment()">
+                                <i class="fas fa-credit-card"></i> Simular Pago
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Matrícula</th>
+                                <th>Zona</th>
+                                <th>Método</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table">
+                            <!-- Payments will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tickets Section -->
+            <section id="tickets-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-receipt"></i>
+                    Gestión de Tickets
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showGenerateTicketModal()">
+                        <i class="fas fa-plus"></i> Generar Ticket
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                    <button class="btn btn-warning" onclick="printAllTickets()">
+                        <i class="fas fa-print"></i> Imprimir Todos
+                    </button>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Generador de Tickets</h4>
+                        </div>
+                        <div class="ticket-generator">
+                            <div class="form-group">
+                                <label class="form-label">Matrícula</label>
+                                <input type="text" id="ticket-plate" class="form-control" placeholder="1234ABC">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Zona</label>
+                                <select id="ticket-zone" class="form-control">
+                                    <option value="">Seleccionar zona...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Duración (minutos)</label>
+                                <input type="number" id="ticket-duration" class="form-control" min="15" step="15">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo</label>
+                                <select id="ticket-type" class="form-control">
+                                    <option value="new">Nuevo Estacionamiento</option>
+                                    <option value="extend">Extensión</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="generateTicket()">
+                                <i class="fas fa-receipt"></i> Generar Ticket
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Vista Previa del Ticket</h4>
+                        </div>
+                        <div class="ticket-preview" id="ticket-preview">
+                            <div class="ticket">
+                                <div class="ticket-header">
+                                    <h3>MEYPARK</h3>
+                                    <p>Ticket de Estacionamiento</p>
+                                </div>
+                                <div class="ticket-body">
+                                    <div class="ticket-row">
+                                        <span>Matrícula:</span>
+                                        <span id="preview-plate">--</span>
+                                    </div>
+                                    <div class="ticket-row">
+                                        <span>Zona:</span>
+                                        <span id="preview-zone">--</span>
+                                    </div>
+                                    <div class="ticket-row">
+                                        <span>Inicio:</span>
+                                        <span id="preview-start">--:--</span>
+                                    </div>
+                                    <div class="ticket-row">
+                                        <span>Fin:</span>
+                                        <span id="preview-end">--:--</span>
+                                    </div>
+                                    <div class="ticket-row">
+                                        <span>Importe:</span>
+                                        <span id="preview-amount">--€</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-footer">
+                                    <p>Gracias por usar MEYPARK</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Matrícula</th>
+                                <th>Zona</th>
+                                <th>Tipo</th>
+                                <th>Fecha</th>
+                                <th>Importe</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-table">
+                            <!-- Tickets will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Reportes y Estadísticas
+                </h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Ingresos por Día</h4>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="daily-income-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Uso de Zonas</h4>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="zones-usage-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Mode Section -->
+            <section id="tech-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-tools"></i>
+                    Modo Técnico - Control Remoto
+                </h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Estado del Sistema</h4>
+                            <button class="btn btn-secondary" onclick="refreshTechStatus()">
+                                <i class="fas fa-sync"></i> Refrescar
+                            </button>
+                        </div>
+                        <div id="tech-status">
+                            <div class="status-grid">
+                                <div class="status-item" id="tech-network">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Red</span>
+                                    <span class="status-value">OK</span>
+                                </div>
+                                <div class="status-item" id="tech-printer">
+                                    <i class="fas fa-print"></i>
+                                    <span>Impresora</span>
+                                    <span class="status-value">OK</span>
+                                </div>
+                                <div class="status-item" id="tech-coins">
+                                    <i class="fas fa-coins"></i>
+                                    <span>Monedas</span>
+                                    <span class="status-value">OK</span>
+                                </div>
+                                <div class="status-item" id="tech-cards">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Tarjetas</span>
+                                    <span class="status-value">OK</span>
+                                </div>
+                                <div class="status-item" id="tech-temp">
+                                    <i class="fas fa-thermometer-half"></i>
+                                    <span>Temperatura</span>
+                                    <span class="status-value">25.5°C</span>
+                                </div>
+                                <div class="status-item" id="tech-door">
+                                    <i class="fas fa-door-closed"></i>
+                                    <span>Puerta</span>
+                                    <span class="status-value">Cerrada</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Diagnósticos</h4>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="runTechTest('display')">
+                                <i class="fas fa-desktop"></i> Test Pantalla
+                            </button>
+                            <button class="btn btn-primary" onclick="runTechTest('touch')">
+                                <i class="fas fa-hand-paper"></i> Test Táctil
+                            </button>
+                            <button class="btn btn-primary" onclick="runTechTest('printer')">
+                                <i class="fas fa-print"></i> Test Impresora
+                            </button>
+                            <button class="btn btn-primary" onclick="runTechTest('coins')">
+                                <i class="fas fa-coins"></i> Test Monedas
+                            </button>
+                            <button class="btn btn-primary" onclick="runTechTest('cards')">
+                                <i class="fas fa-credit-card"></i> Test Tarjetas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Contadores Diarios</h4>
+                            <button class="btn btn-warning" onclick="resetDayCounters()">
+                                <i class="fas fa-refresh"></i> Reiniciar Día
+                            </button>
+                        </div>
+                        <div class="counters-grid">
+                            <div class="counter-item">
+                                <span class="counter-label">Transacciones Hoy</span>
+                                <span class="counter-value" id="tech-transactions">0</span>
+                            </div>
+                            <div class="counter-item">
+                                <span class="counter-label">Ingresos Efectivo</span>
+                                <span class="counter-value" id="tech-cash-income">0.00€</span>
+                            </div>
+                            <div class="counter-item">
+                                <span class="counter-label">Ingresos Tarjeta</span>
+                                <span class="counter-value" id="tech-card-income">0.00€</span>
+                            </div>
+                            <div class="counter-item">
+                                <span class="counter-label">Última Sincronización</span>
+                                <span class="counter-value" id="tech-last-sync">--:--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Configuración del Sistema</h4>
+                            <button class="btn btn-secondary" onclick="reloadConfig()">
+                                <i class="fas fa-refresh"></i> Recargar
+                            </button>
+                        </div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <span class="config-label">Operador Activo</span>
+                                <span class="config-value" id="tech-operator">N/A</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Zonas Cargadas</span>
+                                <span class="config-value" id="tech-zones">0</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Tarifas Cargadas</span>
+                                <span class="config-value" id="tech-tariffs">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Acciones del Sistema</h4>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-danger" onclick="rebootKioskApp()">
+                            <i class="fas fa-power-off"></i> Reiniciar App
+                        </button>
+                        <button class="btn btn-warning" onclick="restartKiosk()">
+                            <i class="fas fa-restart"></i> Reiniciar Kiosco
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeKiosk()">
+                            <i class="fas fa-times"></i> Cerrar Kiosco
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Operators Section -->
+            <section id="operators-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Gestión de Operadores
+                </h3>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showAddOperatorModal()">
+                        <i class="fas fa-plus"></i> Nuevo Operador
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Empresa</th>
+                                <th>Usuario</th>
+                                <th>Estado</th>
+                                <th>Último Acceso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="operators-table">
+                            <!-- Operators will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings-section" class="content-section hidden">
+                <h3 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Configuración del Sistema
+                </h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Configuración General</h4>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">URL del Servidor WebSocket</label>
+                            <input type="text" class="form-control" id="websocket-url" value="ws://localhost:8080">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Intervalo de Actualización (segundos)</label>
+                            <input type="number" class="form-control" id="update-interval" value="5" min="1" max="60">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <i class="fas fa-save"></i> Guardar Configuración
+                        </button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Accesibilidad</h4>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="dark-mode">Modo Oscuro</label>
+                            <input type="checkbox" id="dark-mode" onchange="toggleDarkMode()">
+                            <span class="sr-only">Activar para usar tema oscuro</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="high-contrast">Alto Contraste</label>
+                            <input type="checkbox" id="high-contrast" onchange="toggleHighContrast()">
+                            <span class="sr-only">Activar para mayor contraste visual</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tamaño de Fuente</label>
+                            <select class="form-control" id="font-size" onchange="changeFontSize()">
+                                <option value="small">Pequeño</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="large">Grande</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reducir Animaciones</label>
+                            <input type="checkbox" id="reduce-animations" onchange="toggleReduceAnimations()">
+                            <span class="sr-only">Activar para reducir animaciones y transiciones</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Idioma</label>
+                            <select class="form-control" id="language-select" onchange="changeLanguage()">
+                                <option value="es-ES" selected>Español (España)</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="add-company-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nueva Empresa</h3>
+                <button class="close" onclick="closeModal('add-company-modal')">&times;</button>
+            </div>
+            <form id="add-company-form">
+                <div class="form-group">
+                    <label class="form-label">Nombre de la Empresa</label>
+                    <input type="text" class="form-control" id="company-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color Primario</label>
+                    <input type="color" class="form-control" id="company-color" value="#E62144">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color de Fondo</label>
+                    <input type="color" class="form-control" id="company-bg-color" value="#FFFFFF">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-company-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Empresa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="add-zone-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nueva Zona</h3>
+                <button class="close" onclick="closeModal('add-zone-modal')">&times;</button>
+            </div>
+            <form id="add-zone-form">
+                <div class="form-group">
+                    <label class="form-label">Empresa</label>
+                    <select class="form-control" id="zone-company" required>
+                        <option value="">Seleccionar empresa...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">ID de la Zona</label>
+                    <input type="text" class="form-control" id="zone-id" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nombre de la Zona</label>
+                    <input type="text" class="form-control" id="zone-name" required>
+                </div>
+                            <div class="form-group">
+                                <label class="form-label">Precio por Hora (€)</label>
+                                <div class="price-input-group">
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="adjustPrice(-0.10)">-</button>
+                                    <input type="number" class="form-control" id="zone-price" step="0.01" min="0" value="2.10" required>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="adjustPrice(0.10)">+</button>
+                                </div>
+                            </div>
+                <div class="form-group">
+                    <label class="form-label">Máximo de Horas</label>
+                    <input type="number" class="form-control" id="zone-max-hours" min="1" max="24" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color</label>
+                    <input type="color" class="form-control" id="zone-color" value="#2196F3">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-zone-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Zona</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="add-operator-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nuevo Operador</h3>
+                <button class="close" onclick="closeModal('add-operator-modal')">&times;</button>
+            </div>
+            <form id="add-operator-form">
+                <div class="form-group">
+                    <label class="form-label">Empresa</label>
+                    <select class="form-control" id="operator-company" required>
+                        <option value="">Seleccionar empresa...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nombre del Operador</label>
+                    <input type="text" class="form-control" id="operator-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" class="form-control" id="operator-username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="operator-password" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-operator-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Operador</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="extend-session-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Extender Sesión</h3>
+                <button class="close" onclick="closeModal('extend-session-modal')">&times;</button>
+            </div>
+            <form id="extend-session-form">
+                <div class="form-group">
+                    <label class="form-label">Matrícula</label>
+                    <input type="text" class="form-control" id="extend-plate" placeholder="1234ABC" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tiempo Extra (minutos)</label>
+                    <input type="number" class="form-control" id="extend-minutes" min="15" step="15" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Método de Pago</label>
+                    <select class="form-control" id="extend-payment-method">
+                        <option value="cash">Monedas</option>
+                        <option value="chip">Chip+PIN</option>
+                        <option value="contactless">Contactless</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('extend-session-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Extender Sesión</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Simular Pago</h3>
+                <button class="close" onclick="closeModal('payment-modal')">&times;</button>
+            </div>
+            <form id="payment-modal-form">
+                <div class="form-group">
+                    <label class="form-label">Matrícula</label>
+                    <input type="text" class="form-control" id="payment-modal-plate" placeholder="1234ABC" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Zona</label>
+                    <select class="form-control" id="payment-modal-zone" required>
+                        <option value="">Seleccionar zona...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duración (minutos)</label>
+                    <input type="number" class="form-control" id="payment-modal-duration" min="15" step="15" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Método de Pago</label>
+                    <select class="form-control" id="payment-modal-method">
+                        <option value="cash">Monedas</option>
+                        <option value="chip">Chip+PIN</option>
+                        <option value="contactless">Contactless</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('payment-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Procesar Pago</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast">    </div>
+
+    <!-- Modal para cambiar login -->
+    <div id="change-login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🔐 Cambiar Login del Kiosco</h3>
+                <button class="close" onclick="closeModal('change-login-modal')">&times;</button>
+            </div>
+            <form id="change-login-form">
+                <div class="form-group">
+                    <label class="form-label">Empresa</label>
+                    <select class="form-control" id="login-company" required>
+                        <option value="">Seleccionar empresa...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Usuario Actual</label>
+                    <input type="text" class="form-control" id="current-username" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nuevo Usuario</label>
+                    <input type="text" class="form-control" id="new-username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nueva Contraseña</label>
+                    <input type="password" class="form-control" id="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirmar Contraseña</label>
+                    <input type="password" class="form-control" id="confirm-password" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('change-login-modal')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

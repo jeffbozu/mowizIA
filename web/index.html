@@ -29,10 +29,90 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>mi_nuevo_proyecto</title>
+  <title>MEYPARK</title>
   <link rel="manifest" href="manifest.json">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+    
+    .logo {
+      font-size: 64px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 20px 40px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav-button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .kiosco-button {
+      background: linear-gradient(135deg, #E62144 0%, #FF6B6B 100%);
+    }
+    
+    .dashboard-button {
+      background: linear-gradient(135deg, #7F7F7F 0%, #9E9E9E 100%);
+    }
+  </style>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <div class="main-container">
+    <div class="logo">MEYPARK</div>
+    <div class="button-container">
+      <a href="/kiosco.html" class="nav-button kiosco-button">
+        🏪 Kiosco Web
+      </a>
+      <a href="/dashboard.html" class="nav-button dashboard-button">
+        📊 Dashboard Admin
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Detectar si es una ruta específica y redirigir
+    const path = window.location.pathname;
+    if (path.includes('/dashboard')) {
+      window.location.href = '/dashboard.html';
+    } else if (path.includes('/kiosco') || path.includes('/web')) {
+      window.location.href = '/kiosco.html';
+    }
+  </script>
 </body>
 </html>

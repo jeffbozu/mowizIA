@@ -1,0 +1,30 @@
+{
+  "name": "meypark-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard de gestión para MEYPARK - Sistema de parquímetros",
+  "main": "websocket_server.js",
+  "scripts": {
+    "start": "node websocket_server.js",
+    "dev": "nodemon websocket_server.js",
+    "install-deps": "npm install"
+  },
+  "keywords": [
+    "parking",
+    "kiosk",
+    "dashboard",
+    "websocket",
+    "flutter",
+    "meypark"
+  ],
+  "author": "MEYPARK Team",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
