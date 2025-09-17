@@ -10,6 +10,7 @@ import 'screens/payment_screen.dart';
 import 'screens/ticket_screen.dart';
 import 'screens/accessibility_screen.dart';
 import 'screens/tech_screen.dart';
+import 'screens/test_accessibility_screen.dart';
 import 'modals/language_modal.dart';
 import 'modals/admin_pass_modal.dart';
 import 'modals/tech_pass_modal.dart';
@@ -78,6 +79,11 @@ class AppRouter {
         path: '/accesibilidad',
         name: 'accesibilidad',
         builder: (context, state) => const AccessibilityScreen(),
+      ),
+      GoRoute(
+        path: '/test-accesibilidad',
+        name: 'test-accesibilidad',
+        builder: (context, state) => const TestAccessibilityScreen(),
       ),
       GoRoute(
         path: '/tecnico',

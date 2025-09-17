@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'app_router.dart';
 import 'theme/app_theme.dart';
@@ -7,6 +6,9 @@ import 'data/models.dart';
 import 'data/mock_data.dart';
 import 'services/websocket_service.dart';
 import 'services/local_storage_service.dart';
+import 'services/voice_guide_service.dart';
+import 'services/adaptive_ai_service.dart';
+import 'services/simplified_mode_service.dart';
 import 'i18n/strings.dart';
 
 void main() async {
@@ -15,6 +17,17 @@ void main() async {
   // Cargar configuración local
   await LocalStorageService.loadConfig();
   await LocalStorageService.loadSessions();
+  
+  // Inicializar servicio de guía por voz (opcional)
+  try {
+    await VoiceGuideService.initialize();
+  } catch (e) {
+    print('⚠️ No se pudo inicializar TTS - la app funcionará sin guía por voz');
+  }
+  
+  // Inicializar servicios de accesibilidad avanzada
+  AdaptiveAIService.initialize();
+  SimplifiedModeService.setEnabled(AppState.simplifiedMode);
   
   // Verificar idioma cargado
   print('Idioma actual: ${AppState.currentLanguage}');
@@ -64,7 +77,6 @@ void main() async {
       'coins': true,
       'cards': true,
     });
-  }
   
   runApp(const MEYPARKApp());
 }

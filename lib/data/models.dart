@@ -259,6 +259,21 @@ class AppState {
   static String currentLanguage = 'es-ES';
   static String fontSize = 'normal'; // 'small', 'normal', 'large'
   static bool reduceAnimations = false;
+  static bool voiceGuideEnabled = false;
+  
+  // Configuración de guía por voz
+  static double voiceSpeed = 0.5; // 0.1 - 1.0
+  static double voicePitch = 1.0; // 0.5 - 2.0
+  static double voiceVolume = 0.8; // 0.0 - 1.0
+  
+  // Funcionalidades avanzadas de accesibilidad
+  static bool adaptiveAI = false; // IA adaptativa
+  static bool simplifiedMode = false; // Modo simplificado
+  
+  // Datos de IA adaptativa
+  static Map<String, int> userBehavior = {}; // Comportamiento del usuario
+  static Map<String, dynamic> userPreferences = {}; // Preferencias aprendidas
+  static List<String> mostUsedFeatures = []; // Características más usadas
   
   // Datos dinámicos
   static Map<String, Company> companies = {};
@@ -321,6 +336,83 @@ class AppState {
   
   static List<Zone> getZonesForCompany(String companyId) {
     return zones.values.where((zone) => zone.companyId == companyId && zone.isActive).toList();
+  }
+  
+  // Métodos para IA adaptativa
+  static void learnUserBehavior(String action) {
+    if (!adaptiveAI) return;
+    
+    userBehavior[action] = (userBehavior[action] ?? 0) + 1;
+    
+    // Actualizar características más usadas
+    final sortedEntries = userBehavior.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    mostUsedFeatures = sortedEntries
+        .take(5)
+        .map((e) => e.key)
+        .toList();
+    
+    // Aprender preferencias automáticamente
+    _learnPreferences(action);
+    
+    print('🧠 IA Adaptativa: Aprendido comportamiento - $action (${userBehavior[action]} veces)');
+  }
+  
+  static void _learnPreferences(String action) {
+    // Aprender preferencias basadas en comportamiento
+    switch (action) {
+      case 'voice_guide_used':
+        if (userBehavior[action]! > 3) {
+          userPreferences['prefers_voice'] = true;
+        }
+        break;
+      case 'large_buttons_used':
+        if (userBehavior[action]! > 2) {
+          userPreferences['prefers_large_ui'] = true;
+        }
+        break;
+      case 'simplified_mode_used':
+        if (userBehavior[action]! > 1) {
+          userPreferences['prefers_simple'] = true;
+        }
+        break;
+      case 'zone_selected':
+        // Aprender zona preferida
+        final zoneId = selectedZoneId;
+        if (zoneId != null) {
+          userPreferences['preferred_zone'] = zoneId;
+        }
+        break;
+    }
+  }
+  
+  static void applyLearnedPreferences() {
+    if (!adaptiveAI) return;
+    
+    // Aplicar preferencias aprendidas
+    if (userPreferences['prefers_voice'] == true && !voiceGuideEnabled) {
+      voiceGuideEnabled = true;
+      print('🧠 IA: Habilitando guía por voz basada en comportamiento');
+    }
+    
+    if (userPreferences['prefers_large_ui'] == true && fontSize != 'large') {
+      fontSize = 'large';
+      print('🧠 IA: Aumentando tamaño de fuente basado en comportamiento');
+    }
+    
+    if (userPreferences['prefers_simple'] == true && !simplifiedMode) {
+      simplifiedMode = true;
+      print('🧠 IA: Habilitando modo simplificado basado en comportamiento');
+    }
+    
+    notifyAccessibilityChange();
+  }
+  
+  static void resetAdaptiveAI() {
+    userBehavior.clear();
+    userPreferences.clear();
+    mostUsedFeatures.clear();
+    print('🧠 IA Adaptativa: Datos de aprendizaje reiniciados');
   }
   
   static void dispose() {
