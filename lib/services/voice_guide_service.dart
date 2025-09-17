@@ -1,5 +1,7 @@
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter/foundation.dart';
 import '../data/models.dart';
+import 'voice_guide_service_web.dart';
 
 class VoiceGuideService {
   static final FlutterTts _flutterTts = FlutterTts();
@@ -11,7 +13,14 @@ class VoiceGuideService {
     if (_isInitialized) return;
 
     try {
-      // Verificar si TTS está disponible en esta plataforma
+      // Para Web, usar el servicio web
+      if (kIsWeb) {
+        await VoiceGuideServiceWeb.initialize();
+        _isInitialized = true;
+        return;
+      }
+
+      // Para Desktop, usar flutter_tts
       final languages = await _flutterTts.getLanguages;
       if (languages == null || languages.isEmpty) {
         print('⚠️ TTS no disponible en esta plataforma - guía por voz deshabilitada');
@@ -61,6 +70,13 @@ class VoiceGuideService {
     if (!_isEnabled || !_isInitialized) return;
 
     try {
+      // Para Web, usar el servicio web
+      if (kIsWeb) {
+        await VoiceGuideServiceWeb.speak(text);
+        return;
+      }
+
+      // Para Desktop, usar flutter_tts
       // Detener cualquier habla anterior
       await _flutterTts.stop();
       
@@ -75,7 +91,11 @@ class VoiceGuideService {
   /// Detener la guía por voz
   static Future<void> stop() async {
     try {
-      await _flutterTts.stop();
+      if (kIsWeb) {
+        VoiceGuideServiceWeb.stop();
+      } else {
+        await _flutterTts.stop();
+      }
     } catch (e) {
       print('❌ Error deteniendo TTS: $e');
     }
@@ -107,10 +127,14 @@ class VoiceGuideService {
     if (!_isInitialized) return;
     
     try {
-      await _flutterTts.setSpeechRate(AppState.voiceSpeed);
-      await _flutterTts.setPitch(AppState.voicePitch);
-      await _flutterTts.setVolume(AppState.voiceVolume);
-      print('🎤 Configuración de voz actualizada');
+      if (kIsWeb) {
+        VoiceGuideServiceWeb.updateVoiceSettings();
+      } else {
+        await _flutterTts.setSpeechRate(AppState.voiceSpeed);
+        await _flutterTts.setPitch(AppState.voicePitch);
+        await _flutterTts.setVolume(AppState.voiceVolume);
+        print('🎤 Configuración de voz actualizada');
+      }
     } catch (e) {
       print('❌ Error actualizando configuración de voz: $e');
     }

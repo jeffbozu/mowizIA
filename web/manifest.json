@@ -1,12 +1,12 @@
 {
-    "name": "mi_nuevo_proyecto",
-    "short_name": "mi_nuevo_proyecto",
+    "name": "MEYPARK - Kiosco de Parquímetro",
+    "short_name": "MEYPARK",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#E62144",
+    "theme_color": "#E62144",
+    "description": "MEYPARK - Kiosco de parquímetro físico con funcionalidades avanzadas de accesibilidad",
+    "orientation": "landscape-primary",
     "prefer_related_applications": false,
     "icons": [
         {

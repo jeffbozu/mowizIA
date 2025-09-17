@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/mi_nuevo_proyecto/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="MEYPARK - Kiosco de parquímetro físico con funcionalidades avanzadas de accesibilidad">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="MEYPARK">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Viewport para responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <title>MEYPARK - Kiosco de Parquímetro</title>
+  <link rel="manifest" href="manifest.json">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+    
+    .logo {
+      font-size: 64px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .nav-button {
+      display: inline-block;
+      padding: 20px 40px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav-button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .kiosco-button {
+      background: linear-gradient(135deg, #E62144 0%, #FF6B6B 100%);
+    }
+    
+    .dashboard-button {
+      background: linear-gradient(135deg, #7F7F7F 0%, #9E9E9E 100%);
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="logo">MEYPARK</div>
+    <div class="button-container">
+      <a href="/kiosco.html" class="nav-button kiosco-button">
+        🏪 Kiosco Web
+      </a>
+      <a href="/dashboard.html" class="nav-button dashboard-button">
+        📊 Dashboard Admin
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Detectar si es una ruta específica y redirigir
+    const path = window.location.pathname;
+    if (path.includes('/dashboard')) {
+      window.location.href = '/dashboard.html';
+    } else if (path.includes('/kiosco') || path.includes('/web')) {
+      window.location.href = '/kiosco.html';
+    }
+  </script>
+</body>
+</html>
