@@ -15,9 +15,22 @@ import 'i18n/strings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // NO CARGAR DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
-  // await LocalStorageService.loadConfig();
-  // await LocalStorageService.loadSessions();
+  // CARGAR DATOS MOCK PARA LA DEMO
+  await LocalStorageService.loadConfig();
+  await LocalStorageService.loadSessions();
+  
+  // Cargar datos mock para la demo
+  for (final company in MockData.companies) {
+    AppState.addCompany(company);
+  }
+  for (final operator in MockData.operators) {
+    AppState.addOperator(operator);
+  }
+  for (final zone in MockData.zones) {
+    AppState.addZone(zone);
+  }
+  
+  print('📊 Datos mock cargados: ${AppState.companies.length} empresas, ${AppState.operators.length} operadores, ${AppState.zones.length} zonas');
   
   // Inicializar servicio de guía por voz (opcional)
   try {
@@ -48,23 +61,23 @@ void main() async {
   print('🏢 ID Geográfico asignado: ${AppState.kioscoId}');
   
   // CONECTAR AL BACKEND PRIMERO - NO USAR DATOS LOCALES
-  CentralizedWebSocketService.connect(AppState.kioscoId!);
+  // CentralizedWebSocketService.connect(AppState.kioscoId!);
   
   // Solicitar datos completos del backend
-  CentralizedWebSocketService.requestFullData();
+  // CentralizedWebSocketService.requestFullData();
   
   // NO USAR DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
   // La app esperará a recibir datos del backend antes de funcionar
   
   // Enviar diagnósticos técnicos simulados
-  CentralizedWebSocketService.sendTechDiagnostics({
-      'network': true,
-      'printer': true,
-      'display': true,
-      'touch': true,
-      'coins': true,
-      'cards': true,
-    });
+  // CentralizedWebSocketService.sendTechDiagnostics({
+  //     'network': true,
+  //     'printer': true,
+  //     'display': true,
+  //     'touch': true,
+  //     'coins': true,
+  //     'cards': true,
+  //   });
   
   runApp(const MEYPARKApp());
 }

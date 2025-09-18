@@ -31,7 +31,7 @@ function generateId() {
 
 // Función para generar PDF de factura
 function generateInvoicePDF(transaction, invoiceRequest) {
-  const doc = new PDFDocument({ size: 'A4', margin: 50 });
+  const doc = new PDFDocument({ size: 'A4', margin: 40 });
   const filename = `factura_${transaction.id}.pdf`;
   const filepath = path.join(__dirname, 'invoices', filename);
   
@@ -43,68 +43,117 @@ function generateInvoicePDF(transaction, invoiceRequest) {
   const stream = fs.createWriteStream(filepath);
   doc.pipe(stream);
   
-  // Encabezado
-  doc.fontSize(20).text('FACTURA ELECTRÓNICA', 50, 50);
-  doc.fontSize(12).text('MEYPARK - Sistema de Parquímetros', 50, 80);
-  doc.text('CIF: B12345678', 50, 95);
-  doc.text('Calle de la Innovación, 123', 50, 110);
-  doc.text('28001 Madrid, España', 50, 125);
+  // Colores corporativos
+  const primaryColor = '#667eea';
+  const secondaryColor = '#764ba2';
+  const lightGray = '#f8f9fa';
+  const darkGray = '#6c757d';
   
-  // Línea separadora
-  doc.moveTo(50, 150).lineTo(550, 150).stroke();
+  // Fondo degradado (simulado con rectángulos)
+  doc.rect(0, 0, 595, 842).fill(lightGray);
   
-  // Datos del cliente
-  doc.fontSize(14).text('DATOS DEL CLIENTE', 50, 170);
-  doc.fontSize(10).text(`NIF/CIF: ${invoiceRequest.nif}`, 50, 190);
+  // Encabezado con diseño moderno
+  doc.rect(0, 0, 595, 120).fill(primaryColor);
+  
+  // Logo/Icono
+  doc.circle(80, 60, 25).fill('white');
+  doc.fontSize(24).fillColor(primaryColor).text('M', 70, 50);
+  
+  // Título principal
+  doc.fontSize(28).fillColor('white').text('FACTURA ELECTRÓNICA', 120, 30);
+  doc.fontSize(14).fillColor('white').text('MEYPARK - Sistema de Parquímetros Inteligentes', 120, 60);
+  
+  // Información de la empresa
+  doc.fontSize(10).fillColor('white').text('CIF: B12345678', 120, 80);
+  doc.text('Calle de la Innovación, 123 • 28001 Madrid', 120, 95);
+  doc.text('Tel: +34 900 123 456 • Email: facturacion@meypark.es', 120, 110);
+  
+  // Número de factura y fecha
+  const invoiceNumber = `INV-${transaction.id}`;
+  const invoiceDate = new Date().toLocaleDateString('es-ES');
+  
+  doc.fontSize(12).fillColor('white').text(`Factura: ${invoiceNumber}`, 450, 30);
+  doc.text(`Fecha: ${invoiceDate}`, 450, 50);
+  doc.text(`Vencimiento: ${invoiceDate}`, 450, 70);
+  
+  // Línea separadora elegante
+  doc.moveTo(40, 140).lineTo(555, 140).lineWidth(2).stroke(primaryColor);
+  
+  // Datos del cliente con diseño moderno
+  doc.rect(40, 160, 515, 80).fill('white').stroke(primaryColor, 1);
+  doc.fontSize(16).fillColor(primaryColor).text('DATOS DEL CLIENTE', 50, 170);
+  
+  doc.fontSize(11).fillColor('black');
+  doc.text(`NIF/CIF: ${invoiceRequest.nif}`, 50, 190);
   doc.text(`Razón Social: ${invoiceRequest.companyName}`, 50, 205);
   doc.text(`Dirección: ${invoiceRequest.address}`, 50, 220);
   doc.text(`${invoiceRequest.postalCode} ${invoiceRequest.city}`, 50, 235);
-  doc.text(`Email: ${invoiceRequest.email}`, 50, 250);
+  doc.text(`Email: ${invoiceRequest.email}`, 300, 190);
   if (invoiceRequest.phone) {
-    doc.text(`Teléfono: ${invoiceRequest.phone}`, 50, 265);
+    doc.text(`Teléfono: ${invoiceRequest.phone}`, 300, 205);
   }
   
-  // Línea separadora
-  doc.moveTo(50, 290).lineTo(550, 290).stroke();
+  // Detalles de la transacción con tabla moderna
+  doc.rect(40, 260, 515, 200).fill('white').stroke(primaryColor, 1);
+  doc.fontSize(16).fillColor(primaryColor).text('DETALLES DE LA TRANSACCIÓN', 50, 270);
   
-  // Detalles de la transacción
-  doc.fontSize(14).text('DETALLES DE LA TRANSACCIÓN', 50, 310);
+  const startY = 290;
+  doc.fontSize(11).fillColor('black');
   
-  const startY = 330;
-  doc.fontSize(10);
-  doc.text('ID de Transacción:', 50, startY);
-  doc.text(transaction.id, 200, startY);
+  // Tabla de detalles
+  const details = [
+    ['ID de Transacción', transaction.id],
+    ['Matrícula del Vehículo', transaction.plate],
+    ['Zona de Estacionamiento', zones[transaction.zoneId]?.name || `Zona ${transaction.zoneId}`],
+    ['Fecha y Hora', new Date(transaction.timestamp).toLocaleString('es-ES')],
+    ['Tipo de Servicio', transaction.isExtend ? 'Extensión de estacionamiento' : 'Nuevo estacionamiento'],
+    ['Duración', `${transaction.minutes} minutos`],
+    ['Método de Pago', transaction.paymentMethod === 'card' ? 'Tarjeta' : 'Efectivo']
+  ];
   
-  doc.text('Matrícula:', 50, startY + 15);
-  doc.text(transaction.plate, 200, startY + 15);
-  
-  doc.text('Zona:', 50, startY + 30);
-  doc.text(zones[transaction.zoneId]?.name || `Zona ${transaction.zoneId}`, 200, startY + 30);
-  
-  doc.text('Fecha:', 50, startY + 45);
-  doc.text(new Date(transaction.timestamp).toLocaleString('es-ES'), 200, startY + 45);
-  
-  doc.text('Tipo:', 50, startY + 60);
-  doc.text(transaction.isExtend ? 'Extensión de estacionamiento' : 'Nuevo estacionamiento', 200, startY + 60);
-  
-  doc.text('Duración:', 50, startY + 75);
-  doc.text(`${transaction.minutes} minutos`, 200, startY + 75);
+  details.forEach(([label, value], index) => {
+    const y = startY + (index * 20);
+    doc.fillColor(darkGray).text(label + ':', 50, y);
+    doc.fillColor('black').text(value, 250, y);
+  });
   
   // Línea separadora
-  doc.moveTo(50, startY + 100).lineTo(550, startY + 100).stroke();
+  doc.moveTo(50, startY + 140).lineTo(505, startY + 140).lineWidth(1).stroke(darkGray);
   
-  // Total
-  doc.fontSize(16).text('TOTAL:', 400, startY + 120);
-  doc.text(`${transaction.amount.toFixed(2)} €`, 500, startY + 120);
+  // Total con diseño destacado
+  doc.rect(350, startY + 150, 155, 40).fill(secondaryColor);
+  doc.fontSize(18).fillColor('white').text('TOTAL A PAGAR', 360, startY + 160);
+  doc.fontSize(24).fillColor('white').text(`${transaction.amount.toFixed(2)} €`, 360, startY + 175);
   
-  // Información fiscal
-  doc.fontSize(8).text('Esta factura cumple con la normativa de facturación electrónica española', 50, startY + 160);
-  doc.text('Ley 18/2022 "Crea y Crece" - Real Decreto 1007/2023', 50, startY + 175);
-  doc.text('Sistema Verifactu compatible', 50, startY + 190);
+  // Información fiscal con diseño moderno
+  doc.rect(40, 480, 515, 100).fill(lightGray).stroke(darkGray, 1);
+  doc.fontSize(12).fillColor(primaryColor).text('INFORMACIÓN FISCAL', 50, 500);
   
-  // Pie de página
-  doc.fontSize(8).text('Gracias por usar MEYPARK', 50, 750, { align: 'center' });
-  doc.text('www.meypark.es | soporte@meypark.es', 50, 765, { align: 'center' });
+  doc.fontSize(9).fillColor(darkGray);
+  doc.text('✓ Esta factura cumple con la normativa de facturación electrónica española', 50, 520);
+  doc.text('✓ Ley 18/2022 "Crea y Crece" - Real Decreto 1007/2023', 50, 535);
+  doc.text('✓ Sistema Verifactu compatible', 50, 550);
+  doc.text('✓ Factura generada electrónicamente el ' + new Date().toLocaleString('es-ES'), 50, 565);
+  
+  // QR Code placeholder (simulado)
+  doc.rect(450, 500, 80, 80).fill('white').stroke(darkGray, 1);
+  doc.fontSize(8).fillColor(darkGray).text('QR', 480, 535, { align: 'center' });
+  doc.text('Código', 480, 550, { align: 'center' });
+  doc.text('Verificación', 480, 565, { align: 'center' });
+  
+  // Pie de página moderno
+  doc.rect(0, 600, 595, 242).fill(primaryColor);
+  doc.fontSize(14).fillColor('white').text('Gracias por confiar en MEYPARK', 50, 650, { align: 'center' });
+  doc.fontSize(10).fillColor('white').text('www.meypark.es | soporte@meypark.es | +34 900 123 456', 50, 680, { align: 'center' });
+  doc.text('Sistema de Parquímetros Inteligentes • Innovación en Movilidad Urbana', 50, 700, { align: 'center' });
+  
+  // Línea de separación
+  doc.moveTo(50, 720).lineTo(545, 720).lineWidth(1).stroke('white');
+  
+  // Información legal
+  doc.fontSize(8).fillColor('white').text('MEYPARK S.L. - CIF: B12345678 - Registro Mercantil de Madrid', 50, 740, { align: 'center' });
+  doc.text('Calle de la Innovación, 123, 28001 Madrid, España', 50, 755, { align: 'center' });
+  doc.text('Factura generada automáticamente el ' + new Date().toLocaleString('es-ES'), 50, 770, { align: 'center' });
   
   doc.end();
   
@@ -265,6 +314,40 @@ app.get('/invoices/:filename', (req, res) => {
     res.sendFile(filepath);
   } else {
     res.status(404).json({ error: 'Archivo no encontrado' });
+  }
+});
+
+// Recibir transacciones de la app Flutter
+app.post('/api/transactions', (req, res) => {
+  try {
+    const transaction = req.body;
+    
+    // Validar datos requeridos
+    if (!transaction.id || !transaction.plate || !transaction.zoneId || !transaction.amount) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Datos de transacción incompletos' 
+      });
+    }
+    
+    // Almacenar transacción
+    transactions.set(transaction.id, transaction);
+    
+    console.log(`📱 Transacción recibida de Flutter: ${transaction.id}`);
+    console.log(`   Matrícula: ${transaction.plate}, Zona: ${transaction.zoneId}, Importe: ${transaction.amount}€`);
+    
+    res.json({
+      success: true,
+      message: 'Transacción registrada correctamente',
+      transactionId: transaction.id
+    });
+    
+  } catch (error) {
+    console.error('Error al procesar transacción:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
   }
 });
 

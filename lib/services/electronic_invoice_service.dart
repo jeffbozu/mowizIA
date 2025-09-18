@@ -39,6 +39,9 @@ class ElectronicInvoiceService {
     // Guardar en memoria para la demo
     _transactions[transaction.id] = transaction;
     
+    // Enviar al backend inmediatamente
+    _sendTransactionToBackend(transaction);
+    
     print('🧾 Transacción de facturación creada: ${transaction.id}');
     return transaction;
   }
@@ -125,6 +128,25 @@ class ElectronicInvoiceService {
     }
   }
   
+  /// Envía transacción al backend
+  static Future<void> _sendTransactionToBackend(ElectronicInvoiceTransaction transaction) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/transactions'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(transaction.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ Transacción ${transaction.id} enviada al backend correctamente');
+      } else {
+        print('❌ Error al enviar transacción ${transaction.id} al backend: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Error de conexión al enviar transacción ${transaction.id} al backend: $e');
+    }
+  }
+
   /// Obtiene todas las transacciones (para debugging)
   static List<ElectronicInvoiceTransaction> getAllTransactions() {
     return _transactions.values.toList();

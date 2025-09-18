@@ -1,75 +1,271 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="MEYPARK Kiosco Web - Sistema de Parquímetro Digital">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Favicon -->
+  <title>MEYPARK Kiosco Web</title>
   <link rel="icon" type="image/png" href="favicon.png"/>
   
-  <title>MEYPARK Kiosco Web</title>
-  <link rel="manifest" href="manifest.json">
-  
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #E62144 0%, #FF6B6B 100%);
+      box-sizing: border-box;
     }
     
-    #loading {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #E62144 0%, #FF6B6B 100%);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .container {
+      flex: 1;
+      display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .kiosco-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .kiosco-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: #E62144;
+    }
+    
+    .kiosco-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .kiosco-description {
+      font-size: 1.1rem;
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 25px;
+      font-weight: 500;
+      margin-bottom: 30px;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #E62144;
       color: white;
     }
     
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-      margin-bottom: 20px;
+    .btn-primary:hover {
+      background: #C41E3A;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(230, 33, 68, 0.3);
     }
     
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #333;
+      border: 2px solid #dee2e6;
     }
     
-    .loading-text {
-      font-size: 18px;
-      font-weight: 300;
+    .btn-secondary:hover {
+      background: #e9ecef;
+      transform: translateY(-2px);
     }
     
-    .kiosco-logo {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .info-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .info-item h3 {
+      color: #E62144;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .info-item p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .kiosco-card {
+        padding: 30px 20px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="loading">
-    <div class="kiosco-logo">MEYPARK</div>
-    <div class="loading-spinner"></div>
-    <div class="loading-text">Iniciando Kiosco Web...</div>
+  <div class="header">
+    <h1>MEYPARK</h1>
+    <p>Sistema de Parquímetro Digital - Kiosco Web</p>
+  </div>
+  
+  <div class="container">
+    <div class="kiosco-card">
+      <div class="kiosco-icon">🏢</div>
+      <h2 class="kiosco-title">Kiosco Web Activo</h2>
+      <p class="kiosco-description">
+        El sistema de parquímetro digital está funcionando correctamente. 
+        Puedes gestionar zonas, monitorear transacciones y acceder a todas las funcionalidades del sistema.
+      </p>
+      
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        Sistema Online
+      </div>
+      
+      <div class="action-buttons">
+        <a href="dashboard.html" class="btn btn-primary">Abrir Dashboard</a>
+        <a href="facturacion.html" class="btn btn-secondary">Portal Facturación</a>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <h3>🌐 Dashboard</h3>
+          <p>Gestión completa del sistema</p>
+        </div>
+        <div class="info-item">
+          <h3>🧾 Facturación</h3>
+          <p>Portal de facturación electrónica</p>
+        </div>
+        <div class="info-item">
+          <h3>📊 Monitoreo</h3>
+          <p>Transacciones en tiempo real</p>
+        </div>
+        <div class="info-item">
+          <h3>⚙️ Configuración</h3>
+          <p>Gestión de zonas y precios</p>
+        </div>
+      </div>
+    </div>
   </div>
   
   <script>
-    // Configurar para modo kiosco web
-    window.meyparkMode = 'kiosco';
-    window.meyparkRoute = '/web';
+    // Verificar estado de los servicios
+    async function checkServices() {
+      try {
+        // Verificar servidor de facturación
+        const facturacionResponse = await fetch('http://localhost:3002/api/stats');
+        if (facturacionResponse.ok) {
+          console.log('✅ Servidor de facturación: Online');
+        }
+      } catch (error) {
+        console.log('❌ Servidor de facturación: Offline');
+      }
+      
+      try {
+        // Verificar servidor WebSocket
+        const wsResponse = await fetch('http://localhost:3001/health');
+        if (wsResponse.ok) {
+          console.log('✅ Servidor WebSocket: Online');
+        }
+      } catch (error) {
+        console.log('❌ Servidor WebSocket: Offline');
+      }
+    }
+    
+    // Verificar servicios al cargar
+    checkServices();
+    
+    // Actualizar estado cada 30 segundos
+    setInterval(checkServices, 30000);
   </script>
-  
-  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
