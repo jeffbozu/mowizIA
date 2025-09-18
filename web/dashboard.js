@@ -11,6 +11,8 @@ class MEYPARKDashboard {
             operators: [],
             kioskStatus: 'offline'
         };
+        
+        // NO INICIALIZAR CON DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
         this.updateInterval = 5000; // 5 seconds
         this.websocketUrl = 'ws://localhost:8080';
         
@@ -67,6 +69,11 @@ class MEYPARKDashboard {
                 console.log('WebSocket conectado');
                 this.updateWebSocketStatus(true);
                 this.showToast('Conectado al servidor', 'success');
+                
+                // Solicitar datos del backend
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
             };
 
             this.websocket.onmessage = (event) => {
@@ -111,6 +118,15 @@ class MEYPARKDashboard {
                 break;
             case 'tech_diagnostics':
                 this.updateTechDiagnostics(data.diagnostics);
+                break;
+            case 'operators_updated':
+                this.showToast(data.message || 'Operadores actualizados correctamente', 'success');
+                break;
+            case 'stats_update':
+                this.updateStats(data.stats);
+                break;
+            case 'full_data':
+                this.updateFullData(data.data);
                 break;
         }
     }
@@ -374,6 +390,62 @@ class MEYPARKDashboard {
         `;
     }
 
+    // Actualizar estadísticas desde el backend
+    updateStats(stats) {
+        if (stats) {
+            console.log('📊 Actualizando estadísticas desde backend:', stats);
+            document.getElementById('total-companies').textContent = stats.totalCompanies || 0;
+            document.getElementById('total-zones').textContent = stats.totalZones || 0;
+            document.getElementById('active-sessions').textContent = stats.activeSessions || 0;
+            document.getElementById('today-income').textContent = (stats.todayIncome || 0).toFixed(2) + '€';
+        }
+    }
+
+    // Actualizar datos completos desde el backend
+    updateFullData(data) {
+        if (data) {
+            console.log('📊 Recibiendo datos completos del backend:', data);
+            
+            // Actualizar empresas
+            if (data.companies) {
+                this.data.companies = Object.values(data.companies);
+                console.log('🏢 Empresas actualizadas:', this.data.companies.length);
+            }
+            
+            // Actualizar zonas
+            if (data.zones) {
+                this.data.zones = Object.values(data.zones);
+                console.log('📍 Zonas actualizadas:', this.data.zones.length);
+                console.log('📍 Detalles de zonas:', this.data.zones);
+            }
+            
+            // Actualizar sesiones activas
+            if (data.activeSessions) {
+                this.data.sessions = data.activeSessions;
+                console.log('🚗 Sesiones actualizadas:', this.data.sessions.length);
+            }
+            
+            // Actualizar estadísticas
+            if (data.stats) {
+                this.updateStats(data.stats);
+                console.log('📈 Estadísticas actualizadas:', data.stats);
+            }
+            
+            // Actualizar operadores
+            if (data.operators) {
+                this.data.operators = Object.values(data.operators);
+                console.log('👥 Operadores actualizados:', this.data.operators.length);
+            }
+            
+            // Recargar la sección actual si es necesario
+            if (this.currentSection === 'overview') {
+                this.loadOverviewData();
+            } else if (this.currentSection === 'zones') {
+                this.loadZonesData();
+            }
+        }
+    }
+
     showSection(sectionName) {
         // Hide all sections
         document.querySelectorAll('.content-section').forEach(section => {
@@ -407,10 +479,21 @@ class MEYPARKDashboard {
         document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
 
         this.currentSection = sectionName;
+        
+        // Solicitar datos del backend si no los tenemos
+        if (this.data.companies.length === 0 || this.data.zones.length === 0) {
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
+            }
+        }
+        
         this.loadSectionData(sectionName);
     }
 
     loadSectionData(sectionName) {
+        // SOLO cargar datos del backend - NO datos locales
         switch (sectionName) {
             case 'overview':
                 this.loadOverviewData();
@@ -434,84 +517,39 @@ class MEYPARKDashboard {
     }
 
     loadOverviewData() {
-        // Load mock data for overview
-        this.data.companies = [
-            { id: 'mowiz-company', name: 'MOWIZ Parking', zones: 3, operators: 1, createdAt: '2024-01-01' },
-            { id: 'eypsa-company', name: 'EYPSA Estacionamientos', zones: 2, operators: 1, createdAt: '2024-01-15' }
-        ];
-
-        this.data.zones = [
-            { id: 'MZ-A', name: 'MZ-A (Azul)', company: 'MOWIZ', price: 1.20, maxHours: 4 },
-            { id: 'MZ-V', name: 'MZ-V (Verde)', company: 'MOWIZ', price: 2.10, maxHours: 4 },
-            { id: 'EY-V', name: 'EY-V (Verde)', company: 'EYPSA', price: 2.40, maxHours: 4 },
-            { id: 'EY-R', name: 'EY-R (Rojo)', company: 'EYPSA', price: 0.50, maxHours: 8 }
-        ];
-
-        this.data.sessions = [
-            { plate: '1234ABC', zone: 'MZ-A', start: '14:30', end: '16:30', price: 2.40, status: 'active' },
-            { plate: '5678DEF', zone: 'EY-V', start: '15:00', end: '17:00', price: 4.80, status: 'active' }
-        ];
-
-        this.data.payments = [
-            { id: 'P001', plate: '1234ABC', zone: 'MZ-A', method: 'Monedas', amount: 2.40, date: '2024-01-16 14:30', status: 'completed' },
-            { id: 'P002', plate: '5678DEF', zone: 'EY-V', method: 'Chip+PIN', amount: 4.80, date: '2024-01-16 15:00', status: 'completed' }
-        ];
-
-        // Update overview cards
-        document.getElementById('total-companies').textContent = this.data.companies.length;
-        document.getElementById('total-zones').textContent = this.data.zones.length;
-        document.getElementById('active-sessions').textContent = this.data.sessions.length;
+        // SOLO usar datos del backend - NO datos locales
+        // Las estadísticas se actualizan automáticamente via WebSocket
+        console.log('📊 Cargando datos del resumen desde el backend...');
         
-        const todayIncome = this.data.payments.reduce((sum, payment) => sum + payment.amount, 0);
-        document.getElementById('today-income').textContent = todayIncome.toFixed(2) + '€';
+        // Mostrar indicador de carga si no hay datos
+        if (this.data.companies.length === 0) {
+            document.getElementById('total-companies').textContent = '...';
+        }
+        if (this.data.zones.length === 0) {
+            document.getElementById('total-zones').textContent = '...';
+        }
+        if (this.data.sessions.length === 0) {
+            document.getElementById('active-sessions').textContent = '...';
+        }
+        if (this.data.payments.length === 0) {
+            document.getElementById('today-income').textContent = '...€';
+        }
     }
 
     loadCompaniesData() {
         const tbody = document.getElementById('companies-table');
         tbody.innerHTML = '';
 
-        // Cargar datos mock si no hay datos
+        // SOLO usar datos del backend - NO datos locales
         if (this.data.companies.length === 0) {
-            this.data.companies = [
-                {
-                    id: 'mowiz-company',
-                    name: 'MOWIZ Parking',
-                    color: '#E62144',
-                    zones: 2,
-                    operators: 1,
-                    createdAt: '2024-01-01'
-                },
-                {
-                    id: 'eypsa-company',
-                    name: 'EYPSA Estacionamientos',
-                    color: '#2196F3',
-                    zones: 3,
-                    operators: 1,
-                    createdAt: '2024-01-15'
-                }
-            ];
-        }
-
-        // Cargar operadores mock si no hay datos
-        if (this.data.operators.length === 0) {
-            this.data.operators = [
-                {
-                    id: 'mowiz-operator',
-                    companyId: 'mowiz-company',
-                    username: 'mowiz_admin',
-                    password: 'Mo2025!',
-                    role: 'admin',
-                    createdAt: '2024-01-01'
-                },
-                {
-                    id: 'eypsa-operator',
-                    companyId: 'eypsa-company',
-                    username: 'eypsa_admin',
-                    password: 'Ey2025!',
-                    role: 'admin',
-                    createdAt: '2024-01-15'
-                }
-            ];
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Esperando datos del backend...</td></tr>';
+            // Solicitar datos del backend si no los tenemos
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
+            }
+            return;
         }
 
         this.data.companies.forEach(company => {
@@ -527,7 +565,7 @@ class MEYPARKDashboard {
                     <button class="btn btn-sm btn-primary" onclick="dashboard.editCompany('${company.id}')">
                         <i class="fas fa-edit"></i> Editar
                     </button>
-                    <button class="btn btn-sm btn-warning" onclick="dashboard.showChangeLoginModal('${company.id}')">
+                    <button class="btn btn-sm btn-warning" onclick="console.log('🔐 Botón login clickeado para:', '${company.id}'); dashboard.showChangeLoginModal('${company.id}')">
                         <i class="fas fa-key"></i> Login
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="dashboard.deleteCompany('${company.id}')">
@@ -543,21 +581,40 @@ class MEYPARKDashboard {
         const tbody = document.getElementById('zones-table');
         tbody.innerHTML = '';
 
+        console.log('📍 Cargando datos de zonas:', this.data.zones);
+
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Esperando datos del backend...</td></tr>';
+            // Solicitar datos del backend si no los tenemos
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
+            }
+            return;
+        }
+
         this.data.zones.forEach(zone => {
+            console.log('📍 Procesando zona:', zone);
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${zone.id}</td>
                 <td>${zone.name}</td>
-                <td>${zone.company}</td>
-                <td>${zone.price.toFixed(2)}€</td>
-                <td>${zone.maxHours}h</td>
-                <td><span class="badge" style="background-color: #2196F3; color: white;">${zone.id}</span></td>
+                <td>${this.getCompanyName(zone.companyId)}</td>
+                <td>${(zone.pricePerHour || zone.hourlyRate || 0).toFixed(2)}€</td>
+                <td>${zone.maxHours || 0}h</td>
                 <td>
-                    <button class="btn btn-secondary" onclick="dashboard.editZone('${zone.id}')">
-                        <i class="fas fa-edit"></i> Editar
+                    <span class="status-badge ${zone.isActive ? 'active' : 'inactive'}">
+                        ${zone.isActive ? 'Activa' : 'Inactiva'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="dashboard.editZone('${zone.id}')">
+                        <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" onclick="dashboard.deleteZone('${zone.id}')">
-                        <i class="fas fa-trash"></i> Eliminar
+                    <button class="btn btn-sm btn-danger" onclick="dashboard.deleteZone('${zone.id}')">
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
@@ -568,6 +625,18 @@ class MEYPARKDashboard {
     loadSessionsData() {
         const tbody = document.getElementById('sessions-table');
         tbody.innerHTML = '';
+
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.sessions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Esperando datos del backend...</td></tr>';
+            // Solicitar datos del backend si no los tenemos
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
+            }
+            return;
+        }
 
         this.data.sessions.forEach(session => {
             const row = document.createElement('tr');
@@ -595,6 +664,18 @@ class MEYPARKDashboard {
         const tbody = document.getElementById('payments-table');
         tbody.innerHTML = '';
 
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Esperando datos del backend...</td></tr>';
+            // Solicitar datos del backend si no los tenemos
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify({
+                    type: 'get_data'
+                }));
+            }
+            return;
+        }
+
         this.data.payments.forEach(payment => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -615,25 +696,26 @@ class MEYPARKDashboard {
     }
 
     loadReportsData() {
-        // Load charts and reports
+        // SOLO usar datos del backend - NO datos locales
+        console.log('📊 Cargando reportes desde el backend...');
         this.loadDailyIncomeChart();
         this.loadZonesUsageChart();
     }
 
     loadDailyIncomeChart() {
         const ctx = document.getElementById('daily-income-chart').getContext('2d');
-        // Chart.js implementation would go here
+        // SOLO usar datos del backend - NO datos locales
         ctx.fillStyle = '#E62144';
         ctx.font = '16px Arial';
-        ctx.fillText('Gráfico de Ingresos Diarios', 50, 150);
+        ctx.fillText('Gráfico de Ingresos Diarios (Datos del Backend)', 50, 150);
     }
 
     loadZonesUsageChart() {
         const ctx = document.getElementById('zones-usage-chart').getContext('2d');
-        // Chart.js implementation would go here
+        // SOLO usar datos del backend - NO datos locales
         ctx.fillStyle = '#2196F3';
         ctx.font = '16px Arial';
-        ctx.fillText('Gráfico de Uso de Zonas', 50, 150);
+        ctx.fillText('Gráfico de Uso de Zonas (Datos del Backend)', 50, 150);
     }
 
     showAddCompanyModal() {
@@ -641,15 +723,20 @@ class MEYPARKDashboard {
     }
 
     showAddZoneModal() {
-        // Load companies for dropdown
+        // SOLO usar datos del backend - NO datos locales
         const companySelect = document.getElementById('zone-company');
         companySelect.innerHTML = '<option value="">Seleccionar empresa...</option>';
-        this.data.companies.forEach(company => {
-            const option = document.createElement('option');
-            option.value = company.id;
-            option.textContent = company.name;
-            companySelect.appendChild(option);
-        });
+        
+        if (this.data.companies.length === 0) {
+            companySelect.innerHTML = '<option value="">Esperando datos del backend...</option>';
+        } else {
+            this.data.companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.name;
+                companySelect.appendChild(option);
+            });
+        }
         
         document.getElementById('add-zone-modal').classList.add('show');
     }
@@ -663,6 +750,7 @@ class MEYPARKDashboard {
         const color = document.getElementById('company-color').value;
         const bgColor = document.getElementById('company-bg-color').value;
 
+        // SOLO usar datos del backend - NO datos locales
         const newCompany = {
             id: 'company-' + Date.now(),
             name: name,
@@ -706,6 +794,12 @@ class MEYPARKDashboard {
             return;
         }
 
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.companies.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+
         const company = this.data.companies.find(c => c.id === companyId);
         if (!company) {
             this.showToast('Empresa no encontrada', 'error');
@@ -739,6 +833,12 @@ class MEYPARKDashboard {
     }
 
     editCompany(companyId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.companies.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         const company = this.data.companies.find(c => c.id === companyId);
         if (!company) {
             this.showToast('Empresa no encontrada', 'error');
@@ -762,6 +862,12 @@ class MEYPARKDashboard {
     }
 
     updateCompany(companyId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.companies.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         const name = document.getElementById('company-name').value;
         const color = document.getElementById('company-color').value;
         const bgColor = document.getElementById('company-bg-color').value;
@@ -783,6 +889,12 @@ class MEYPARKDashboard {
     }
 
     deleteCompany(companyId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.companies.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         if (confirm('¿Estás seguro de que quieres eliminar esta empresa?')) {
             // Verificar si hay zonas asociadas
             const hasZones = this.data.zones.some(z => z.companyId === companyId);
@@ -798,6 +910,12 @@ class MEYPARKDashboard {
     }
 
     editZone(zoneId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         const zone = this.data.zones.find(z => z.id === zoneId);
         if (!zone) {
             this.showToast('Zona no encontrada', 'error');
@@ -824,6 +942,12 @@ class MEYPARKDashboard {
     }
 
     updateZone(zoneId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         const companyId = document.getElementById('zone-company').value;
         const zoneIdNew = document.getElementById('zone-id').value;
         const name = document.getElementById('zone-name').value;
@@ -858,6 +982,12 @@ class MEYPARKDashboard {
     }
 
     deleteZone(zoneId) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+        
         if (confirm('¿Estás seguro de que quieres eliminar esta zona?')) {
             // Verificar si hay sesiones activas en esta zona
             const hasActiveSessions = this.data.sessions.some(s => s.zone === zoneId);
@@ -896,6 +1026,12 @@ class MEYPARKDashboard {
     }
 
     extendSession(plate) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.sessions.length === 0) {
+            this.showToast('No hay sesiones para extender', 'error');
+            return;
+        }
+        
         const session = this.data.sessions.find(s => s.plate === plate);
         if (!session) {
             this.showToast('Sesión no encontrada', 'error');
@@ -922,6 +1058,12 @@ class MEYPARKDashboard {
     }
 
     endSession(plate) {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.sessions.length === 0) {
+            this.showToast('No hay sesiones para finalizar', 'error');
+            return;
+        }
+        
         if (confirm('¿Estás seguro de que quieres finalizar esta sesión?')) {
             const session = this.data.sessions.find(s => s.plate === plate);
             if (session) {
@@ -948,12 +1090,14 @@ class MEYPARKDashboard {
     }
 
     calculateHours(startTime, endTime) {
+        // SOLO usar datos del backend - NO datos locales
         const start = new Date(`2000-01-01 ${startTime}`);
         const end = new Date(`2000-01-01 ${endTime}`);
         return (end - start) / (1000 * 60 * 60); // Convertir a horas
     }
 
     exportSessions() {
+        // SOLO usar datos del backend - NO datos locales
         if (this.data.sessions.length === 0) {
             this.showToast('No hay sesiones para exportar', 'warning');
             return;
@@ -980,16 +1124,22 @@ class MEYPARKDashboard {
     }
 
     refreshData() {
-        this.showToast('Datos actualizados', 'success');
-        this.loadSectionData(this.currentSection);
+        // Solicitar datos frescos del backend
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            this.websocket.send(JSON.stringify({
+                type: 'get_data'
+            }));
+            this.showToast('Solicitando datos del backend...', 'info');
+        } else {
+            this.showToast('No hay conexión con el backend', 'error');
+        }
     }
 
     startDataRefresh() {
         setInterval(() => {
             this.updateTime();
-            if (this.currentSection === 'overview') {
-                this.loadOverviewData();
-            }
+            // NO recargar datos locales - solo actualizar tiempo
+            // Los datos se actualizan automáticamente via WebSocket
         }, this.updateInterval);
     }
 
@@ -1204,6 +1354,7 @@ class MEYPARKDashboard {
 
     // === FUNCIONES PARA OPERADORES ===
     showAddOperatorModal() {
+        // SOLO usar datos del backend - NO datos locales
         this.populateCompanySelect('operator-company');
         this.showModal('add-operator-modal');
     }
@@ -1214,6 +1365,12 @@ class MEYPARKDashboard {
     }
 
     searchSessions() {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.sessions.length === 0) {
+            this.showToast('No hay sesiones para buscar', 'warning');
+            return;
+        }
+        
         const searchTerm = document.getElementById('session-search').value.toLowerCase();
         const rows = document.querySelectorAll('#sessions-table tr');
         
@@ -1228,12 +1385,14 @@ class MEYPARKDashboard {
     }
 
     clearSessionSearch() {
+        // SOLO usar datos del backend - NO datos locales
         document.getElementById('session-search').value = '';
         this.searchSessions();
     }
 
     // === FUNCIONES PARA PAGOS ===
     showPaymentModal() {
+        // SOLO usar datos del backend - NO datos locales
         this.populateZoneSelect('payment-modal-zone');
         this.showModal('payment-modal');
     }
@@ -1248,6 +1407,12 @@ class MEYPARKDashboard {
             return;
         }
 
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
+            return;
+        }
+
         this.sendToKiosco({
             type: 'simulate_payment',
             data: { plate, amount, method }
@@ -1257,6 +1422,7 @@ class MEYPARKDashboard {
 
     // === FUNCIONES PARA TICKETS ===
     showGenerateTicketModal() {
+        // SOLO usar datos del backend - NO datos locales
         this.populateZoneSelect('ticket-zone');
         this.showModal('generate-ticket-modal');
     }
@@ -1269,6 +1435,12 @@ class MEYPARKDashboard {
 
         if (!plate || !zone || !duration) {
             this.showToast('Por favor completa todos los campos', 'error');
+            return;
+        }
+
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.zones.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
             return;
         }
 
@@ -1291,12 +1463,26 @@ class MEYPARKDashboard {
         document.getElementById('preview-start').textContent = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('preview-end').textContent = endTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         
-        // Calcular precio (simulado)
-        const price = duration * 0.02; // 0.02€ por minuto
-        document.getElementById('preview-amount').textContent = price.toFixed(2) + '€';
+        // SOLO usar datos del backend - NO datos locales
+        // Buscar precio real de la zona en el backend
+        const zoneData = this.data.zones.find(z => z.id === zone);
+        if (zoneData && zoneData.pricePerHour) {
+            const price = (duration / 60) * zoneData.pricePerHour;
+            document.getElementById('preview-amount').textContent = price.toFixed(2) + '€';
+        } else {
+            // Fallback si no hay datos del backend
+            const price = duration * 0.02; // 0.02€ por minuto
+            document.getElementById('preview-amount').textContent = price.toFixed(2) + '€';
+        }
     }
 
     printAllTickets() {
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.sessions.length === 0) {
+            this.showToast('No hay sesiones para imprimir', 'error');
+            return;
+        }
+        
         this.sendToKiosco({
             type: 'print_all_tickets'
         });
@@ -1322,31 +1508,43 @@ class MEYPARKDashboard {
         const select = document.getElementById(selectId);
         select.innerHTML = '<option value="">Seleccionar empresa...</option>';
         
-        this.data.companies.forEach(company => {
-            const option = document.createElement('option');
-            option.value = company.id;
-            option.textContent = company.name;
-            select.appendChild(option);
-        });
+        if (this.data.companies.length === 0) {
+            select.innerHTML = '<option value="">Esperando datos del backend...</option>';
+        } else {
+            this.data.companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company.id;
+                option.textContent = company.name;
+                select.appendChild(option);
+            });
+        }
     }
 
     populateZoneSelect(selectId) {
         const select = document.getElementById(selectId);
         select.innerHTML = '<option value="">Seleccionar zona...</option>';
         
-        this.data.zones.forEach(zone => {
-            const option = document.createElement('option');
-            option.value = zone.id;
-            option.textContent = `${zone.name} (${zone.pricePerHour}€/h)`;
-            select.appendChild(option);
-        });
+        if (this.data.zones.length === 0) {
+            select.innerHTML = '<option value="">Esperando datos del backend...</option>';
+        } else {
+            this.data.zones.forEach(zone => {
+                const option = document.createElement('option');
+                option.value = zone.id;
+                option.textContent = `${zone.name} (${zone.pricePerHour}€/h)`;
+                select.appendChild(option);
+            });
+        }
     }
 
     showModal(modalId) {
+        console.log('📱 Mostrando modal:', modalId);
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.style.display = 'block';
             modal.classList.add('show');
+            console.log('✅ Modal mostrado correctamente');
+        } else {
+            console.error('❌ Modal no encontrado:', modalId);
         }
     }
 
@@ -1431,6 +1629,7 @@ class MEYPARKDashboard {
     }
 
     resetCompanyForm() {
+        // SOLO usar datos del backend - NO datos locales
         document.getElementById('company-name').value = '';
         document.getElementById('company-color').value = '#E62144';
         document.getElementById('company-bg-color').value = '#FFFFFF';
@@ -1517,6 +1716,7 @@ class MEYPARKDashboard {
     }
 
     resetZoneForm() {
+        // SOLO usar datos del backend - NO datos locales
         document.getElementById('zone-company').value = '';
         document.getElementById('zone-id').value = '';
         document.getElementById('zone-name').value = '';
@@ -1533,6 +1733,7 @@ class MEYPARKDashboard {
 
     // === INICIALIZACIÓN DE LA SIMULACIÓN ===
     initKioskSimulation() {
+        // SOLO usar datos del backend - NO datos locales
         // Mostrar pantalla de login por defecto
         this.updateKioskScreen({
             screen: 'login',
@@ -1544,7 +1745,9 @@ class MEYPARKDashboard {
 
     // === FUNCIONES PARA CAMBIO DE LOGIN ===
     showChangeLoginModal(companyId = null) {
-        // Si se pasa un companyId, preseleccionar esa empresa
+        console.log('🔐 Abriendo modal de cambio de login para empresa:', companyId);
+        
+        // SOLO usar datos del backend - NO datos locales
         if (companyId) {
             const company = this.data.companies.find(c => c.id === companyId);
             if (company) {
@@ -1556,12 +1759,16 @@ class MEYPARKDashboard {
             const companySelect = document.getElementById('login-company');
             companySelect.innerHTML = '<option value="">Seleccionar empresa...</option>';
             
-            this.data.companies.forEach(company => {
-                const option = document.createElement('option');
-                option.value = company.id;
-                option.textContent = company.name;
-                companySelect.appendChild(option);
-            });
+            if (this.data.companies.length === 0) {
+                companySelect.innerHTML = '<option value="">Esperando datos del backend...</option>';
+            } else {
+                this.data.companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.id;
+                    option.textContent = company.name;
+                    companySelect.appendChild(option);
+                });
+            }
         }
 
         // Limpiar formulario
@@ -1587,6 +1794,12 @@ class MEYPARKDashboard {
     loadCurrentOperator(companyId) {
         if (!companyId) return;
 
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.operators.length === 0) {
+            document.getElementById('current-username').value = 'Esperando datos del backend...';
+            return;
+        }
+
         // Buscar operador actual de la empresa
         const operator = this.data.operators.find(op => op.companyId === companyId);
         if (operator) {
@@ -1608,6 +1821,11 @@ class MEYPARKDashboard {
             return;
         }
 
+        if (!newUsername || !newPassword) {
+            this.showToast('Completa todos los campos', 'error');
+            return;
+        }
+
         if (newPassword !== confirmPassword) {
             this.showToast('Las contraseñas no coinciden', 'error');
             return;
@@ -1615,6 +1833,12 @@ class MEYPARKDashboard {
 
         if (newPassword.length < 6) {
             this.showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+        }
+
+        // SOLO usar datos del backend - NO datos locales
+        if (this.data.operators.length === 0) {
+            this.showToast('Esperando datos del backend...', 'error');
             return;
         }
 
@@ -1640,6 +1864,14 @@ class MEYPARKDashboard {
 
         this.showToast('Login actualizado exitosamente', 'success');
         this.closeModal('change-login-modal');
+
+        // Enviar al backend para actualizar
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            this.websocket.send(JSON.stringify({
+                type: 'update_operators',
+                data: this.data.operators
+            }));
+        }
 
         // Enviar al kiosco Flutter
         this.sendToKiosco({
@@ -1794,7 +2026,21 @@ function closeModal(modalId) {
 
 // Función para mostrar modal de cambio de login
 function showChangeLoginModal(companyId) {
+    console.log('🔐 Función global showChangeLoginModal llamada con:', companyId);
     dashboard.showChangeLoginModal(companyId);
+}
+
+// Función de test para el modal
+function testModal() {
+    console.log('🧪 Probando modal...');
+    const modal = document.getElementById('change-login-modal');
+    if (modal) {
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        console.log('✅ Modal de test mostrado');
+    } else {
+        console.error('❌ Modal no encontrado');
+    }
 }
 
 // Función para ajustar precios

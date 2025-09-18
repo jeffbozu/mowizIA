@@ -167,7 +167,7 @@ class _WebKioscoHomeState extends State<WebKioscoHome> {
                 width: 200,
                 height: 60,
                 child: FilledButton.icon(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () => context.go('/zona'),
                   icon: const Icon(Icons.add_circle_outline, size: 24),
                   label: Text(
                     'Nuevo Estacionamiento',

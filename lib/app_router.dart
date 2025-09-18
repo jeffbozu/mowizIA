@@ -17,6 +17,7 @@ import 'modals/tech_pass_modal.dart';
 import 'dashboard/screens/dashboard_home.dart';
 import 'dashboard/screens/kiosco_monitor_screen.dart';
 import 'web/screens/web_kiosco_home.dart';
+import 'web/screens/web_company_selection.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -109,7 +110,12 @@ class AppRouter {
       // Rutas de la versión web
       GoRoute(
         path: '/web',
-        name: 'web-kiosco',
+        name: 'web-company-selection',
+        builder: (context, state) => const WebCompanySelection(),
+      ),
+      GoRoute(
+        path: '/web-home',
+        name: 'web-kiosco-home',
         builder: (context, state) => const WebKioscoHome(),
       ),
     ],

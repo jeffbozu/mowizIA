@@ -452,3 +452,180 @@ class AppState {
     _websocketController.close();
   }
 }
+
+// Modelos para facturación electrónica
+class ElectronicInvoiceTransaction {
+  final String id;
+  final String plate;
+  final String zoneId;
+  final DateTime timestamp;
+  final double amount;
+  final String paymentMethod;
+  final String kioscoId;
+  final bool isExtend;
+  final int minutes;
+  final String? invoiceId; // ID de la factura generada
+  final DateTime? invoiceGeneratedAt;
+  final String? invoiceUrl;
+
+  const ElectronicInvoiceTransaction({
+    required this.id,
+    required this.plate,
+    required this.zoneId,
+    required this.timestamp,
+    required this.amount,
+    required this.paymentMethod,
+    required this.kioscoId,
+    required this.isExtend,
+    required this.minutes,
+    this.invoiceId,
+    this.invoiceGeneratedAt,
+    this.invoiceUrl,
+  });
+
+  factory ElectronicInvoiceTransaction.fromJson(Map<String, dynamic> json) {
+    return ElectronicInvoiceTransaction(
+      id: json['id'] ?? '',
+      plate: json['plate'] ?? '',
+      zoneId: json['zoneId'] ?? '',
+      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      amount: (json['amount'] ?? 0.0).toDouble(),
+      paymentMethod: json['paymentMethod'] ?? 'cash',
+      kioscoId: json['kioscoId'] ?? '',
+      isExtend: json['isExtend'] ?? false,
+      minutes: json['minutes'] ?? 0,
+      invoiceId: json['invoiceId'],
+      invoiceGeneratedAt: json['invoiceGeneratedAt'] != null 
+          ? DateTime.parse(json['invoiceGeneratedAt']) 
+          : null,
+      invoiceUrl: json['invoiceUrl'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'plate': plate,
+      'zoneId': zoneId,
+      'timestamp': timestamp.toIso8601String(),
+      'amount': amount,
+      'paymentMethod': paymentMethod,
+      'kioscoId': kioscoId,
+      'isExtend': isExtend,
+      'minutes': minutes,
+      'invoiceId': invoiceId,
+      'invoiceGeneratedAt': invoiceGeneratedAt?.toIso8601String(),
+      'invoiceUrl': invoiceUrl,
+    };
+  }
+
+  ElectronicInvoiceTransaction copyWith({
+    String? id,
+    String? plate,
+    String? zoneId,
+    DateTime? timestamp,
+    double? amount,
+    String? paymentMethod,
+    String? kioscoId,
+    bool? isExtend,
+    int? minutes,
+    String? invoiceId,
+    DateTime? invoiceGeneratedAt,
+    String? invoiceUrl,
+  }) {
+    return ElectronicInvoiceTransaction(
+      id: id ?? this.id,
+      plate: plate ?? this.plate,
+      zoneId: zoneId ?? this.zoneId,
+      timestamp: timestamp ?? this.timestamp,
+      amount: amount ?? this.amount,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      kioscoId: kioscoId ?? this.kioscoId,
+      isExtend: isExtend ?? this.isExtend,
+      minutes: minutes ?? this.minutes,
+      invoiceId: invoiceId ?? this.invoiceId,
+      invoiceGeneratedAt: invoiceGeneratedAt ?? this.invoiceGeneratedAt,
+      invoiceUrl: invoiceUrl ?? this.invoiceUrl,
+    );
+  }
+}
+
+class InvoiceRequest {
+  final String transactionId;
+  final String nif;
+  final String companyName;
+  final String address;
+  final String city;
+  final String postalCode;
+  final String email;
+  final String? phone;
+
+  const InvoiceRequest({
+    required this.transactionId,
+    required this.nif,
+    required this.companyName,
+    required this.address,
+    required this.city,
+    required this.postalCode,
+    required this.email,
+    this.phone,
+  });
+
+  factory InvoiceRequest.fromJson(Map<String, dynamic> json) {
+    return InvoiceRequest(
+      transactionId: json['transactionId'] ?? '',
+      nif: json['nif'] ?? '',
+      companyName: json['companyName'] ?? '',
+      address: json['address'] ?? '',
+      city: json['city'] ?? '',
+      postalCode: json['postalCode'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'transactionId': transactionId,
+      'nif': nif,
+      'companyName': companyName,
+      'address': address,
+      'city': city,
+      'postalCode': postalCode,
+      'email': email,
+      'phone': phone,
+    };
+  }
+}
+
+class InvoiceResponse {
+  final bool success;
+  final String? invoiceId;
+  final String? invoiceUrl;
+  final String? errorMessage;
+
+  const InvoiceResponse({
+    required this.success,
+    this.invoiceId,
+    this.invoiceUrl,
+    this.errorMessage,
+  });
+
+  factory InvoiceResponse.fromJson(Map<String, dynamic> json) {
+    return InvoiceResponse(
+      success: json['success'] ?? false,
+      invoiceId: json['invoiceId'],
+      invoiceUrl: json['invoiceUrl'],
+      errorMessage: json['errorMessage'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'invoiceId': invoiceId,
+      'invoiceUrl': invoiceUrl,
+      'errorMessage': errorMessage,
+    };
+  }
+}

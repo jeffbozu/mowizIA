@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../i18n/strings.dart';
 import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
+import '../services/electronic_invoice_service.dart';
 
 class TicketScreen extends StatefulWidget {
   final bool isExtend;
@@ -27,6 +29,9 @@ class TicketScreen extends StatefulWidget {
 }
 
 class _TicketScreenState extends State<TicketScreen> {
+  ElectronicInvoiceTransaction? _invoiceTransaction;
+  String? _qrData;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +41,9 @@ class _TicketScreenState extends State<TicketScreen> {
     } else {
       _createNewSession();
     }
+    
+    // Crear transacción de facturación electrónica
+    _createInvoiceTransaction();
   }
 
   void _extendSession() {
@@ -64,6 +72,22 @@ class _TicketScreenState extends State<TicketScreen> {
       totalPrice: widget.price,
     );
     MockData.addSession(session);
+  }
+
+  void _createInvoiceTransaction() {
+    _invoiceTransaction = ElectronicInvoiceService.createTransaction(
+      plate: widget.plate,
+      zoneId: widget.zoneId,
+      amount: widget.price,
+      paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+      kioscoId: AppState.kioscoId ?? 'DEMO_KIOSCO',
+      isExtend: widget.isExtend,
+      minutes: widget.minutes,
+    );
+    
+    _qrData = ElectronicInvoiceService.generateQRData(_invoiceTransaction!.id);
+    
+    print('🧾 Transacción de facturación creada: ${_invoiceTransaction!.id}');
   }
 
   void _printTicket() {
@@ -181,6 +205,81 @@ class _TicketScreenState extends State<TicketScreen> {
                             '${widget.price.toStringAsFixed(2)} €',
                           ),
                         ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Sección de facturación electrónica
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.receipt_long,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Facturación Electrónica',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Escanea este código QR para obtener tu factura electrónica desde casa',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        if (_qrData != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: QrImageView(
+                              data: _qrData!,
+                              version: QrVersions.auto,
+                              size: 150.0,
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'ID: ${_invoiceTransaction?.id ?? ''}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ] else ...[
+                          const CircularProgressIndicator(),
+                        ],
+                        const SizedBox(height: 12),
+                        Text(
+                          'Válido por 30 días',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:flutter/foundation.dart';
 import '../data/models.dart';
 
 class CentralizedWebSocketService {
@@ -24,7 +25,14 @@ class CentralizedWebSocketService {
   static Future<void> connect(String clientId, {String serverUrl = 'ws://localhost:8080'}) async {
     try {
       _clientId = clientId;
-      _channel = IOWebSocketChannel.connect(serverUrl);
+      
+      // Usar el WebSocket correcto según la plataforma
+      if (kIsWeb) {
+        _channel = WebSocketChannel.connect(Uri.parse(serverUrl));
+      } else {
+        _channel = IOWebSocketChannel.connect(serverUrl);
+      }
+      
       _isConnected = true;
       
       _connectionController.add(true);
@@ -186,7 +194,7 @@ class CentralizedWebSocketService {
     // Sincronizar empresas
     if (data['companies'] != null) {
       AppState.companies.clear();
-      data['companies'].forEach((key, value) {
+      (data['companies'] as Map<String, dynamic>).forEach((key, value) {
         AppState.companies[key] = Company.fromJson(value);
       });
     }
@@ -194,7 +202,7 @@ class CentralizedWebSocketService {
     // Sincronizar operadores
     if (data['operators'] != null) {
       AppState.operators.clear();
-      data['operators'].forEach((key, value) {
+      (data['operators'] as Map<String, dynamic>).forEach((key, value) {
         AppState.operators[key] = Operator.fromJson(value);
       });
     }
@@ -202,7 +210,7 @@ class CentralizedWebSocketService {
     // Sincronizar zonas
     if (data['zones'] != null) {
       AppState.zones.clear();
-      data['zones'].forEach((key, value) {
+      (data['zones'] as Map<String, dynamic>).forEach((key, value) {
         AppState.zones[key] = Zone.fromJson(value);
       });
     }
@@ -210,7 +218,7 @@ class CentralizedWebSocketService {
     // Sincronizar sesiones activas
     if (data['activeSessions'] != null) {
       AppState.activeSessions.clear();
-      data['activeSessions'].forEach((key, value) {
+      (data['activeSessions'] as Map<String, dynamic>).forEach((key, value) {
         AppState.activeSessions[key] = Session.fromJson(value);
       });
     }

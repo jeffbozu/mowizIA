@@ -74,15 +74,50 @@ let kioskData = {
 // Clientes conectados
 const clients = new Set();
 
+// Función para cargar datos del archivo JSON
+function loadData() {
+    try {
+        const data = fs.readFileSync(path.join(__dirname, 'mock_data.json'), 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error cargando datos:', error);
+        return {
+            companies: {},
+            operators: {},
+            zones: {},
+            sessions: [],
+            stats: {
+                totalIncome: 0,
+                todayIncome: 0,
+                activeSessions: 0,
+                totalCompanies: 0,
+                totalZones: 0
+            }
+        };
+    }
+}
+
 wss.on('connection', (ws) => {
     console.log('Cliente conectado al dashboard');
     clients.add(ws);
     
     // Enviar datos iniciales completos del backend
     const fullData = loadData();
+    console.log('📤 Enviando datos iniciales del backend:', {
+        companies: Object.keys(fullData.companies || {}).length,
+        zones: Object.keys(fullData.zones || {}).length,
+        operators: Object.keys(fullData.operators || {}).length,
+        activeSessions: Object.keys(fullData.activeSessions || {}).length
+    });
     ws.send(JSON.stringify({
         type: 'initial_data',
         data: fullData
+    }));
+    
+    // Enviar estadísticas actualizadas
+    ws.send(JSON.stringify({
+        type: 'stats_update',
+        stats: fullData.stats
     }));
     
     ws.on('message', (message) => {
@@ -111,10 +146,39 @@ function handleMessage(ws, data) {
         case 'get_data':
             // Enviar datos completos del backend
             const fullData = loadData();
+            console.log('📤 Enviando datos completos del backend:', {
+                companies: Object.keys(fullData.companies || {}).length,
+                zones: Object.keys(fullData.zones || {}).length,
+                operators: Object.keys(fullData.operators || {}).length,
+                activeSessions: Object.keys(fullData.activeSessions || {}).length
+            });
             ws.send(JSON.stringify({
                 type: 'full_data',
                 data: fullData
             }));
+            break;
+            
+        case 'get_stats':
+            // Enviar solo estadísticas
+            const statsData = loadData();
+            ws.send(JSON.stringify({
+                type: 'stats_update',
+                stats: statsData.stats
+            }));
+            break;
+            
+        case 'update_operators':
+            // Actualizar operadores en el backend
+            if (data.data) {
+                const fullData = loadData();
+                fullData.operators = data.data;
+                // Guardar en archivo (simulado)
+                console.log('📝 Operadores actualizados:', data.data);
+                ws.send(JSON.stringify({
+                    type: 'operators_updated',
+                    message: 'Operadores actualizados correctamente'
+                }));
+            }
             break;
             
         case 'kiosk_status':
