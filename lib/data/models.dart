@@ -95,6 +95,10 @@ class Zone {
   final String description;
   final bool isActive;
   final DateTime createdAt;
+  // Configuración de tiempo
+  final List<int> timeOptions; // Opciones de tiempo disponibles (en minutos)
+  final int timeIncrement; // Incremento mínimo de tiempo (en minutos)
+  final int minTime; // Tiempo mínimo (en minutos)
 
   const Zone({
     required this.id,
@@ -106,6 +110,9 @@ class Zone {
     required this.description,
     this.isActive = true,
     required this.createdAt,
+    this.timeOptions = const [15, 30, 60, 120, 180, 240], // 15m, 30m, 1h, 2h, 3h, 4h
+    this.timeIncrement = 15, // Incremento de 15 minutos
+    this.minTime = 15, // Mínimo 15 minutos
   });
 
   factory Zone.fromJson(Map<String, dynamic> json) {
@@ -114,11 +121,14 @@ class Zone {
       companyId: json['companyId'] ?? '',
       name: json['name'] ?? '',
       color: json['color'] ?? '#2196F3',
-      pricePerHour: (json['pricePerHour'] ?? 0.0).toDouble(),
+      pricePerHour: (json['pricePerHour'] ?? json['hourlyRate'] ?? 0.0).toDouble(),
       maxHours: json['maxHours'] ?? 4,
       description: json['description'] ?? '',
       isActive: json['isActive'] ?? true,
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      timeOptions: (json['timeOptions'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [15, 30, 60, 120, 180, 240],
+      timeIncrement: json['timeIncrement'] ?? 15,
+      minTime: json['minTime'] ?? 15,
     );
   }
 
@@ -133,6 +143,9 @@ class Zone {
       'description': description,
       'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
+      'timeOptions': timeOptions,
+      'timeIncrement': timeIncrement,
+      'minTime': minTime,
     };
   }
 }
@@ -286,6 +299,24 @@ class AppState {
   // Configuración de WebSocket
   static String? kioscoId;
   static bool isConnectedToDashboard = false;
+  
+  // Estadísticas
+  static double totalIncome = 0.0;
+  static double todayIncome = 0.0;
+  static int activeSessionsCount = 0;
+  
+  // Configuración de pagos
+  static List<double> acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
+  static List<String> acceptedCards = ['Visa', 'Mastercard', 'American Express'];
+  static double maxChangeAmount = 10.0;
+  static double minPaymentAmount = 0.15;
+  static String currency = 'EUR';
+  static String currencySymbol = '€';
+  
+  // Configuración del kiosco
+  static String kioscoLocation = 'Centro Comercial';
+  static String timezone = 'Europe/Madrid';
+  static bool maintenanceMode = false;
   
   // Streams para notificar cambios
   static final StreamController<void> _accessibilityController = StreamController<void>.broadcast();

@@ -43,7 +43,7 @@ class _TimeScreenState extends State<TimeScreen> {
 
   void _subtractMinutes(int minutes) {
     final newMinutes = _selectedMinutes - minutes;
-    if (newMinutes >= 15) { // Mínimo 15 minutos
+    if (newMinutes >= _selectedZone.minTime) { // Usar mínimo de la zona
       setState(() {
         _selectedMinutes = newMinutes;
       });
@@ -72,7 +72,7 @@ class _TimeScreenState extends State<TimeScreen> {
   }
 
   Widget _buildContent() {
-    final timeOptions = [15, 30, 60, 120, 180, 240]; // 15m, 30m, 1h, 2h, 3h, 4h
+    final timeOptions = _selectedZone.timeOptions; // Usar configuración de la zona
     final maxMinutes = _selectedZone.maxHours * 60;
     final availableOptions = timeOptions.where((minutes) => minutes <= maxMinutes).toList();
 

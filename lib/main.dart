@@ -4,19 +4,20 @@ import 'app_router.dart';
 import 'theme/app_theme.dart';
 import 'data/models.dart';
 import 'data/mock_data.dart';
-import 'services/websocket_service.dart';
+import 'services/centralized_websocket_service.dart';
 import 'services/local_storage_service.dart';
 import 'services/voice_guide_service.dart';
 import 'services/adaptive_ai_service.dart';
 import 'services/simplified_mode_service.dart';
+import 'services/geographic_id_service.dart';
 import 'i18n/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Cargar configuración local
-  await LocalStorageService.loadConfig();
-  await LocalStorageService.loadSessions();
+  // NO CARGAR DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
+  // await LocalStorageService.loadConfig();
+  // await LocalStorageService.loadSessions();
   
   // Inicializar servicio de guía por voz (opcional)
   try {
@@ -32,22 +33,6 @@ void main() async {
   // Verificar idioma cargado
   print('Idioma actual: ${AppState.currentLanguage}');
   
-  // Si no hay datos cargados, inicializar datos mock
-  if (AppState.companies.isEmpty) {
-    MockData.initializeMockData();
-  }
-  
-  // Inicializar operadores desde MockData si no hay datos
-  if (AppState.operators.isEmpty) {
-    for (var operator in MockData.operators) {
-      AppState.operators[operator.id] = operator;
-    }
-    print('Operadores inicializados desde MockData:');
-    for (var op in AppState.operators.values) {
-      print('  ${op.username} / ${op.password}');
-    }
-  }
-  
   // Asegurar que el idioma esté en español por defecto
   if (AppState.currentLanguage.isEmpty) {
     AppState.currentLanguage = 'es-ES';
@@ -58,18 +43,21 @@ void main() async {
   print('Idioma cargado: ${AppState.currentLanguage}');
   print('Traducción de zone.title: ${AppStrings.t('zone.title')}');
   
-  // Probar cálculos de precios
-  MockData.testPriceCalculations();
+  // GENERAR ID GEOGRÁFICO PARA EL KIOSKO
+  AppState.kioscoId = 'MAD_Centro_K${DateTime.now().millisecondsSinceEpoch % 100}';
+  print('🏢 ID Geográfico asignado: ${AppState.kioscoId}');
   
-  // Conectar al WebSocket
-  AppState.kioscoId = 'kiosco-${DateTime.now().millisecondsSinceEpoch}';
-  WebSocketService.connectKiosco(AppState.kioscoId!);
+  // CONECTAR AL BACKEND PRIMERO - NO USAR DATOS LOCALES
+  CentralizedWebSocketService.connect(AppState.kioscoId!);
   
-  // Enviar estado inicial del kiosco
-  WebSocketService.sendKioscoStatus({'status': 'online'});
+  // Solicitar datos completos del backend
+  CentralizedWebSocketService.requestFullData();
+  
+  // NO USAR DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
+  // La app esperará a recibir datos del backend antes de funcionar
   
   // Enviar diagnósticos técnicos simulados
-  WebSocketService.sendTechDiagnostics({
+  CentralizedWebSocketService.sendTechDiagnostics({
       'network': true,
       'printer': true,
       'display': true,

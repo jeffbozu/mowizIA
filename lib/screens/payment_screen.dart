@@ -277,7 +277,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        color: _insertedAmount >= widget.price 
+                            ? Colors.green[100]
+                            : Theme.of(context).colorScheme.surfaceContainerHighest,
+                        border: Border.all(
+                          color: _insertedAmount >= widget.price 
+                              ? Colors.green
+                              : Colors.transparent,
+                          width: 2,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -292,20 +300,51 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: _insertedAmount >= widget.price
-                                  ? Theme.of(context).colorScheme.primary
+                                  ? Colors.green[800]
                                   : Theme.of(context).colorScheme.error,
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    // Información de estado
                     if (_insertedAmount < widget.price) ...[
-                      const SizedBox(height: 8),
                       Text(
                         AppStrings.t('pay.remaining') + ': ${(widget.price - _insertedAmount).toStringAsFixed(2)} €',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.error,
                         ),
+                      ),
+                    ] else if (_insertedAmount == widget.price) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppStrings.t('pay.exact_amount'),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.green[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.warning, color: Colors.orange, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            AppStrings.t('pay.excess_amount').replaceAll('{change}', (_insertedAmount - widget.price).toStringAsFixed(2)),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.orange[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ],
@@ -316,6 +355,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     height: 64,
                     child: FilledButton(
                       onPressed: _canPay() && !_isProcessing ? _payNow : null,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _canPay() 
+                            ? (_insertedAmount == widget.price 
+                                ? Colors.green 
+                                : (_insertedAmount > widget.price 
+                                    ? Colors.orange 
+                                    : null))
+                            : null,
+                        foregroundColor: _canPay() 
+                            ? Colors.white 
+                            : null,
+                      ),
                       child: _isProcessing
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -332,9 +383,31 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 Text(AppStrings.t('pay.authorizing')),
                               ],
                             )
-                          : Text(
-                              AppStrings.t('pay.pay_now'),
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (_canPay()) ...[
+                                  Icon(
+                                    _insertedAmount == widget.price 
+                                        ? Icons.check_circle
+                                        : (_insertedAmount > widget.price 
+                                            ? Icons.warning 
+                                            : Icons.payment),
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
+                                Text(
+                                  _isProcessing 
+                                      ? AppStrings.t('pay.authorizing')
+                                      : (_insertedAmount == widget.price 
+                                          ? AppStrings.t('pay.pay_exact')
+                                          : (_insertedAmount > widget.price 
+                                              ? AppStrings.t('pay.pay_change')
+                                              : AppStrings.t('pay.pay_now'))),
+                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                     ),
                   ),
@@ -401,28 +474,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildCoinButton(double amount, String label) {
+    // Deshabilitar botón si al insertar esta moneda se excedería el precio
+    final wouldExceed = _insertedAmount + amount > widget.price;
+    final isDisabled = wouldExceed || _insertedAmount >= widget.price;
+    
     return ElevatedButton(
-      onPressed: () => _insertCoin(amount),
+      onPressed: isDisabled ? null : () => _insertCoin(amount),
       style: ElevatedButton.styleFrom(
         minimumSize: const Size(80, 60),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        backgroundColor: isDisabled 
+            ? Colors.grey[300] 
+            : (_insertedAmount >= widget.price ? Colors.green[100] : null),
+        foregroundColor: isDisabled 
+            ? Colors.grey[600] 
+            : (_insertedAmount >= widget.price ? Colors.green[800] : null),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
+              color: isDisabled ? Colors.grey[600] : null,
             ),
           ),
           Text(
             '${amount.toStringAsFixed(2)}€',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
+              color: isDisabled ? Colors.grey[600] : null,
             ),
           ),
         ],

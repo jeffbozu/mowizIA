@@ -1,0 +1,565 @@
+{
+  "companies": {
+    "mowiz": {
+      "id": "mowiz",
+      "name": "MOWIZ Parking",
+      "color": "#E62144",
+      "backgroundColor": "#FFFFFF",
+      "logo": "MOWIZ",
+      "logoUrl": "",
+      "createdAt": "2025-09-17T09:52:09.738Z"
+    },
+    "eypsa": {
+      "id": "eypsa",
+      "name": "EYPSA Estacionamientos",
+      "color": "#2196F3",
+      "backgroundColor": "#F5F5F5",
+      "logo": "EYPSA",
+      "logoUrl": "",
+      "createdAt": "2025-09-17T09:52:09.738Z"
+    }
+  },
+  "operators": {
+    "mowiz_admin": {
+      "id": "mowiz_admin",
+      "username": "mowiz_admin",
+      "password": "Mo2025!",
+      "name": "MOWIZ Admin",
+      "companyId": "mowiz",
+      "role": "admin",
+      "createdAt": "2025-09-17T09:52:09.739Z"
+    },
+    "eypsa_admin": {
+      "id": "eypsa_admin",
+      "username": "eypsa_admin",
+      "password": "Ey2025!",
+      "name": "EYPSA Admin",
+      "companyId": "eypsa",
+      "role": "admin",
+      "createdAt": "2025-09-17T09:52:09.739Z"
+    }
+  },
+  "zones": {
+    "mz_a": {
+      "id": "mz_a",
+      "name": "MZ-A (Azul)",
+      "companyId": "mowiz",
+      "hourlyRate": 1.2,
+      "pricePerHour": 1.2,
+      "maxHours": 4,
+      "color": "#2196F3",
+      "description": "Zona azul - Centro comercial",
+      "isActive": true,
+      "timeOptions": [
+        15,
+        30,
+        60,
+        120,
+        180,
+        240
+      ],
+      "timeIncrement": 15,
+      "minTime": 15,
+      "createdAt": "2025-09-17T09:52:09.740Z"
+    },
+    "mz_v": {
+      "id": "mz_v",
+      "name": "MZ-V (Verde)",
+      "companyId": "mowiz",
+      "hourlyRate": 2.1,
+      "pricePerHour": 2.1,
+      "maxHours": 4,
+      "color": "#4CAF50",
+      "description": "Zona verde - Área residencial",
+      "isActive": true,
+      "timeOptions": [
+        15,
+        30,
+        60,
+        120,
+        180,
+        240
+      ],
+      "timeIncrement": 15,
+      "minTime": 15,
+      "createdAt": "2025-09-17T09:52:09.740Z"
+    },
+    "ey_a": {
+      "id": "ey_a",
+      "name": "EY-A (Azul)",
+      "companyId": "eypsa",
+      "hourlyRate": 1.5,
+      "pricePerHour": 1.5,
+      "maxHours": 4,
+      "color": "#2196F3",
+      "description": "Zona azul - Distrito financiero",
+      "isActive": true,
+      "timeOptions": [
+        15,
+        30,
+        60,
+        120,
+        180,
+        240
+      ],
+      "timeIncrement": 15,
+      "minTime": 15,
+      "createdAt": "2025-09-17T09:52:09.740Z"
+    },
+    "ey_v": {
+      "id": "ey_v",
+      "name": "EY-V (Verde)",
+      "companyId": "eypsa",
+      "hourlyRate": 2.4,
+      "pricePerHour": 2.4,
+      "maxHours": 4,
+      "color": "#4CAF50",
+      "description": "Zona verde - Zona turística",
+      "isActive": true,
+      "timeOptions": [
+        15,
+        30,
+        60,
+        120,
+        180,
+        240
+      ],
+      "timeIncrement": 15,
+      "minTime": 15,
+      "createdAt": "2025-09-17T09:52:09.740Z"
+    },
+    "ey_r": {
+      "id": "ey_r",
+      "name": "EY-R (Residente)",
+      "companyId": "eypsa",
+      "hourlyRate": 0.5,
+      "pricePerHour": 0.5,
+      "maxHours": 24,
+      "color": "#FF9800",
+      "description": "Zona residente - Solo con etiqueta",
+      "isActive": true,
+      "timeOptions": [
+        15,
+        30,
+        60,
+        120,
+        180,
+        240,
+        480,
+        720,
+        960,
+        1440
+      ],
+      "timeIncrement": 15,
+      "minTime": 15,
+      "createdAt": "2025-09-17T09:52:09.740Z"
+    }
+  },
+  "paymentConfig": {
+    "acceptedCoins": [
+      0.05,
+      0.1,
+      0.2,
+      0.5,
+      1,
+      2
+    ],
+    "acceptedCards": [
+      "Visa",
+      "Mastercard",
+      "American Express"
+    ],
+    "maxChangeAmount": 10,
+    "minPaymentAmount": 0.15,
+    "currency": "EUR",
+    "symbol": "€"
+  },
+  "activeSessions": {},
+  "stats": {
+    "totalIncome": 0,
+    "todayIncome": 0,
+    "activeSessions": 0,
+    "totalCompanies": 2,
+    "totalZones": 5,
+    "totalOperators": 2
+  },
+  "techDiagnostics": {
+    "network": true,
+    "printer": true,
+    "display": true,
+    "touch": true,
+    "coins": true,
+    "cards": true,
+    "lastUpdate": "2025-09-17T14:42:13.125Z"
+  },
+  "accessibility": {
+    "darkMode": false,
+    "highContrast": false,
+    "fontSize": "normal",
+    "reduceAnimations": false,
+    "voiceGuide": false,
+    "voiceSpeed": 0.5,
+    "voicePitch": 1,
+    "voiceVolume": 0.8,
+    "adaptiveAI": false,
+    "simplifiedMode": false,
+    "currentLanguage": "es-ES"
+  },
+  "kioscoConfig": {
+    "id": "",
+    "location": "Centro Comercial",
+    "timezone": "Europe/Madrid",
+    "maintenanceMode": false,
+    "lastRestart": "2025-09-17T09:52:09.741Z"
+  },
+  "parkingMeters": {
+    "MAD_Centro_K01": {
+      "id": "MAD_Centro_K01",
+      "name": "Madrid - Centro",
+      "location": "Puerta del Sol - Madrid Centro",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:02:52.595Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "BCN_Eixample_K02": {
+      "id": "BCN_Eixample_K02",
+      "name": "Barcelona - Eixample",
+      "location": "Passeig de Gràcia - Barcelona",
+      "gps": {
+        "lat": 41.3902,
+        "lng": 2.154
+      },
+      "status": "online",
+      "lastConnection": "2025-01-17T13:44:08.923Z",
+      "assignedCompany": "eypsa",
+      "assignedOperator": "eypsa_admin",
+      "currentScreen": "payment",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": {
+        "id": "session-001",
+        "plateNumber": "1234ABC",
+        "zoneId": "ey_a",
+        "startTime": "2025-01-17T13:30:00.000Z",
+        "duration": 60,
+        "amount": 1.5
+      },
+      "totalSessions": 15,
+      "todayIncome": 45.5,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "VLC_Centro_K03": {
+      "id": "VLC_Centro_K03",
+      "name": "Valencia - Centro",
+      "location": "Plaza del Ayuntamiento - Valencia",
+      "gps": {
+        "lat": 39.4699,
+        "lng": -0.3763
+      },
+      "status": "offline",
+      "lastConnection": "2025-01-17T12:30:00.000Z",
+      "assignedCompany": "eypsa",
+      "assignedOperator": "eypsa_admin",
+      "currentScreen": "error",
+      "hardwareStatus": {
+        "display": true,
+        "touch": false,
+        "printer": true,
+        "coins": false,
+        "cards": true,
+        "network": false
+      },
+      "currentSession": null,
+      "totalSessions": 8,
+      "todayIncome": 19.2,
+      "lastError": {
+        "code": "NETWORK_ERROR",
+        "message": "Pérdida de conexión de red",
+        "timestamp": "2025-01-17T12:30:00.000Z"
+      },
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "SEV_Triana_K04": {
+      "id": "SEV_Triana_K04",
+      "name": "Sevilla - Triana",
+      "location": "Calle Betis - Triana, Sevilla",
+      "gps": {
+        "lat": 37.3891,
+        "lng": -6.0025
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:15:30.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 12,
+      "todayIncome": 28.5,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "ZAR_Delicias_K05": {
+      "id": "ZAR_Delicias_K05",
+      "name": "Zaragoza - Delicias",
+      "location": "Estación Delicias - Zaragoza",
+      "gps": {
+        "lat": 41.6488,
+        "lng": -0.8891
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:10:15.000Z",
+      "assignedCompany": "eypsa",
+      "assignedOperator": "eypsa_admin",
+      "currentScreen": "payment",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": {
+        "id": "session-002",
+        "plateNumber": "5678DEF",
+        "zoneId": "mz_a",
+        "startTime": "2025-01-17T14:00:00.000Z",
+        "duration": 90,
+        "amount": 2.7
+      },
+      "totalSessions": 22,
+      "todayIncome": 67.8,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "MAL_Centro_K06": {
+      "id": "MAL_Centro_K06",
+      "name": "Málaga - Centro",
+      "location": "Calle Larios - Málaga Centro",
+      "gps": {
+        "lat": 36.7213,
+        "lng": -4.4214
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:05:45.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 18,
+      "todayIncome": 42.3,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "MUR_Centro_K07": {
+      "id": "MUR_Centro_K07",
+      "name": "Murcia - Centro",
+      "location": "Plaza de las Flores - Murcia",
+      "gps": {
+        "lat": 37.9922,
+        "lng": -1.1307
+      },
+      "status": "offline",
+      "lastConnection": "2025-01-17T11:45:00.000Z",
+      "assignedCompany": "eypsa",
+      "assignedOperator": "eypsa_admin",
+      "currentScreen": "error",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": true,
+        "cards": false,
+        "network": false
+      },
+      "currentSession": null,
+      "totalSessions": 5,
+      "todayIncome": 12.75,
+      "lastError": {
+        "code": "HARDWARE_ERROR",
+        "message": "Fallo en lector de tarjetas",
+        "timestamp": "2025-01-17T11:45:00.000Z"
+      },
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "PAL_Centro_K08": {
+      "id": "PAL_Centro_K08",
+      "name": "Palma - Centro",
+      "location": "Paseo del Borne - Palma de Mallorca",
+      "gps": {
+        "lat": 39.5696,
+        "lng": 2.6502
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:12:20.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 25,
+      "todayIncome": 58.9,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "BIL_Centro_K09": {
+      "id": "BIL_Centro_K09",
+      "name": "Bilbao - Centro",
+      "location": "Gran Vía - Bilbao",
+      "gps": {
+        "lat": 43.2627,
+        "lng": -2.9253
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:08:10.000Z",
+      "assignedCompany": "eypsa",
+      "assignedOperator": "eypsa_admin",
+      "currentScreen": "payment",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": {
+        "id": "session-003",
+        "plateNumber": "9012GHI",
+        "zoneId": "ey_v",
+        "startTime": "2025-01-17T13:45:00.000Z",
+        "duration": 120,
+        "amount": 4.8
+      },
+      "totalSessions": 31,
+      "todayIncome": 89.4,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "COR_Centro_K10": {
+      "id": "COR_Centro_K10",
+      "name": "Córdoba - Centro",
+      "location": "Plaza de las Tendillas - Córdoba",
+      "gps": {
+        "lat": 37.8847,
+        "lng": -4.7791
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:03:55.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": true,
+        "coins": true,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 14,
+      "todayIncome": 33.6,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-01-17T09:00:00.000Z",
+      "isApp": false
+    },
+    "MAD_Centro_K31": {
+      "id": "MAD_Centro_K31",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-17T14:58:24.062Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-17T14:54:30.438Z",
+      "isApp": true
+    }
+  }
+}

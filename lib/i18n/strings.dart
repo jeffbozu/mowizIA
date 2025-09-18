@@ -58,6 +58,10 @@ class AppStrings {
       'pay.total': 'Total',
       'pay.select_method': 'Seleccionar Método',
       'pay.insert_coins': 'Insertar Monedas',
+      'pay.exact_amount': '¡Cantidad exacta! Puedes pagar ahora',
+      'pay.excess_amount': 'Cantidad excedida: {change} € de cambio',
+      'pay.pay_exact': 'Pagar (Cantidad exacta)',
+      'pay.pay_change': 'Pagar (Con cambio)',
 
       // Ticket
       'ticket.title.new': 'Estacionamiento Registrado',
@@ -277,6 +281,10 @@ class AppStrings {
       'pay.total': 'Total',
       'pay.select_method': 'Select Method',
       'pay.insert_coins': 'Insert Coins',
+      'pay.exact_amount': 'Exact amount! You can pay now',
+      'pay.excess_amount': 'Excess amount: {change} € change',
+      'pay.pay_exact': 'Pay (Exact amount)',
+      'pay.pay_change': 'Pay (With change)',
 
       // Ticket
       'ticket.title.new': 'Parking Registered',

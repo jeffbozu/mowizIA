@@ -78,10 +78,11 @@ wss.on('connection', (ws) => {
     console.log('Cliente conectado al dashboard');
     clients.add(ws);
     
-    // Enviar datos iniciales
+    // Enviar datos iniciales completos del backend
+    const fullData = loadData();
     ws.send(JSON.stringify({
         type: 'initial_data',
-        data: kioskData
+        data: fullData
     }));
     
     ws.on('message', (message) => {
@@ -107,6 +108,15 @@ wss.on('connection', (ws) => {
 
 function handleMessage(ws, data) {
     switch (data.type) {
+        case 'get_data':
+            // Enviar datos completos del backend
+            const fullData = loadData();
+            ws.send(JSON.stringify({
+                type: 'full_data',
+                data: fullData
+            }));
+            break;
+            
         case 'kiosk_status':
             kioskData.status = data.status;
             broadcast({
