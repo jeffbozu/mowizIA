@@ -7,6 +7,7 @@ import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
 import '../services/electronic_invoice_service.dart';
+import '../services/ticket_pdf_service.dart';
 
 class TicketScreen extends StatefulWidget {
   final bool isExtend;
@@ -31,6 +32,7 @@ class TicketScreen extends StatefulWidget {
 class _TicketScreenState extends State<TicketScreen> {
   ElectronicInvoiceTransaction? _invoiceTransaction;
   String? _qrData;
+  bool _isGeneratingPdf = false;
 
   @override
   void initState() {
@@ -90,14 +92,167 @@ class _TicketScreenState extends State<TicketScreen> {
     print('🧾 Transacción de facturación creada: ${_invoiceTransaction!.id}');
   }
 
-  void _printTicket() {
-    // Mock: mostrar mensaje de impresión
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppStrings.t('ticket.print')),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-    );
+  Future<void> _printTicket() async {
+    if (_isGeneratingPdf) return;
+    
+    setState(() {
+      _isGeneratingPdf = true;
+    });
+
+    try {
+      final session = MockData.getSessionByPlate(widget.plate);
+      final startTime = session?.start ?? DateTime.now();
+      final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
+      
+      // Generar y descargar PDF directamente
+      final filePath = await TicketPdfService.downloadTicketPdf(
+        plate: widget.plate,
+        zoneId: widget.zoneId,
+        startTime: startTime,
+        endTime: endTime,
+        price: widget.price,
+        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+        language: AppState.currentLanguage,
+        transactionId: _invoiceTransaction?.id,
+        isExtend: widget.isExtend,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PDF guardado en: $filePath'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.t('ticket.print_error')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error generando PDF: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGeneratingPdf = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _downloadPdfTicket() async {
+    if (_isGeneratingPdf) return;
+    
+    setState(() {
+      _isGeneratingPdf = true;
+    });
+
+    try {
+      final session = MockData.getSessionByPlate(widget.plate);
+      final startTime = session?.start ?? DateTime.now();
+      final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
+      
+      final filePath = await TicketPdfService.downloadTicketPdf(
+        plate: widget.plate,
+        zoneId: widget.zoneId,
+        startTime: startTime,
+        endTime: endTime,
+        price: widget.price,
+        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+        language: AppState.currentLanguage,
+        transactionId: _invoiceTransaction?.id,
+        isExtend: widget.isExtend,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.t('ticket.download_success')),
+            backgroundColor: Colors.green,
+            action: SnackBarAction(
+              label: 'Ver',
+              textColor: Colors.white,
+              onPressed: () {
+                // Aquí podrías abrir el archivo PDF
+                print('PDF guardado en: $filePath');
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.t('ticket.download_error')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error generando PDF: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGeneratingPdf = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _printPdfTicket() async {
+    if (_isGeneratingPdf) return;
+    
+    setState(() {
+      _isGeneratingPdf = true;
+    });
+
+    try {
+      final session = MockData.getSessionByPlate(widget.plate);
+      final startTime = session?.start ?? DateTime.now();
+      final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
+      
+      await TicketPdfService.printTicket(
+        plate: widget.plate,
+        zoneId: widget.zoneId,
+        startTime: startTime,
+        endTime: endTime,
+        price: widget.price,
+        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+        language: AppState.currentLanguage,
+        transactionId: _invoiceTransaction?.id,
+        isExtend: widget.isExtend,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.t('ticket.print_success')),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppStrings.t('ticket.print_error')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error imprimiendo PDF: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGeneratingPdf = false;
+        });
+      }
+    }
   }
 
   void _ok() {
@@ -287,13 +442,23 @@ class _TicketScreenState extends State<TicketScreen> {
                   // Botones
                   Column(
                     children: [
+                      // Botón principal de impresión
                       SizedBox(
                         width: double.infinity,
                         height: 56,
-                        child: OutlinedButton.icon(
-                          onPressed: _printTicket,
-                          icon: const Icon(Icons.print),
-                          label: Text(AppStrings.t('ticket.print')),
+                        child: FilledButton.icon(
+                          onPressed: _isGeneratingPdf ? null : _printTicket,
+                          icon: _isGeneratingPdf 
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                )
+                              : const Icon(Icons.print, size: 24),
+                          label: Text(
+                            AppStrings.t('ticket.print'),
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),

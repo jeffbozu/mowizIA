@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
+import '../services/local_storage_service.dart';
 
 class PaymentScreen extends StatefulWidget {
   final bool isExtend;
@@ -62,6 +63,80 @@ class _PaymentScreenState extends State<PaymentScreen> {
         insertedAmount: _insertedAmount,
       );
     });
+
+    // Si se excedió el precio, simular devolución de cambio
+    if (_insertedAmount > widget.price) {
+      _simulateChangeReturn();
+    }
+  }
+
+  void _simulateChangeReturn() {
+    final change = _insertedAmount - widget.price;
+    
+    // Mostrar diálogo de devolución de cambio
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.monetization_on, color: Colors.green),
+            const SizedBox(width: 8),
+            Text('Devolución de Cambio'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Se ha insertado más dinero del necesario.'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                border: Border.all(color: Colors.green),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.money, color: Colors.green[800]),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Cambio: ${change.toStringAsFixed(2)} €',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[800],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'El cambio se devolverá automáticamente.',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Ajustar el monto insertado al precio exacto
+              setState(() {
+                _insertedAmount = widget.price;
+                AppState.currentPayment = AppState.currentPayment?.copyWith(
+                  insertedAmount: _insertedAmount,
+                );
+              });
+            },
+            child: Text('Entendido'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _payNow() {
@@ -71,7 +146,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       });
 
       // Simular procesamiento de pago
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 2), () async {
         if (mounted) {
           setState(() {
             _isProcessing = false;
@@ -88,6 +163,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
               paymentMethod: _paymentMethod,
             );
             MockData.addSession(session);
+            print('💾 Sesión guardada: ${session.plate} en zona ${session.zoneId}');
+            print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');
+            
+            // Guardar sesiones en almacenamiento local
+            await LocalStorageService.saveSessions();
           }
 
           // Ir al ticket
@@ -323,7 +403,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           Icon(Icons.check_circle, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            AppStrings.t('pay.exact_amount'),
+                            '¡Cantidad exacta! Puedes pagar ahora',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.green[800],
                               fontWeight: FontWeight.bold,
@@ -335,12 +415,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.warning, color: Colors.orange, size: 20),
+                          Icon(Icons.monetization_on, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            AppStrings.t('pay.excess_amount').replaceAll('{change}', (_insertedAmount - widget.price).toStringAsFixed(2)),
+                            'Cambio: ${(_insertedAmount - widget.price).toStringAsFixed(2)} €',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.orange[800],
+                              color: Colors.green[800],
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -474,9 +554,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Widget _buildCoinButton(double amount, String label) {
-    // Deshabilitar botón si al insertar esta moneda se excedería el precio
-    final wouldExceed = _insertedAmount + amount > widget.price;
-    final isDisabled = wouldExceed || _insertedAmount >= widget.price;
+    // Deshabilitar botones cuando se alcance o supere el precio exacto
+    // Una vez alcanzado el precio, no se pueden insertar más monedas
+    final isDisabled = _insertedAmount >= widget.price;
+    final isCloseToPrice = _insertedAmount >= widget.price - 0.50 && _insertedAmount < widget.price;
     
     return ElevatedButton(
       onPressed: isDisabled ? null : () => _insertCoin(amount),
@@ -487,10 +568,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         backgroundColor: isDisabled 
             ? Colors.grey[300] 
-            : (_insertedAmount >= widget.price ? Colors.green[100] : null),
+            : (_insertedAmount >= widget.price ? Colors.green[100] : (isCloseToPrice ? Colors.orange[100] : Colors.blue[50])),
         foregroundColor: isDisabled 
             ? Colors.grey[600] 
-            : (_insertedAmount >= widget.price ? Colors.green[800] : null),
+            : (_insertedAmount >= widget.price ? Colors.green[800] : (isCloseToPrice ? Colors.orange[800] : Colors.blue[700])),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

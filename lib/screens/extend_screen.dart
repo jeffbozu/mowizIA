@@ -4,6 +4,7 @@ import '../i18n/strings.dart';
 import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
+import '../services/centralized_websocket_service.dart';
 
 class ExtendScreen extends StatefulWidget {
   const ExtendScreen({super.key});
@@ -24,6 +25,46 @@ class _ExtendScreenState extends State<ExtendScreen> {
     super.dispose();
   }
 
+  void _refreshSessions() async {
+    setState(() {
+      _isSearching = true;
+    });
+
+    try {
+      print('🔄 Refrescando sesiones desde el backend...');
+      CentralizedWebSocketService.sendMessage({
+        'type': 'get_data',
+      });
+      
+      // Esperar un poco para que llegue la respuesta
+      await Future.delayed(const Duration(milliseconds: 1000));
+      
+      print('✅ Sesiones refrescadas. Total: ${AppState.activeSessions.length}');
+      AppState.activeSessions.forEach((key, value) {
+        print('  - Matrícula: $key, Zona: ${value.zoneId}, Inicio: ${value.start}');
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.refresh_success')),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    } catch (e) {
+      print('❌ Error refrescando sesiones: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.refresh_error')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+    
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
   void _searchSession() async {
     final plate = _plateController.text.toUpperCase();
     
@@ -41,10 +82,59 @@ class _ExtendScreenState extends State<ExtendScreen> {
       _isSearching = true;
     });
 
-    // Simular búsqueda
-    await Future.delayed(const Duration(seconds: 1));
+    // Debug: Mostrar todas las sesiones activas
+    print('🔍 Buscando sesión para matrícula: $plate');
+    print('📊 Sesiones activas totales: ${AppState.activeSessions.length}');
+    AppState.activeSessions.forEach((key, value) {
+      print('  - Matrícula: $key, Zona: ${value.zoneId}, Inicio: ${value.start}');
+    });
 
-    final session = MockData.getSessionByPlate(plate);
+    // Buscar en el estado local primero
+    Session? session = MockData.getSessionByPlate(plate);
+    
+    // Si no se encuentra localmente, refrescar datos del backend
+    if (session == null) {
+      print('🔍 Sesión no encontrada localmente, refrescando datos del backend...');
+      try {
+        // Solicitar datos actualizados del backend
+        CentralizedWebSocketService.sendMessage({
+          'type': 'get_data',
+        });
+        
+        // Esperar un poco para que llegue la respuesta
+        await Future.delayed(const Duration(milliseconds: 1000));
+        
+        // Buscar nuevamente en el estado actualizado
+        session = MockData.getSessionByPlate(plate);
+        
+        // Si aún no se encuentra, buscar en todas las sesiones del backend
+        if (session == null) {
+          print('🔍 Buscando en todas las sesiones del backend...');
+          CentralizedWebSocketService.searchSession(plate);
+          
+          await Future.delayed(const Duration(milliseconds: 500));
+          session = MockData.getSessionByPlate(plate);
+        }
+      } catch (e) {
+        print('❌ Error consultando backend: $e');
+      }
+    }
+    
+    print('✅ Sesión encontrada: ${session != null ? "SÍ" : "NO"}');
+    if (session != null) {
+      print('  - Matrícula: ${session.plate}');
+      print('  - Zona: ${session.zoneId}');
+      print('  - Inicio: ${session.start}');
+      print('  - Fin: ${session.end}');
+    } else {
+      // Mostrar mensaje de error si no se encuentra la sesión
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.no_session')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
     
     setState(() {
       _currentSession = session;
@@ -102,6 +192,13 @@ class _ExtendScreenState extends State<ExtendScreen> {
     final zone = MockData.getZoneById(_currentSession!.zoneId);
     final price = MockData.calculatePrice(zone!.pricePerHour, _extraMinutes);
     
+    // Notificar al backend sobre la extensión de sesión
+    CentralizedWebSocketService.extendSession(
+      _currentSession!.plate,
+      _extraMinutes,
+      price,
+    );
+    
     context.push('/pago', extra: {
       'extend': true,
       'minutosExtra': _extraMinutes,
@@ -144,7 +241,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<void>(
-      stream: AppState.accessibilityStream,
+      stream: AppState.configStream,
       builder: (context, snapshot) {
         return _buildContent();
       },
@@ -200,26 +297,41 @@ class _ExtendScreenState extends State<ExtendScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  // Botón buscar
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton.icon(
-                      onPressed: _isSearching ? null : _searchSession,
-                      icon: _isSearching
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.search),
-                      label: Text(
-                        _isSearching ? AppStrings.t('common.loading') : AppStrings.t('extend.search'),
+                  // Botones de búsqueda
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: SizedBox(
+                          height: 56,
+                          child: FilledButton.icon(
+                            onPressed: _isSearching ? null : _searchSession,
+                            icon: _isSearching
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.search),
+                            label: Text(
+                              _isSearching ? AppStrings.t('common.loading') : AppStrings.t('extend.search'),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        height: 56,
+                        child: OutlinedButton.icon(
+                          onPressed: _isSearching ? null : _refreshSessions,
+                          icon: const Icon(Icons.refresh),
+                          label: Text(AppStrings.t('extend.refresh')),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 32),
                   // Contenido según el estado

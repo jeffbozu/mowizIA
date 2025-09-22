@@ -62,6 +62,9 @@ class AppStrings {
       'pay.excess_amount': 'Cantidad excedida: {change} € de cambio',
       'pay.pay_exact': 'Pagar (Cantidad exacta)',
       'pay.pay_change': 'Pagar (Con cambio)',
+      'pay.payment_cash': 'Efectivo',
+      'pay.payment_chip': 'Chip+PIN',
+      'pay.payment_contactless': 'Contactless',
 
       // Ticket
       'ticket.title.new': 'Estacionamiento Registrado',
@@ -78,6 +81,12 @@ class AppStrings {
       'ticket.previous_end': 'Fin anterior',
       'ticket.new_end': 'Nuevo fin',
       'ticket.extra_amount': 'Importe adicional',
+      'ticket.download_pdf': 'Descargar PDF',
+      'ticket.print_pdf': 'Imprimir PDF',
+      'ticket.download_success': 'Ticket descargado correctamente',
+      'ticket.download_error': 'Error al descargar el ticket',
+      'ticket.print_success': 'Ticket enviado a impresora',
+      'ticket.print_error': 'Error al imprimir el ticket',
 
       // Accessibility
       'access.title': 'Accesibilidad',
@@ -285,6 +294,9 @@ class AppStrings {
       'pay.excess_amount': 'Excess amount: {change} € change',
       'pay.pay_exact': 'Pay (Exact amount)',
       'pay.pay_change': 'Pay (With change)',
+      'pay.payment_cash': 'Cash',
+      'pay.payment_chip': 'Chip+PIN',
+      'pay.payment_contactless': 'Contactless',
 
       // Ticket
       'ticket.title.new': 'Parking Registered',
@@ -301,6 +313,12 @@ class AppStrings {
       'ticket.previous_end': 'Previous end',
       'ticket.new_end': 'New end',
       'ticket.extra_amount': 'Extra amount',
+      'ticket.download_pdf': 'Download PDF',
+      'ticket.print_pdf': 'Print PDF',
+      'ticket.download_success': 'Ticket downloaded successfully',
+      'ticket.download_error': 'Error downloading ticket',
+      'ticket.print_success': 'Ticket sent to printer',
+      'ticket.print_error': 'Error printing ticket',
 
       // Accessibility
       'access.title': 'Accessibility',

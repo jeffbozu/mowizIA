@@ -113,15 +113,6 @@ class CentralizedWebSocketService {
       case 'stats_update':
         _handleStatsUpdate(message);
         break;
-      case 'session_extended':
-        _handleSessionExtended(message);
-        break;
-      case 'session_found':
-        _handleSessionFound(message);
-        break;
-      case 'session_not_found':
-        _handleSessionNotFound(message);
-        break;
       default:
         print('❓ Tipo de mensaje no reconocido: ${message['type']}');
     }
@@ -410,25 +401,6 @@ class CentralizedWebSocketService {
     });
   }
   
-  // Extender sesión
-  static void extendSession(String plate, int extraMinutes, double extraPrice) {
-    sendMessage({
-      'type': 'extend_session',
-      'plate': plate,
-      'extraMinutes': extraMinutes,
-      'extraPrice': extraPrice,
-      'timestamp': DateTime.now().toIso8601String()
-    });
-  }
-  
-  // Buscar sesión específica
-  static void searchSession(String plate) {
-    sendMessage({
-      'type': 'search_session',
-      'plate': plate
-    });
-  }
-  
   // Actualizar accesibilidad
   static void updateAccessibility(Map<String, dynamic> updates) {
     sendMessage({
@@ -507,33 +479,6 @@ class CentralizedWebSocketService {
     disconnect();
     _messageController.close();
     _connectionController.close();
-  }
-  
-  // Manejar sesión extendida
-  static void _handleSessionExtended(Map<String, dynamic> message) {
-    if (message['success'] == true && message['session'] != null) {
-      final session = Session.fromJson(message['session']);
-      AppState.activeSessions[session.plate] = session;
-      AppState.notifyConfigChange();
-      print('⏰ Sesión extendida: ${session.plate} - ${message['extraMinutes']} minutos adicionales');
-    } else {
-      print('❌ Error extendiendo sesión: ${message['error'] ?? 'Error desconocido'}');
-    }
-  }
-  
-  // Manejar sesión encontrada
-  static void _handleSessionFound(Map<String, dynamic> message) {
-    if (message['session'] != null) {
-      final session = Session.fromJson(message['session']);
-      AppState.activeSessions[session.plate] = session;
-      AppState.notifyConfigChange();
-      print('🔍 Sesión encontrada: ${session.plate}');
-    }
-  }
-  
-  // Manejar sesión no encontrada
-  static void _handleSessionNotFound(Map<String, dynamic> message) {
-    print('❌ Sesión no encontrada: ${message['plate'] ?? 'Desconocida'}');
   }
 }
 

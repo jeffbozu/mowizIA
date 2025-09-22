@@ -1,4 +1,5 @@
 import 'models.dart';
+import 'dart:io';
 
 class MockData {
   // Datos mock para empresas
@@ -169,6 +170,11 @@ class MockData {
 
   static void addSession(Session session) {
     AppState.activeSessions[session.plate] = session;
+    print('💾 Sesión agregada a AppState: ${session.plate}');
+    print('📊 Total sesiones en AppState: ${AppState.activeSessions.length}');
+    
+    // Nota: La persistencia se maneja en el servicio de almacenamiento local
+    // que se carga automáticamente al iniciar la aplicación
   }
 
   static void removeSession(String plate) {
