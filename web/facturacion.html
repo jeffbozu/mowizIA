@@ -4,7 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facturación Electrónica - MEYPARK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,159 +38,358 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            max-width: 500px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            padding: 0;
+            max-width: 800px;
             width: 100%;
+            overflow: hidden;
+            position: relative;
         }
 
         .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
             text-align: center;
-            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(180deg); }
         }
 
         .logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
             font-size: 32px;
-            font-weight: bold;
+            font-weight: 700;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
         }
 
         .subtitle {
-            color: #666;
             font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .transaction-lookup {
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .transaction-lookup h3 {
+            color: var(--gray-800);
+            margin-bottom: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lookup-form {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
         }
 
         .transaction-info {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            border: 1px solid #bae6fd;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transaction-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .transaction-info h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
+            color: var(--gray-800);
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .info-row {
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .info-item {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 5px 0;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .info-label {
-            color: #666;
+            color: var(--gray-600);
+            font-size: 14px;
             font-weight: 500;
         }
 
         .info-value {
-            color: #333;
+            color: var(--gray-800);
+            font-size: 16px;
             font-weight: 600;
+        }
+
+        .invoice-form {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .invoice-form h3 {
+            color: var(--gray-800);
+            margin-bottom: 24px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .form-group {
             margin-bottom: 20px;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        input[type="text"], input[type="email"], input[type="tel"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 14px;
         }
 
         .required {
-            color: #e74c3c;
+            color: var(--error);
         }
 
-        .btn {
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-primary {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .btn:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: var(--shadow-lg);
         }
 
-        .btn:disabled {
-            background: #ccc;
+        .btn-primary:disabled {
+            background: var(--gray-300);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        .loading {
+        .status {
             display: none;
             text-align: center;
+            padding: 32px;
+            border-radius: 16px;
             margin: 20px 0;
         }
 
+        .status.show {
+            display: block;
+        }
+
+        .status.loading {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            color: #92400e;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 16px;
         }
 
         @keyframes spin {
@@ -172,241 +397,393 @@
             100% { transform: rotate(360deg); }
         }
 
-        .success {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            color: #155724;
-            margin: 20px 0;
-        }
-
-        .error {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 8px;
-            color: #721c24;
-            margin: 20px 0;
-        }
-
         .download-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 12px 24px;
-            background: #28a745;
+            background: var(--success);
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 12px;
             font-weight: 600;
-            margin-top: 15px;
-            transition: background 0.3s ease;
+            margin-top: 16px;
+            transition: all 0.2s ease;
         }
 
         .download-btn:hover {
-            background: #218838;
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        @media (max-width: 600px) {
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
             .container {
-                padding: 20px;
+                margin: 10px;
+                border-radius: 16px;
+            }
+            
+            .header {
+                padding: 24px;
+            }
+            
+            .content {
+                padding: 24px;
             }
             
             .form-row {
                 grid-template-columns: 1fr;
             }
+            
+            .lookup-form {
+                flex-direction: column;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qr-section {
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            margin: 16px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .qr-instructions {
+            color: var(--gray-600);
+            font-size: 14px;
+            margin-top: 12px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">M</div>
+            <div class="logo">
+                <i class="fas fa-receipt"></i>
+            </div>
             <h1>Facturación Electrónica</h1>
-            <p class="subtitle">MEYPARK - Sistema de Parquímetros</p>
+            <p class="subtitle">MEYPARK - Sistema de Parquímetros Inteligente</p>
         </div>
 
-        <div class="transaction-info" id="transactionInfo">
-            <h3>Información de la Transacción</h3>
-            <div class="info-row">
-                <span class="info-label">ID de Transacción:</span>
-                <span class="info-value" id="transactionId">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Matrícula:</span>
-                <span class="info-value" id="plate">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Zona:</span>
-                <span class="info-value" id="zone">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Importe:</span>
-                <span class="info-value" id="amount">-</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Fecha:</span>
-                <span class="info-value" id="date">-</span>
-            </div>
-        </div>
-
-        <form id="invoiceForm">
-            <div class="form-group">
-                <label for="nif">NIF/CIF <span class="required">*</span></label>
-                <input type="text" id="nif" name="nif" required placeholder="12345678A">
-            </div>
-
-            <div class="form-group">
-                <label for="companyName">Razón Social <span class="required">*</span></label>
-                <input type="text" id="companyName" name="companyName" required placeholder="Nombre de la empresa">
-            </div>
-
-            <div class="form-group">
-                <label for="address">Dirección <span class="required">*</span></label>
-                <input type="text" id="address" name="address" required placeholder="Calle, número">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="city">Ciudad <span class="required">*</span></label>
-                    <input type="text" id="city" name="city" required placeholder="Madrid">
-                </div>
-                <div class="form-group">
-                    <label for="postalCode">Código Postal <span class="required">*</span></label>
-                    <input type="text" id="postalCode" name="postalCode" required placeholder="28001">
+        <div class="content">
+            <!-- Sección de búsqueda de transacción -->
+            <div class="transaction-lookup" id="transactionLookup">
+                <h3>
+                    <i class="fas fa-search"></i>
+                    Buscar Transacción
+                </h3>
+                <div class="lookup-form">
+                    <div class="form-group">
+                        <label for="transactionIdInput">ID de Transacción</label>
+                        <input type="text" id="transactionIdInput" placeholder="Ej: TXN_1234567890_1234" />
+                    </div>
+                    <button class="btn" id="searchBtn" onclick="searchTransaction()">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required placeholder="empresa@ejemplo.com">
+            <!-- Información de la transacción -->
+            <div class="transaction-info hidden" id="transactionInfo">
+                <h3>
+                    <i class="fas fa-ticket-alt"></i>
+                    Información de la Transacción
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">ID de Transacción</span>
+                        <span class="info-value" id="transactionId">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Matrícula</span>
+                        <span class="info-value" id="plate">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Zona</span>
+                        <span class="info-value" id="zone">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Importe</span>
+                        <span class="info-value" id="amount">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha</span>
+                        <span class="info-value" id="date">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Método de Pago</span>
+                        <span class="info-value" id="paymentMethod">-</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="phone">Teléfono (opcional)</label>
-                <input type="tel" id="phone" name="phone" placeholder="+34 600 000 000">
+            <!-- Sección QR -->
+            <div class="qr-section hidden" id="qrSection">
+                <h3>
+                    <i class="fas fa-qrcode"></i>
+                    Escanea el Código QR
+                </h3>
+                <div class="qr-code" id="qrCode">
+                    <!-- QR Code se generará aquí -->
+                </div>
+                <p class="qr-instructions">
+                    Escanea este código con tu móvil para acceder rápidamente a la facturación
+                </p>
             </div>
 
-            <button type="submit" class="btn" id="generateBtn">
-                Generar Factura Electrónica
-            </button>
-        </form>
+            <!-- Formulario de facturación -->
+            <div class="invoice-form hidden" id="invoiceForm">
+                <h3>
+                    <i class="fas fa-file-invoice"></i>
+                    Datos para la Factura
+                </h3>
+                <form id="form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nif">NIF/CIF <span class="required">*</span></label>
+                            <input type="text" id="nif" name="nif" required placeholder="12345678A" />
+                        </div>
+                        <div class="form-group">
+                            <label for="companyName">Razón Social <span class="required">*</span></label>
+                            <input type="text" id="companyName" name="companyName" required placeholder="Nombre de la empresa" />
+                        </div>
+                    </div>
 
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Generando tu factura electrónica...</p>
-        </div>
+                    <div class="form-group">
+                        <label for="address">Dirección <span class="required">*</span></label>
+                        <input type="text" id="address" name="address" required placeholder="Calle, número" />
+                    </div>
 
-        <div class="success" id="success">
-            <h3>¡Factura Generada Exitosamente!</h3>
-            <p>Tu factura electrónica ha sido creada y está lista para descargar.</p>
-            <a href="#" id="downloadLink" class="download-btn">Descargar Factura PDF</a>
-        </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">Ciudad <span class="required">*</span></label>
+                            <input type="text" id="city" name="city" required placeholder="Madrid" />
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Código Postal <span class="required">*</span></label>
+                            <input type="text" id="postalCode" name="postalCode" required placeholder="28001" />
+                        </div>
+                    </div>
 
-        <div class="error" id="error">
-            <h3>Error al Generar la Factura</h3>
-            <p id="errorMessage">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.</p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required placeholder="empresa@ejemplo.com" />
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+34 600 000 000" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="generateBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        Generar Factura Electrónica
+                    </button>
+                </form>
+            </div>
+
+            <!-- Estados -->
+            <div class="status loading" id="loading">
+                <div class="spinner"></div>
+                <h3>Generando tu factura electrónica...</h3>
+                <p>Por favor, espera mientras procesamos tu solicitud</p>
+            </div>
+
+            <div class="status success" id="success">
+                <i class="fas fa-check-circle" style="font-size: 48px; margin-bottom: 16px; color: var(--success);"></i>
+                <h3>¡Factura Generada Exitosamente!</h3>
+                <p>Tu factura electrónica ha sido creada y está lista para descargar.</p>
+                <a href="#" id="downloadLink" class="download-btn">
+                    <i class="fas fa-download"></i>
+                    Descargar Factura PDF
+                </a>
+            </div>
+
+            <div class="status error" id="error">
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; color: var(--error);"></i>
+                <h3>Error al Generar la Factura</h3>
+                <p id="errorMessage">Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.</p>
+                <button class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fas fa-redo"></i>
+                    Intentar de Nuevo
+                </button>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
     <script>
-        // Obtener parámetros de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const transactionId = urlParams.get('transactionId');
+        // Variables globales
+        let currentTransactionId = null;
+        let currentTransaction = null;
 
         // Elementos del DOM
-        const transactionInfo = document.getElementById('transactionInfo');
-        const transactionIdEl = document.getElementById('transactionId');
-        const plateEl = document.getElementById('plate');
-        const zoneEl = document.getElementById('zone');
-        const amountEl = document.getElementById('amount');
-        const dateEl = document.getElementById('date');
-        const form = document.getElementById('invoiceForm');
-        const generateBtn = document.getElementById('generateBtn');
-        const loading = document.getElementById('loading');
-        const success = document.getElementById('success');
-        const error = document.getElementById('error');
-        const errorMessage = document.getElementById('errorMessage');
-        const downloadLink = document.getElementById('downloadLink');
+        const elements = {
+            transactionLookup: document.getElementById('transactionLookup'),
+            transactionInfo: document.getElementById('transactionInfo'),
+            qrSection: document.getElementById('qrSection'),
+            invoiceForm: document.getElementById('invoiceForm'),
+            loading: document.getElementById('loading'),
+            success: document.getElementById('success'),
+            error: document.getElementById('error'),
+            form: document.getElementById('form'),
+            generateBtn: document.getElementById('generateBtn'),
+            searchBtn: document.getElementById('searchBtn'),
+            transactionIdInput: document.getElementById('transactionIdInput'),
+            errorMessage: document.getElementById('errorMessage'),
+            downloadLink: document.getElementById('downloadLink')
+        };
 
-        // Validar NIF español
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const transactionIdFromUrl = urlParams.get('transaction');
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            if (transactionIdFromUrl) {
+                elements.transactionIdInput.value = transactionIdFromUrl;
+                searchTransaction();
+            }
+        });
+
+        // Validaciones
         function validateNIF(nif) {
             const nifRegex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
             return nifRegex.test(nif);
         }
 
-        // Validar CIF español
         function validateCIF(cif) {
             const cifRegex = /^[ABCDEFGHJNPQRSUVW][0-9]{7}[0-9A-J]$/i;
             return cifRegex.test(cif);
         }
 
-        // Validar NIF o CIF
         function validateNIFCIF(value) {
             return validateNIF(value) || validateCIF(value);
         }
 
-        // Cargar información de la transacción
-        async function loadTransactionInfo() {
+        // Buscar transacción
+        async function searchTransaction() {
+            const transactionId = elements.transactionIdInput.value.trim();
+            
             if (!transactionId) {
-                showError('ID de transacción no válido');
+                showError('Por favor, introduce un ID de transacción válido');
                 return;
             }
 
+            showLoading();
+            
             try {
                 const response = await fetch(`http://localhost:3002/api/transaction/${transactionId}`);
                 const data = await response.json();
 
-                if (data.success) {
-                    const transaction = data.transaction;
-                    transactionIdEl.textContent = transaction.id;
-                    plateEl.textContent = transaction.plate;
-                    zoneEl.textContent = transaction.zoneName || 'Zona ' + transaction.zoneId;
-                    amountEl.textContent = transaction.amount + ' €';
-                    dateEl.textContent = new Date(transaction.timestamp).toLocaleString('es-ES');
+                if (data.success && data.transaction) {
+                    currentTransactionId = transactionId;
+                    currentTransaction = data.transaction;
+                    displayTransactionInfo(data.transaction);
+                    generateQRCode(transactionId);
+                    hideAllStatus();
+                    elements.transactionInfo.classList.remove('hidden');
+                    elements.qrSection.classList.remove('hidden');
+                    elements.invoiceForm.classList.remove('hidden');
+                    elements.transactionInfo.classList.add('fade-in');
                 } else {
-                    showError('Transacción no encontrada o expirada');
+                    showError('Transacción no encontrada. Verifica el ID e inténtalo de nuevo.');
                 }
             } catch (err) {
-                console.error('Error al cargar transacción:', err);
-                showError('Error al cargar la información de la transacción');
+                console.error('Error al buscar transacción:', err);
+                showError('Error de conexión. Verifica que el servidor esté funcionando.');
             }
         }
 
-        // Mostrar error
-        function showError(message) {
-            errorMessage.textContent = message;
-            error.style.display = 'block';
-            success.style.display = 'none';
-            loading.style.display = 'none';
-            form.style.display = 'block';
+        // Mostrar información de la transacción
+        function displayTransactionInfo(transaction) {
+            document.getElementById('transactionId').textContent = transaction.id;
+            document.getElementById('plate').textContent = transaction.plate;
+            document.getElementById('zone').textContent = transaction.zoneName || `Zona ${transaction.zoneId}`;
+            document.getElementById('amount').textContent = `${transaction.amount.toFixed(2)} €`;
+            document.getElementById('date').textContent = new Date(transaction.timestamp).toLocaleString('es-ES');
+            document.getElementById('paymentMethod').textContent = getPaymentMethodName(transaction.paymentMethod);
         }
 
-        // Mostrar éxito
-        function showSuccess(invoiceUrl) {
-            downloadLink.href = invoiceUrl;
-            success.style.display = 'block';
-            error.style.display = 'none';
-            loading.style.display = 'none';
-            form.style.display = 'none';
+        // Obtener nombre del método de pago
+        function getPaymentMethodName(method) {
+            const methods = {
+                'cash': 'Efectivo',
+                'chip': 'Chip+PIN',
+                'contactless': 'Contactless'
+            };
+            return methods[method] || method.toUpperCase();
         }
 
-        // Mostrar loading
-        function showLoading() {
-            loading.style.display = 'block';
-            error.style.display = 'none';
-            success.style.display = 'none';
-            form.style.display = 'none';
+        // Generar código QR
+        function generateQRCode(transactionId) {
+            const qrContainer = document.getElementById('qrCode');
+            qrContainer.innerHTML = '';
+            
+            QRCode.toCanvas(qrContainer, `http://localhost:3002/facturacion.html?transaction=${transactionId}`, {
+                width: 150,
+                height: 150,
+                color: {
+                    dark: '#374151',
+                    light: '#ffffff'
+                }
+            }, function (error) {
+                if (error) {
+                    console.error('Error generando QR:', error);
+                    qrContainer.innerHTML = '<i class="fas fa-qrcode" style="font-size: 48px; color: #9ca3af;"></i>';
+                }
+            });
         }
 
         // Manejar envío del formulario
-        form.addEventListener('submit', async (e) => {
+        elements.form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(form);
+            if (!currentTransactionId) {
+                showError('Por favor, busca una transacción primero');
+                return;
+            }
+
+            const formData = new FormData(elements.form);
             const nif = formData.get('nif').trim();
 
             // Validar NIF/CIF
@@ -419,7 +796,7 @@
 
             try {
                 const invoiceRequest = {
-                    transactionId: transactionId,
+                    transactionId: currentTransactionId,
                     nif: nif,
                     companyName: formData.get('companyName').trim(),
                     address: formData.get('address').trim(),
@@ -440,7 +817,8 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showSuccess(result.invoiceUrl);
+                    elements.downloadLink.href = result.invoiceUrl;
+                    showSuccess();
                 } else {
                     showError(result.errorMessage || 'Error al generar la factura');
                 }
@@ -450,8 +828,50 @@
             }
         });
 
-        // Cargar información al iniciar
-        loadTransactionInfo();
+        // Funciones de estado
+        function showLoading() {
+            hideAllStatus();
+            elements.loading.classList.add('show');
+            elements.generateBtn.disabled = true;
+            elements.searchBtn.disabled = true;
+        }
+
+        function showSuccess() {
+            hideAllStatus();
+            elements.success.classList.add('show');
+        }
+
+        function showError(message) {
+            hideAllStatus();
+            elements.errorMessage.textContent = message;
+            elements.error.classList.add('show');
+            elements.generateBtn.disabled = false;
+            elements.searchBtn.disabled = false;
+        }
+
+        function hideAllStatus() {
+            elements.loading.classList.remove('show');
+            elements.success.classList.remove('show');
+            elements.error.classList.remove('show');
+        }
+
+        function resetForm() {
+            hideAllStatus();
+            elements.form.reset();
+            elements.transactionIdInput.value = '';
+            currentTransactionId = null;
+            currentTransaction = null;
+            elements.transactionInfo.classList.add('hidden');
+            elements.qrSection.classList.add('hidden');
+            elements.invoiceForm.classList.add('hidden');
+        }
+
+        // Permitir búsqueda con Enter
+        elements.transactionIdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTransaction();
+            }
+        });
     </script>
 </body>
 </html>

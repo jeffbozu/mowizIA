@@ -121,7 +121,39 @@ function generateInvoicePDF(transaction, invoiceRequest) {
 // Obtener información de una transacción
 app.get('/api/transaction/:id', (req, res) => {
   const transactionId = req.params.id;
-  const transaction = transactions.get(transactionId);
+  let transaction = transactions.get(transactionId);
+  
+  // Si no encontramos la transacción en memoria, intentar cargarla desde mock_data.json
+  if (!transaction) {
+    try {
+      const mockData = JSON.parse(fs.readFileSync('mock_data.json', 'utf8'));
+      
+      // Buscar en sesiones activas
+      if (mockData.sessions) {
+        for (const [sessionId, session] of Object.entries(mockData.sessions)) {
+          if (session.transactionId === transactionId) {
+            transaction = {
+              id: transactionId,
+              plate: session.plate,
+              zoneId: session.zoneId,
+              timestamp: session.start || new Date().toISOString(),
+              amount: session.totalPrice || 0,
+              paymentMethod: session.paymentMethod || 'cash',
+              kioscoId: 'KIOSCO_001',
+              isExtend: session.isExtend || false,
+              minutes: session.minutes || 60
+            };
+            
+            // Guardar en memoria para futuras consultas
+            transactions.set(transactionId, transaction);
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando mock_data.json:', error);
+    }
+  }
   
   if (!transaction) {
     return res.json({ success: false, error: 'Transacción no encontrada' });
