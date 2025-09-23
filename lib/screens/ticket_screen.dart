@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -38,6 +39,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
   bool _isGeneratingPdf = false;
   late AnimationController _successAnimationController;
   late Animation<double> _successAnimation;
+  Timer? _autoReturnTimer;
 
   @override
   void initState() {
@@ -65,12 +67,33 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     
     // Iniciar animación de éxito
     _successAnimationController.forward();
+    
+    // Iniciar timer de 30 segundos para volver automáticamente
+    _startAutoReturnTimer();
   }
 
   @override
   void dispose() {
     _successAnimationController.dispose();
+    _autoReturnTimer?.cancel();
     super.dispose();
+  }
+
+  void _startAutoReturnTimer() {
+    _autoReturnTimer?.cancel();
+    _autoReturnTimer = Timer(const Duration(seconds: 30), () {
+      if (mounted) {
+        _returnToZones();
+      }
+    });
+  }
+
+  void _returnToZones() {
+    // Limpiar estado y volver a zonas
+    AppState.currentPayment = null;
+    AppState.currentPlate = null;
+    AppState.selectedZoneId = null;
+    context.go('/zona');
   }
 
   void _extendSession() {
@@ -238,15 +261,11 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     }
   }
 
-  void _ok() {
-    // Volver a la pantalla de zona para continuar con el mismo flujo
-    context.go('/zona');
-  }
-
-  void _newParking() {
-    // Limpiar estado y volver al inicio del flujo
-    AppState.clearCurrentSession();
-    context.go('/zona');
+  void _continue() {
+    // Cancelar timer automático
+    _autoReturnTimer?.cancel();
+    // Volver a la pantalla de zona
+    _returnToZones();
   }
 
   @override
@@ -394,7 +413,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Facturación Electrónica',
+                              AppStrings.t('ticket.electronic_invoice'),
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.primary,
@@ -404,7 +423,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Escanea este código QR para obtener tu factura electrónica desde casa',
+                          AppStrings.t('ticket.electronic_invoice_description'),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
@@ -438,7 +457,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         ],
                         const SizedBox(height: 12),
                         Text(
-                          'Válido por 30 días',
+                          AppStrings.t('ticket.valid_for_days'),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
                           ),
@@ -505,43 +524,21 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         ],
                       ),
                       const SizedBox(height: 16),
-                      // Botones de navegación
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Semantics(
-                              label: 'Continuar con el mismo flujo de estacionamiento',
-                              button: true,
-                              child: SizedBox(
-                                height: 48,
-                                child: OutlinedButton(
-                                  onPressed: _ok,
-                                  child: Text(
-                                    AppStrings.t('ticket.ok'),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                              ),
+                      // Botón de continuar
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: Semantics(
+                          label: 'Continuar - Volver a la pantalla de zonas',
+                          button: true,
+                          child: FilledButton(
+                            onPressed: _continue,
+                            child: Text(
+                              AppStrings.t('ticket.ok'),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Semantics(
-                              label: 'Iniciar un nuevo proceso de estacionamiento',
-                              button: true,
-                              child: SizedBox(
-                                height: 48,
-                                child: FilledButton(
-                                  onPressed: _newParking,
-                                  child: Text(
-                                    AppStrings.t('ticket.new_parking'),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

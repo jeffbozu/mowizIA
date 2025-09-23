@@ -137,12 +137,28 @@
       "end": "2025-09-23T14:56:44.027936",
       "totalPrice": 1.2,
       "paymentMethod": "contactless"
+    },
+    "1234RRR_1758629195474": {
+      "plate": "1234RRR",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T14:06:35.474913",
+      "end": "2025-09-23T14:06:35.474Z",
+      "totalPrice": 2.4,
+      "paymentMethod": "contactless"
+    },
+    "1234GGG_1758629329802": {
+      "plate": "1234GGG",
+      "zoneId": "mz_b",
+      "start": "2025-09-23T14:08:49.802644",
+      "end": "2025-09-23T15:08:49.802645",
+      "totalPrice": 0.8,
+      "paymentMethod": "chip"
     }
   },
   "stats": {
     "totalIncome": 0,
     "todayIncome": 0,
-    "activeSessions": 7,
+    "activeSessions": 9,
     "totalCompanies": 2,
     "totalZones": 4,
     "totalOperators": 2
@@ -154,7 +170,7 @@
     "touch": true,
     "coins": true,
     "cards": true,
-    "lastUpdate": "2025-09-23T11:51:38.358Z"
+    "lastUpdate": "2025-09-23T12:06:05.959Z"
   },
   "accessibility": {},
   "paymentConfig": {
@@ -736,8 +752,8 @@
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "online",
-      "lastConnection": "2025-09-23T11:51:38.358Z",
+      "status": "offline",
+      "lastConnection": "2025-09-23T12:05:10.623Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -755,6 +771,35 @@
       "lastError": null,
       "version": "1.0.0",
       "createdAt": "2025-09-23T11:51:38.358Z",
+      "isApp": true
+    },
+    "MAD_Centro_K59": {
+      "id": "MAD_Centro_K59",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-23T12:06:05.958Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T12:06:05.958Z",
       "isApp": true
     }
   }
