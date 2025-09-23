@@ -1,0 +1,8 @@
+{
+  "plate": "TEST123",
+  "zoneId": "zona_1",
+  "start": "2024-01-15T10:00:00.000Z",
+  "end": "2024-01-15T12:00:00.000Z",
+  "totalPrice": 2.4,
+  "paymentMethod": "card"
+}

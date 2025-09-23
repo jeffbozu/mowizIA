@@ -18,6 +18,14 @@ class _ExtendScreenState extends State<ExtendScreen> {
   Session? _currentSession;
   int _extraMinutes = 0;
   bool _isSearching = false;
+  bool _hasSearched = false; // Para controlar si ya se ha buscado
+
+  @override
+  void initState() {
+    super.initState();
+    // Refrescar sesiones automáticamente al cargar la pantalla
+    _refreshSessionsFromBackend();
+  }
 
   @override
   void dispose() {
@@ -25,11 +33,8 @@ class _ExtendScreenState extends State<ExtendScreen> {
     super.dispose();
   }
 
-  void _refreshSessions() async {
-    setState(() {
-      _isSearching = true;
-    });
-
+  // Método para refrescar automáticamente desde el backend
+  void _refreshSessionsFromBackend() async {
     try {
       print('🔄 Refrescando sesiones desde el backend...');
       CentralizedWebSocketService.sendMessage({
@@ -43,30 +48,48 @@ class _ExtendScreenState extends State<ExtendScreen> {
       AppState.activeSessions.forEach((key, value) {
         print('  - Matrícula: $key, Zona: ${value.zoneId}, Inicio: ${value.start}');
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.t('extend.refresh_success')),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
-      );
     } catch (e) {
       print('❌ Error refrescando sesiones: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.t('extend.refresh_error')),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+    }
+  }
+
+  // Calcular minutos extra máximos usando datos del backend
+  int _calculateMaxExtraMinutes(Zone zone, int sessionDuration) {
+    // Usar maxDuration del modelo Zone (en minutos)
+    final maxTotalMinutes = zone.maxDuration;
+    
+    // sessionDuration es el tiempo total de la sesión actual
+    // Calcular cuánto tiempo se puede extender sin exceder el máximo
+    final maxExtraMinutes = maxTotalMinutes - sessionDuration;
+    
+    // No permitir extensión si ya se alcanzó el máximo
+    if (maxExtraMinutes <= 0) {
+      return 0;
     }
     
-    setState(() {
-      _isSearching = false;
-    });
+    return maxExtraMinutes;
+  }
+
+  // Calcular precio usando datos del backend
+  double _calculatePrice(double pricePerHour, int minutes) {
+    // Calcular precio exacto
+    final exactPrice = pricePerHour * (minutes / 60);
+    // Redondear a 2 decimales
+    return double.parse(exactPrice.toStringAsFixed(2));
   }
 
   void _searchSession() async {
-    final plate = _plateController.text.toUpperCase();
+    final plate = _plateController.text.trim().toUpperCase();
+    
+    if (plate.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.enter_plate')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
     
     if (!MockData.validatePlate(plate)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,6 +103,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
 
     setState(() {
       _isSearching = true;
+      _hasSearched = true; // Marcar que ya se ha buscado
     });
 
     // Debug: Mostrar todas las sesiones activas
@@ -89,35 +113,32 @@ class _ExtendScreenState extends State<ExtendScreen> {
       print('  - Matrícula: $key, Zona: ${value.zoneId}, Inicio: ${value.start}');
     });
 
-    // Buscar en el estado local primero
-    Session? session = MockData.getSessionByPlate(plate);
-    
-    // Si no se encuentra localmente, refrescar datos del backend
-    if (session == null) {
-      print('🔍 Sesión no encontrada localmente, refrescando datos del backend...');
-      try {
-        // Solicitar datos actualizados del backend
-        CentralizedWebSocketService.sendMessage({
-          'type': 'get_data',
-        });
+    // Buscar SOLO en el backend - no usar datos locales
+    Session? session;
+    try {
+      print('🔍 Buscando sesión en el backend...');
+      
+      // Solicitar datos actualizados del backend
+      CentralizedWebSocketService.sendMessage({
+        'type': 'get_data',
+      });
+      
+      // Esperar un poco para que llegue la respuesta
+      await Future.delayed(const Duration(milliseconds: 1000));
+      
+      // Buscar en el estado actualizado (que viene del backend)
+      session = AppState.activeSessions[plate];
+      
+      // Si aún no se encuentra, hacer búsqueda específica en el backend
+      if (session == null) {
+        print('🔍 Sesión no encontrada, haciendo búsqueda específica en el backend...');
+        CentralizedWebSocketService.searchSession(plate);
         
-        // Esperar un poco para que llegue la respuesta
-        await Future.delayed(const Duration(milliseconds: 1000));
-        
-        // Buscar nuevamente en el estado actualizado
-        session = MockData.getSessionByPlate(plate);
-        
-        // Si aún no se encuentra, buscar en todas las sesiones del backend
-        if (session == null) {
-          print('🔍 Buscando en todas las sesiones del backend...');
-          CentralizedWebSocketService.searchSession(plate);
-          
-          await Future.delayed(const Duration(milliseconds: 500));
-          session = MockData.getSessionByPlate(plate);
-        }
-      } catch (e) {
-        print('❌ Error consultando backend: $e');
+        await Future.delayed(const Duration(milliseconds: 500));
+        session = AppState.activeSessions[plate];
       }
+    } catch (e) {
+      print('❌ Error consultando backend: $e');
     }
     
     print('✅ Sesión encontrada: ${session != null ? "SÍ" : "NO"}');
@@ -126,14 +147,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
       print('  - Zona: ${session.zoneId}');
       print('  - Inicio: ${session.start}');
       print('  - Fin: ${session.end}');
-    } else {
-      // Mostrar mensaje de error si no se encuentra la sesión
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppStrings.t('extend.no_session')),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      print('  - Precio: ${session.totalPrice}€');
     }
     
     setState(() {
@@ -143,38 +157,82 @@ class _ExtendScreenState extends State<ExtendScreen> {
         _extraMinutes = 0;
       }
     });
+    
+    if (session != null) {
+      // Calcular minutos extra máximos usando datos del backend
+      final zone = AppState.zones[session.zoneId];
+      final sessionDuration = session.end.difference(session.start).inMinutes;
+      final maxExtra = zone != null ? _calculateMaxExtraMinutes(zone, sessionDuration) : 0;
+      print('⏰ Minutos extra máximos: $maxExtra');
+      
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.session_found')),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    } else {
+      // Mostrar mensaje de no encontrado
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.t('extend.no_session')),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   void _selectExtraTime(int minutes) {
     if (_currentSession == null) return;
     
-    final maxExtra = MockData.getMaxExtraMinutes(
-      _currentSession!.zoneId,
-      _currentSession!.consumedMinutes,
-    );
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return;
     
-    final newExtra = _extraMinutes + minutes;
-    if (newExtra <= maxExtra) {
-      setState(() {
-        _extraMinutes = newExtra;
-      });
+    // Calcular tiempo total de la sesión actual (desde inicio hasta fin)
+    final sessionDuration = _currentSession!.end.difference(_currentSession!.start).inMinutes;
+    final maxTotalMinutes = zone.maxDuration;
+    
+    // Validar que no exceda el máximo total
+    if (minutes > maxTotalMinutes - sessionDuration) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: ${maxTotalMinutes - sessionDuration} min'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
     }
+    
+    setState(() {
+      _extraMinutes = minutes;
+    });
   }
 
   void _addMinutes(int minutes) {
     if (_currentSession == null) return;
     
-    final maxExtra = MockData.getMaxExtraMinutes(
-      _currentSession!.zoneId,
-      _currentSession!.consumedMinutes,
-    );
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return;
     
+    final sessionDuration = _currentSession!.end.difference(_currentSession!.start).inMinutes;
+    final maxTotalMinutes = zone.maxDuration;
     final newExtra = _extraMinutes + minutes;
-    if (newExtra <= maxExtra) {
-      setState(() {
-        _extraMinutes = newExtra;
-      });
+    
+    // Validar que no exceda el máximo total
+    if (newExtra > maxTotalMinutes - sessionDuration) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: ${maxTotalMinutes - sessionDuration} min'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
     }
+    
+    setState(() {
+      _extraMinutes = newExtra;
+    });
   }
 
   void _subtractMinutes(int minutes) {
@@ -189,8 +247,23 @@ class _ExtendScreenState extends State<ExtendScreen> {
   void _goToPayment() {
     if (_currentSession == null) return;
     
-    final zone = MockData.getZoneById(_currentSession!.zoneId);
-    final price = MockData.calculatePrice(zone!.pricePerHour, _extraMinutes);
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return;
+    
+    // Validar que no se exceda el máximo de la zona
+    final sessionDuration = _currentSession!.end.difference(_currentSession!.start).inMinutes;
+    final maxExtra = _calculateMaxExtraMinutes(zone, sessionDuration);
+    if (_extraMinutes > maxExtra) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: $maxExtra min'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    
+    final price = _calculatePrice(zone.pricePerHour, _extraMinutes);
     
     // Notificar al backend sobre la extensión de sesión
     CentralizedWebSocketService.extendSession(
@@ -226,16 +299,17 @@ class _ExtendScreenState extends State<ExtendScreen> {
 
   double get _extraPrice {
     if (_currentSession == null) return 0.0;
-    final zone = MockData.getZoneById(_currentSession!.zoneId);
-    return MockData.calculatePrice(zone!.pricePerHour, _extraMinutes);
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return 0.0;
+    return _calculatePrice(zone.pricePerHour, _extraMinutes);
   }
 
   int get _maxExtraMinutes {
     if (_currentSession == null) return 0;
-    return MockData.getMaxExtraMinutes(
-      _currentSession!.zoneId,
-      _currentSession!.consumedMinutes,
-    );
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return 0;
+    final sessionDuration = _currentSession!.end.difference(_currentSession!.start).inMinutes;
+    return _calculateMaxExtraMinutes(zone, sessionDuration);
   }
 
   @override
@@ -297,46 +371,31 @@ class _ExtendScreenState extends State<ExtendScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  // Botones de búsqueda
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: SizedBox(
-                          height: 56,
-                          child: FilledButton.icon(
-                            onPressed: _isSearching ? null : _searchSession,
-                            icon: _isSearching
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Icon(Icons.search),
-                            label: Text(
-                              _isSearching ? AppStrings.t('common.loading') : AppStrings.t('extend.search'),
-                            ),
-                          ),
-                        ),
+                  // Botón de búsqueda
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: FilledButton.icon(
+                      onPressed: _isSearching ? null : _searchSession,
+                      icon: _isSearching
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.search),
+                      label: Text(
+                        _isSearching ? AppStrings.t('common.loading') : AppStrings.t('extend.search'),
                       ),
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        height: 56,
-                        child: OutlinedButton.icon(
-                          onPressed: _isSearching ? null : _refreshSessions,
-                          icon: const Icon(Icons.refresh),
-                          label: Text(AppStrings.t('extend.refresh')),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   // Contenido según el estado
-                  if (_currentSession == null && !_isSearching) ...[
-                    // No hay sesión
+                  if (_currentSession == null && !_isSearching && _hasSearched) ...[
+                    // No hay sesión (solo después de buscar)
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -373,6 +432,34 @@ class _ExtendScreenState extends State<ExtendScreen> {
                         ],
                       ),
                     ),
+                  ] else if (_currentSession == null && !_isSearching && !_hasSearched) ...[
+                    // Estado inicial - mostrar instrucciones
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: 80,
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            AppStrings.t('extend.enter_plate_to_search'),
+                            style: Theme.of(context).textTheme.headlineSmall,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            AppStrings.t('extend.search_instructions'),
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ] else if (_currentSession != null) ...[
                     // Sesión encontrada
                     Expanded(
@@ -405,6 +492,14 @@ class _ExtendScreenState extends State<ExtendScreen> {
                                   AppStrings.t('extend.remaining'),
                                   _formatMinutes(_currentSession!.remainingMinutes),
                                 ),
+                                _buildSessionInfo(
+                                  AppStrings.t('extend.max_allowed'),
+                                  _getMaxAllowedTime(),
+                                ),
+                                _buildSessionInfo(
+                                  AppStrings.t('extend.remaining_to_extend'),
+                                  _getRemainingTimeToExtend(),
+                                ),
                               ],
                             ),
                           ),
@@ -419,12 +514,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                           Wrap(
                             spacing: 12,
                             runSpacing: 12,
-                            children: [
-                              _buildTimeChip(15),
-                              _buildTimeChip(30),
-                              _buildTimeChip(60),
-                              _buildTimeChip(120),
-                            ],
+                            children: _buildTimeChips(),
                           ),
                           const SizedBox(height: 24),
                           // Controles +/- 5 minutos
@@ -529,6 +619,13 @@ class _ExtendScreenState extends State<ExtendScreen> {
     );
   }
 
+  List<Widget> _buildTimeChips() {
+    final timeOptions = [15, 30, 60, 120, 180, 240]; // Opciones de tiempo en minutos
+    final validOptions = timeOptions.where((minutes) => minutes <= _maxExtraMinutes).toList();
+    
+    return validOptions.map((minutes) => _buildTimeChip(minutes)).toList();
+  }
+
   Widget _buildTimeChip(int minutes) {
     final isSelected = _extraMinutes == minutes;
     final canSelect = minutes <= _maxExtraMinutes;
@@ -558,5 +655,39 @@ class _ExtendScreenState extends State<ExtendScreen> {
         return '${hours}h ${remainingMinutes}m';
       }
     }
+  }
+
+  String _getMaxAllowedTime() {
+    if (_currentSession == null) return '';
+    
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return '';
+    
+    final maxHours = zone.maxDuration / 60;
+    return AppStrings.t('extend.max_allowed_hours', params: {
+      'hours': maxHours.toStringAsFixed(1)
+    });
+  }
+
+  String _getRemainingTimeToExtend() {
+    if (_currentSession == null) return '';
+    
+    final zone = AppState.zones[_currentSession!.zoneId];
+    if (zone == null) return '';
+    
+    final sessionDuration = _currentSession!.end.difference(_currentSession!.start).inMinutes;
+    final remainingToExtend = zone.maxDuration - sessionDuration;
+    
+    print('🔍 DEBUG _getRemainingTimeToExtend:');
+    print('  - Zona: ${_currentSession!.zoneId}');
+    print('  - maxDuration: ${zone.maxDuration} min');
+    print('  - sessionDuration: $sessionDuration min');
+    print('  - remainingToExtend: $remainingToExtend min');
+    
+    if (remainingToExtend <= 0) {
+      return '0 min (máximo alcanzado)';
+    }
+    
+    return _formatMinutes(remainingToExtend);
   }
 }

@@ -47,7 +47,7 @@ class MockData {
       name: 'MZ-A (Azul)',
       color: '#2196F3',
       pricePerHour: 1.20,
-      maxHours: 4,
+      maxDuration: 240, // 4 horas
       description: 'Zona azul - Centro comercial',
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
     ),
@@ -57,7 +57,7 @@ class MockData {
       name: 'MZ-V (Verde)',
       color: '#4CAF50',
       pricePerHour: 2.10,
-      maxHours: 2,
+      maxDuration: 120, // 2 horas
       description: 'Zona verde - Área residencial',
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
     ),
@@ -68,7 +68,7 @@ class MockData {
       name: 'EY-A (Azul)',
       color: '#2196F3',
       pricePerHour: 1.50,
-      maxHours: 4,
+      maxDuration: 240, // 4 horas
       description: 'Zona azul - Distrito financiero',
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
@@ -78,7 +78,7 @@ class MockData {
       name: 'EY-V (Verde)',
       color: '#4CAF50',
       pricePerHour: 2.40,
-      maxHours: 2,
+      maxDuration: 120, // 2 horas
       description: 'Zona verde - Zona turística',
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
@@ -88,7 +88,7 @@ class MockData {
       name: 'EY-R (Residente)',
       color: '#FF9800',
       pricePerHour: 0.50,
-      maxHours: 24, // 1 día
+      maxDuration: 1440, // 24 horas (1 día)
       description: 'Zona residente - Solo con etiqueta',
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
@@ -146,10 +146,12 @@ class MockData {
   }
 
   static Session? getSessionByPlate(String plate) {
+    // Ya no usar datos locales - solo del backend
     return AppState.activeSessions[plate];
   }
 
   static Zone? getZoneById(String zoneId) {
+    // Ya no usar datos locales - solo del backend
     return AppState.zones[zoneId];
   }
 
@@ -164,21 +166,24 @@ class MockData {
     final zone = getZoneById(zoneId);
     if (zone == null) return 0;
     
-    final maxTotalMinutes = zone.maxHours * 60;
+    final maxTotalMinutes = zone.maxDuration;
     return maxTotalMinutes - currentMinutes;
   }
 
   static void addSession(Session session) {
-    AppState.activeSessions[session.plate] = session;
-    print('💾 Sesión agregada a AppState: ${session.plate}');
-    print('📊 Total sesiones en AppState: ${AppState.activeSessions.length}');
+    // Ya no agregar sesiones localmente - solo notificar al backend
+    print('💾 Notificando sesión al backend: ${session.plate}');
     
-    // Nota: La persistencia se maneja en el servicio de almacenamiento local
-    // que se carga automáticamente al iniciar la aplicación
+    // Nota: Las sesiones se manejan completamente en el backend
+    // La app solo muestra los datos que recibe del backend
   }
 
   static void removeSession(String plate) {
-    AppState.activeSessions.remove(plate);
+    // Ya no remover sesiones localmente - solo notificar al backend
+    print('💾 Notificando eliminación de sesión al backend: $plate');
+    
+    // Nota: Las sesiones se manejan completamente en el backend
+    // La app solo muestra los datos que recibe del backend
   }
 
   // Función de prueba para verificar cálculos
@@ -243,7 +248,7 @@ class MockData {
         name: zoneData['name'],
         color: zoneData['color'] ?? '#2196F3',
         pricePerHour: (zoneData['pricePerHour'] ?? zoneData['price'] ?? 0.0).toDouble(),
-        maxHours: zoneData['maxHours'] ?? 24,
+        maxDuration: zoneData['maxDuration'] ?? 1440, // 24 horas por defecto
         description: zoneData['description'] ?? 'Zona de estacionamiento',
         createdAt: DateTime.tryParse(zoneData['createdAt'] ?? '') ?? DateTime.now(),
       );

@@ -19,10 +19,27 @@ class CentralizedWebSocketService {
   
   static Stream<Map<String, dynamic>> get messageStream => _messageController.stream;
   static Stream<bool> get connectionStream => _connectionController.stream;
+
+  // Función auxiliar para conversión segura de tipos numéricos
+  static double _safeToDouble(dynamic value, double defaultValue) {
+    if (value == null) return defaultValue;
+    if (value is int) return value.toDouble();
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
+    return defaultValue;
+  }
+
+  // Función auxiliar para conversión segura de listas de números
+  static List<double> _safeToDoubleList(dynamic value, List<double> defaultValue) {
+    if (value == null) return defaultValue;
+    if (value is! List) return defaultValue;
+    
+    return value.map((e) => _safeToDouble(e, 0.0)).toList();
+  }
   static bool get isConnected => _isConnected;
   
   // Conectar al backend centralizado
-  static Future<void> connect(String clientId, {String serverUrl = 'ws://localhost:8080'}) async {
+  static Future<void> connect(String clientId, {String serverUrl = 'ws://localhost:8082'}) async {
     try {
       _clientId = clientId;
       
@@ -107,6 +124,9 @@ class CentralizedWebSocketService {
       case 'session_removed':
         _handleSessionRemoved(message);
         break;
+      case 'session_found':
+        _handleSessionFound(message);
+        break;
       case 'tech_diagnostics':
         _handleTechDiagnostics(message);
         break;
@@ -118,9 +138,6 @@ class CentralizedWebSocketService {
         break;
       case 'session_found':
         _handleSessionFound(message);
-        break;
-      case 'session_not_found':
-        _handleSessionNotFound(message);
         break;
       default:
         print('❓ Tipo de mensaje no reconocido: ${message['type']}');
@@ -184,12 +201,25 @@ class CentralizedWebSocketService {
     
     // Sincronizar configuración de pagos
     if (data['paymentConfig'] != null) {
-      AppState.acceptedCoins = List<double>.from(data['paymentConfig']['acceptedCoins'] ?? []);
-      AppState.acceptedCards = List<String>.from(data['paymentConfig']['acceptedCards'] ?? []);
-      AppState.maxChangeAmount = (data['paymentConfig']['maxChangeAmount'] ?? 10.0).toDouble();
-      AppState.minPaymentAmount = (data['paymentConfig']['minPaymentAmount'] ?? 0.15).toDouble();
-      AppState.currency = data['paymentConfig']['currency'] ?? 'EUR';
-      AppState.currencySymbol = data['paymentConfig']['symbol'] ?? '€';
+      try {
+        final paymentConfig = data['paymentConfig'];
+        AppState.acceptedCoins = _safeToDoubleList(paymentConfig['acceptedCoins'], [0.05, 0.10, 0.20, 0.50, 1.00, 2.00]);
+        AppState.acceptedCards = List<String>.from(paymentConfig['acceptedCards'] ?? ['Visa', 'Mastercard']);
+        AppState.maxChangeAmount = _safeToDouble(paymentConfig['maxChangeAmount'], 10.0);
+        AppState.minPaymentAmount = _safeToDouble(paymentConfig['minPaymentAmount'], 0.15);
+        AppState.currency = paymentConfig['currency'] ?? 'EUR';
+        AppState.currencySymbol = paymentConfig['symbol'] ?? '€';
+        print('✅ Configuración de pagos sincronizada correctamente');
+      } catch (e) {
+        print('❌ Error sincronizando configuración de pagos: $e');
+        // Valores por defecto en caso de error
+        AppState.acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
+        AppState.acceptedCards = ['Visa', 'Mastercard'];
+        AppState.maxChangeAmount = 10.0;
+        AppState.minPaymentAmount = 0.15;
+        AppState.currency = 'EUR';
+        AppState.currencySymbol = '€';
+      }
     }
     
     print('✅ Datos iniciales sincronizados desde el backend');
@@ -234,21 +264,45 @@ class CentralizedWebSocketService {
     
     // Sincronizar estadísticas
     if (data['stats'] != null) {
-      final stats = data['stats'];
-      AppState.totalIncome = (stats['totalIncome'] ?? 0.0).toDouble();
-      AppState.todayIncome = (stats['todayIncome'] ?? 0.0).toDouble();
-      AppState.activeSessionsCount = stats['activeSessions'] ?? 0;
+      try {
+        final stats = data['stats'];
+        AppState.totalIncome = _safeToDouble(stats['totalIncome'], 0.0);
+        AppState.todayIncome = _safeToDouble(stats['todayIncome'], 0.0);
+        AppState.activeSessionsCount = stats['activeSessions'] is int 
+            ? stats['activeSessions'] as int
+            : (stats['activeSessions'] is double 
+                ? (stats['activeSessions'] as double).toInt()
+                : 0);
+        print('✅ Estadísticas sincronizadas correctamente');
+      } catch (e) {
+        print('❌ Error sincronizando estadísticas: $e');
+        AppState.totalIncome = 0.0;
+        AppState.todayIncome = 0.0;
+        AppState.activeSessionsCount = 0;
+      }
     }
     
     // Sincronizar configuración de pagos
     if (data['paymentConfig'] != null) {
-      final paymentConfig = data['paymentConfig'];
-      AppState.acceptedCoins = List<double>.from(paymentConfig['acceptedCoins'] ?? [0.05, 0.10, 0.20, 0.50, 1.00, 2.00]);
-      AppState.acceptedCards = List<String>.from(paymentConfig['acceptedCards'] ?? ['Visa', 'Mastercard']);
-      AppState.maxChangeAmount = (paymentConfig['maxChangeAmount'] ?? 10.0).toDouble();
-      AppState.minPaymentAmount = (paymentConfig['minPaymentAmount'] ?? 0.15).toDouble();
-      AppState.currency = paymentConfig['currency'] ?? 'EUR';
-      AppState.currencySymbol = paymentConfig['symbol'] ?? '€';
+      try {
+        final paymentConfig = data['paymentConfig'];
+        AppState.acceptedCoins = _safeToDoubleList(paymentConfig['acceptedCoins'], [0.05, 0.10, 0.20, 0.50, 1.00, 2.00]);
+        AppState.acceptedCards = List<String>.from(paymentConfig['acceptedCards'] ?? ['Visa', 'Mastercard']);
+        AppState.maxChangeAmount = _safeToDouble(paymentConfig['maxChangeAmount'], 10.0);
+        AppState.minPaymentAmount = _safeToDouble(paymentConfig['minPaymentAmount'], 0.15);
+        AppState.currency = paymentConfig['currency'] ?? 'EUR';
+        AppState.currencySymbol = paymentConfig['symbol'] ?? '€';
+        print('✅ Configuración de pagos sincronizada correctamente');
+      } catch (e) {
+        print('❌ Error sincronizando configuración de pagos: $e');
+        // Valores por defecto en caso de error
+        AppState.acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
+        AppState.acceptedCards = ['Visa', 'Mastercard'];
+        AppState.maxChangeAmount = 10.0;
+        AppState.minPaymentAmount = 0.15;
+        AppState.currency = 'EUR';
+        AppState.currencySymbol = '€';
+      }
     }
     
     // Sincronizar configuración del kiosco
@@ -332,9 +386,11 @@ class CentralizedWebSocketService {
   static void _handleSessionAdded(Map<String, dynamic> message) {
     if (message['success'] == true && message['session'] != null) {
       final session = Session.fromJson(message['session']);
+      // Usar plate como clave para búsqueda por matrícula
       AppState.activeSessions[session.plate] = session;
       AppState.notifyConfigChange();
-      print('🅿️ Sesión agregada: ${session.plate}');
+      print('🅿️ Sesión agregada: ${session.plate} en zona ${session.zoneId}');
+      print('📊 Total sesiones activas: ${AppState.activeSessions.length}');
     }
   }
   
@@ -344,6 +400,24 @@ class CentralizedWebSocketService {
       AppState.activeSessions.remove(message['sessionId']);
       AppState.notifyConfigChange();
       print('🅿️ Sesión removida: ${message['sessionId']}');
+    }
+  }
+
+  // Manejar sesión encontrada
+  static void _handleSessionFound(Map<String, dynamic> message) {
+    if (message['success'] == true && message['session'] != null) {
+      final session = Session.fromJson(message['session']);
+      final plate = message['plate'] as String;
+      
+      // Agregar/actualizar sesión en el estado local
+      AppState.activeSessions[plate] = session;
+      AppState.notifyConfigChange();
+      
+      print('✅ Sesión encontrada: ${session.plate} en zona ${session.zoneId}');
+      print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');
+    } else {
+      final plate = message['plate'] as String?;
+      print('❌ No se encontró sesión para matrícula: $plate');
     }
   }
   
@@ -442,7 +516,16 @@ class CentralizedWebSocketService {
     sendMessage({
       'type': 'add_session',
       'sessionId': sessionId,
-      'sessionData': sessionData
+      'session': sessionData
+    });
+  }
+  
+  // Actualizar sesión existente
+  static void updateSession(String sessionId, Map<String, dynamic> sessionData) {
+    sendMessage({
+      'type': 'update_session',
+      'sessionId': sessionId,
+      'session': sessionData
     });
   }
   
@@ -519,21 +602,6 @@ class CentralizedWebSocketService {
     } else {
       print('❌ Error extendiendo sesión: ${message['error'] ?? 'Error desconocido'}');
     }
-  }
-  
-  // Manejar sesión encontrada
-  static void _handleSessionFound(Map<String, dynamic> message) {
-    if (message['session'] != null) {
-      final session = Session.fromJson(message['session']);
-      AppState.activeSessions[session.plate] = session;
-      AppState.notifyConfigChange();
-      print('🔍 Sesión encontrada: ${session.plate}');
-    }
-  }
-  
-  // Manejar sesión no encontrada
-  static void _handleSessionNotFound(Map<String, dynamic> message) {
-    print('❌ Sesión no encontrada: ${message['plate'] ?? 'Desconocida'}');
   }
 }
 

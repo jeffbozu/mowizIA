@@ -289,7 +289,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
         const SizedBox(height: 4),
         // Máximo de horas
         Text(
-          AppStrings.t('zone.max_hours', params: {'hours': zone.maxHours.toString()}),
+          AppStrings.t('zone.max_hours', params: {'hours': (zone.maxDuration / 60).toString()}),
           style: TextStyle(
             fontSize: 12,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -347,7 +347,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
               const SizedBox(height: 4),
               // Máximo de horas
               Text(
-                AppStrings.t('zone.max_hours', params: {'hours': zone.maxHours.toString()}),
+                AppStrings.t('zone.max_hours', params: {'hours': (zone.maxDuration / 60).toString()}),
                 style: TextStyle(
                   fontSize: uiConfig.fontSize * 0.6,
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),

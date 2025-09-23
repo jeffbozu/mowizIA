@@ -42,6 +42,9 @@ class _PlateScreenState extends State<PlateScreen> {
 
   void _next() {
     if (_isValid) {
+      // Guardar la matrícula en el estado global
+      AppState.setCurrentPlate(_plateController.text.toUpperCase());
+      print('📝 Matrícula guardada en estado: ${AppState.currentPlate}');
       context.push('/tiempo');
     }
   }

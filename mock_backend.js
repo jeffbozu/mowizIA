@@ -46,8 +46,46 @@ function loadData() {
 // Inicializar datos por defecto si no hay archivo
 function initializeDefaultData() {
   mockData = {
-    companies: {},
-    operators: {},
+    companies: {
+      'mowiz-company': {
+        id: 'mowiz-company',
+        name: 'MOWIZ',
+        contact: 'info@mowiz.com',
+        phone: '+34 900 123 456',
+        address: 'Madrid, España',
+        createdAt: '2025-01-01T00:00:00.000Z'
+      },
+      'eypsa-company': {
+        id: 'eypsa-company',
+        name: 'EYPSA',
+        contact: 'info@eypsa.com',
+        phone: '+34 900 789 012',
+        address: 'Barcelona, España',
+        createdAt: '2025-01-01T00:00:00.000Z'
+      }
+    },
+    operators: {
+      'mowiz-admin': {
+        id: 'mowiz-admin',
+        companyId: 'mowiz-company',
+        name: 'MOWIZ Admin',
+        username: 'mowiz_admin',
+        password: 'Mo2025!',
+        role: 'admin',
+        permissions: ['all'],
+        createdAt: '2025-01-01T00:00:00.000Z'
+      },
+      'eypsa-admin': {
+        id: 'eypsa-admin',
+        companyId: 'eypsa-company',
+        name: 'EYPSA Admin',
+        username: 'eypsa_admin',
+        password: 'Ey2025!',
+        role: 'admin',
+        permissions: ['all'],
+        createdAt: '2025-01-01T00:00:00.000Z'
+      }
+    },
     zones: {},
     activeSessions: {},
     stats: {
@@ -192,10 +230,106 @@ function updateTechDiagnostics(updates) {
 }
 
 function addSession(sessionId, session) {
+  // Mantener fechas en formato ISO para compatibilidad con Flutter
   mockData.activeSessions[sessionId] = session;
   mockData.stats.activeSessions = Object.keys(mockData.activeSessions).length;
   saveData();
+  console.log(`🅿️ Sesión agregada: ${session.plate} (UTC: ${session.start} - ${session.end})`);
   return { success: true, session: session };
+}
+
+function updateSession(sessionId, session) {
+  if (mockData.activeSessions[sessionId]) {
+    mockData.activeSessions[sessionId] = session;
+    saveData();
+    console.log(`🔄 Sesión actualizada: ${session.plate}`);
+    return { success: true, session: session };
+  } else {
+    console.log(`❌ Sesión no encontrada para actualizar: ${sessionId}`);
+    return { success: false, message: 'Sesión no encontrada' };
+  }
+}
+
+function extendSession(plate, extraMinutes, extraPrice) {
+  // Buscar sesión por matrícula
+  let sessionToExtend = null;
+  let sessionId = null;
+  
+  for (const [id, session] of Object.entries(mockData.activeSessions)) {
+    if (session.plate === plate) {
+      sessionToExtend = session;
+      sessionId = id;
+      break;
+    }
+  }
+  
+  if (!sessionToExtend) {
+    console.log(`❌ Sesión no encontrada para extender: ${plate}`);
+    return { success: false, message: 'Sesión no encontrada' };
+  }
+  
+  // Obtener zona para validar límites
+  const zone = mockData.zones[sessionToExtend.zoneId];
+  if (!zone) {
+    console.log(`❌ Zona no encontrada: ${sessionToExtend.zoneId}`);
+    return { success: false, message: 'Zona no encontrada' };
+  }
+  
+  // Calcular tiempo actual de la sesión
+  const startTime = new Date(sessionToExtend.start);
+  const endTime = new Date(sessionToExtend.end);
+  const currentDurationMinutes = Math.floor((endTime - startTime) / (1000 * 60));
+  
+  // Validar límite máximo de la zona
+  const maxDurationMinutes = zone.maxDuration;
+  const newTotalMinutes = currentDurationMinutes + extraMinutes;
+  
+  if (newTotalMinutes > maxDurationMinutes) {
+    console.log(`❌ Extensión excede límite de zona: ${newTotalMinutes}min > ${maxDurationMinutes}min`);
+    return { 
+      success: false, 
+      message: `No se puede extender más. Máximo de zona: ${maxDurationMinutes}min. Quedan: ${maxDurationMinutes - currentDurationMinutes}min`,
+      maxAllowed: maxDurationMinutes - currentDurationMinutes
+    };
+  }
+  
+  // Extender sesión
+  const newEndTime = new Date(endTime.getTime() + (extraMinutes * 60 * 1000));
+  const extendedSession = {
+    ...sessionToExtend,
+    end: newEndTime.toISOString(),
+    totalPrice: sessionToExtend.totalPrice + extraPrice
+  };
+  
+  mockData.activeSessions[sessionId] = extendedSession;
+  saveData();
+  
+  console.log(`⏰ Sesión extendida: ${plate} +${extraMinutes}min (total: ${newTotalMinutes}min/${maxDurationMinutes}min)`);
+  return { success: true, session: extendedSession };
+}
+
+// Función para limpiar sesiones expiradas
+function cleanExpiredSessions() {
+  const now = new Date();
+  let cleanedCount = 0;
+  
+  for (const [sessionId, session] of Object.entries(mockData.activeSessions)) {
+    // Convertir hora de España a UTC para comparar
+    const endTime = new Date(session.end);
+    if (endTime < now) {
+      delete mockData.activeSessions[sessionId];
+      cleanedCount++;
+      console.log(`🗑️ Sesión expirada eliminada: ${session.plate} (expiró: ${endTime.toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })})`);
+    }
+  }
+  
+  if (cleanedCount > 0) {
+    mockData.stats.activeSessions = Object.keys(mockData.activeSessions).length;
+    saveData();
+    console.log(`🧹 Limpieza completada: ${cleanedCount} sesiones expiradas eliminadas`);
+  }
+  
+  return cleanedCount;
 }
 
 function removeSession(sessionId) {
@@ -614,10 +748,79 @@ wss.on('connection', (ws) => {
           broadcast({ type: 'session_added', ...sessionResult });
           break;
           
+        case 'update_session':
+          const updateResult = updateSession(data.sessionId, data.session);
+          ws.send(JSON.stringify({ type: 'session_updated', ...updateResult }));
+          broadcast({ type: 'session_updated', ...updateResult });
+          break;
+          
+        case 'extend_session':
+          console.log('⏰ Extendiendo sesión:', data);
+          const extendResult = extendSession(data.plate, data.extraMinutes, data.extraPrice);
+          ws.send(JSON.stringify({ type: 'session_extended', ...extendResult }));
+          broadcast({ type: 'session_extended', ...extendResult });
+          break;
+          
         case 'remove_session':
           const removeResult = removeSession(data.sessionId);
           ws.send(JSON.stringify({ type: 'session_removed', ...removeResult }));
           broadcast({ type: 'session_removed', ...removeResult });
+          break;
+          
+        case 'search_session':
+          console.log('🔍 Mensaje search_session recibido:', data);
+          const plate = data?.plate;
+          
+          if (!plate) {
+            console.log('❌ Error: No se proporcionó matrícula en search_session');
+            ws.send(JSON.stringify({ 
+              type: 'session_found', 
+              success: false, 
+              message: 'Error: No se proporcionó matrícula',
+              plate: null
+            }));
+            break;
+          }
+          
+          console.log(`🔍 Buscando sesión para matrícula: ${plate}`);
+          
+          // Buscar sesión por matrícula
+          let foundSession = null;
+          for (const [sessionId, session] of Object.entries(mockData.activeSessions)) {
+            if (session.plate === plate) {
+              foundSession = session;
+              break;
+            }
+          }
+          
+          if (foundSession) {
+            console.log(`✅ Sesión encontrada: ${foundSession.plate} en zona ${foundSession.zoneId}`);
+            ws.send(JSON.stringify({ 
+              type: 'session_found', 
+              success: true, 
+              session: foundSession,
+              plate: plate
+            }));
+          } else {
+            console.log(`❌ No se encontró sesión para matrícula: ${plate}`);
+            ws.send(JSON.stringify({ 
+              type: 'session_found', 
+              success: false, 
+              message: 'No hay sesión activa para esta matrícula',
+              plate: plate
+            }));
+          }
+          break;
+          
+        case 'clean_expired':
+          console.log('🧹 Limpieza manual de sesiones expiradas solicitada');
+          const cleanedCount = cleanExpiredSessions();
+          ws.send(JSON.stringify({ 
+            type: 'cleanup_completed', 
+            success: true, 
+            cleanedCount: cleanedCount,
+            message: `Limpieza completada: ${cleanedCount} sesiones eliminadas`
+          }));
           break;
           
         default:
@@ -669,4 +872,16 @@ server.listen(PORT, () => {
   console.log(`🔌 WebSocket: ws://localhost:${PORT}`);
   console.log(`📡 API REST: http://localhost:${PORT}/api/`);
   console.log('💾 Datos centralizados en mock_data.json');
+  
+  // Iniciar limpieza automática de sesiones expiradas cada 5 minutos
+  setInterval(() => {
+    console.log('🧹 Ejecutando limpieza automática de sesiones expiradas...');
+    cleanExpiredSessions();
+  }, 5 * 60 * 1000); // 5 minutos
+  
+  console.log('⏰ Limpieza automática de sesiones configurada (cada 5 minutos)');
+  
+  // Limpieza inicial al iniciar el servidor
+  console.log('🧹 Ejecutando limpieza inicial de sesiones expiradas...');
+  cleanExpiredSessions();
 });

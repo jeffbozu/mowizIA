@@ -8,6 +8,7 @@ import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
 import '../services/electronic_invoice_service.dart';
 import '../services/ticket_pdf_service.dart';
+import '../services/centralized_websocket_service.dart';
 
 class TicketScreen extends StatefulWidget {
   final bool isExtend;
@@ -49,7 +50,8 @@ class _TicketScreenState extends State<TicketScreen> {
   }
 
   void _extendSession() {
-    final existingSession = MockData.getSessionByPlate(widget.plate);
+    // Extender sesión en el backend
+    final existingSession = AppState.activeSessions[widget.plate];
     if (existingSession != null) {
       final newEnd = existingSession.end.add(Duration(minutes: widget.minutes));
       final newSession = Session(
@@ -58,12 +60,21 @@ class _TicketScreenState extends State<TicketScreen> {
         start: existingSession.start,
         end: newEnd,
         totalPrice: existingSession.totalPrice + widget.price,
+        paymentMethod: existingSession.paymentMethod,
       );
-      MockData.addSession(newSession);
+      
+      // Actualizar sesión en el backend (usar updateSession para evitar duplicados)
+      CentralizedWebSocketService.updateSession(
+        '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
+        newSession.toJson(),
+      );
+      
+      print('⏰ Sesión extendida en backend: ${widget.plate}');
     }
   }
 
   void _createNewSession() {
+    // Crear nueva sesión en el backend
     final start = DateTime.now();
     final end = start.add(Duration(minutes: widget.minutes));
     final session = Session(
@@ -72,8 +83,13 @@ class _TicketScreenState extends State<TicketScreen> {
       start: start,
       end: end,
       totalPrice: widget.price,
+      paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
     );
-    MockData.addSession(session);
+    
+    // La sesión ya fue registrada en payment_screen.dart
+    // No es necesario registrarla de nuevo aquí
+    
+    print('💾 Nueva sesión creada en backend: ${widget.plate}');
   }
 
   void _createInvoiceTransaction() {

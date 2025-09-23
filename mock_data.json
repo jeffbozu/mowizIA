@@ -1,160 +1,162 @@
 {
   "companies": {
-    "mowiz": {
-      "id": "mowiz",
-      "name": "MOWIZ Parking",
-      "color": "#E62144",
-      "backgroundColor": "#FFFFFF",
-      "logo": "MOWIZ",
-      "logoUrl": "",
-      "createdAt": "2025-09-17T09:52:09.738Z"
+    "mowiz-company": {
+      "id": "mowiz-company",
+      "name": "MOWIZ",
+      "contact": "info@mowiz.com",
+      "phone": "+34 900 123 456",
+      "address": "Madrid, España",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "eypsa": {
-      "id": "eypsa",
-      "name": "EYPSA Estacionamientos",
-      "color": "#2196F3",
-      "backgroundColor": "#F5F5F5",
-      "logo": "EYPSA",
-      "logoUrl": "",
-      "createdAt": "2025-09-17T09:52:09.738Z"
+    "eypsa-company": {
+      "id": "eypsa-company",
+      "name": "EYPSA",
+      "contact": "info@eypsa.com",
+      "phone": "+34 900 789 012",
+      "address": "Barcelona, España",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
   "operators": {
-    "mowiz_admin": {
-      "id": "mowiz_admin",
+    "mowiz-admin": {
+      "id": "mowiz-admin",
+      "companyId": "mowiz-company",
+      "name": "MOWIZ Admin",
       "username": "mowiz_admin",
       "password": "Mo2025!",
-      "name": "MOWIZ Admin",
-      "companyId": "mowiz",
       "role": "admin",
-      "createdAt": "2025-09-17T09:52:09.739Z"
+      "permissions": [
+        "all"
+      ],
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "eypsa_admin": {
-      "id": "eypsa_admin",
+    "eypsa-admin": {
+      "id": "eypsa-admin",
+      "companyId": "eypsa-company",
+      "name": "EYPSA Admin",
       "username": "eypsa_admin",
       "password": "Ey2025!",
-      "name": "EYPSA Admin",
-      "companyId": "eypsa",
       "role": "admin",
-      "createdAt": "2025-09-17T09:52:09.739Z"
+      "permissions": [
+        "all"
+      ],
+      "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
   "zones": {
     "mz_a": {
       "id": "mz_a",
-      "name": "MZ-A (Azul)",
-      "companyId": "mowiz",
-      "hourlyRate": 1.2,
+      "name": "Zona A - Madrid Centro",
       "pricePerHour": 1.2,
-      "maxHours": 4,
-      "color": "#2196F3",
-      "description": "Zona azul - Centro comercial",
-      "isActive": true,
-      "timeOptions": [
-        15,
-        30,
-        60,
-        120,
-        180,
-        240
-      ],
-      "timeIncrement": 15,
-      "minTime": 15,
-      "createdAt": "2025-09-17T09:52:09.740Z"
+      "maxDuration": 120,
+      "description": "Zona céntrica de Madrid",
+      "companyId": "mowiz-company",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "mz_v": {
-      "id": "mz_v",
-      "name": "MZ-V (Verde)",
-      "companyId": "mowiz",
-      "hourlyRate": 2.1,
-      "pricePerHour": 2.1,
-      "maxHours": 4,
-      "color": "#4CAF50",
-      "description": "Zona verde - Área residencial",
-      "isActive": true,
-      "timeOptions": [
-        15,
-        30,
-        60,
-        120,
-        180,
-        240
-      ],
-      "timeIncrement": 15,
-      "minTime": 15,
-      "createdAt": "2025-09-17T09:52:09.740Z"
+    "mz_b": {
+      "id": "mz_b",
+      "name": "Zona B - Madrid Norte",
+      "pricePerHour": 0.8,
+      "maxDuration": 180,
+      "description": "Zona norte de Madrid",
+      "companyId": "mowiz-company",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
     "ey_a": {
       "id": "ey_a",
-      "name": "EY-A (Azul)",
-      "companyId": "eypsa",
-      "hourlyRate": 1.5,
+      "name": "Zona A - Barcelona Eixample",
       "pricePerHour": 1.5,
-      "maxHours": 4,
-      "color": "#2196F3",
-      "description": "Zona azul - Distrito financiero",
-      "isActive": true,
-      "timeOptions": [
-        15,
-        30,
-        60,
-        120,
-        180,
-        240
-      ],
-      "timeIncrement": 15,
-      "minTime": 15,
-      "createdAt": "2025-09-17T09:52:09.740Z"
+      "maxDuration": 90,
+      "description": "Zona Eixample de Barcelona",
+      "companyId": "eypsa-company",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "ey_v": {
-      "id": "ey_v",
-      "name": "EY-V (Verde)",
-      "companyId": "eypsa",
-      "hourlyRate": 2.4,
-      "pricePerHour": 2.4,
-      "maxHours": 4,
-      "color": "#4CAF50",
-      "description": "Zona verde - Zona turística",
-      "isActive": true,
-      "timeOptions": [
-        15,
-        30,
-        60,
-        120,
-        180,
-        240
-      ],
-      "timeIncrement": 15,
-      "minTime": 15,
-      "createdAt": "2025-09-17T09:52:09.740Z"
-    },
-    "ey_r": {
-      "id": "ey_r",
-      "name": "EY-R (Residente)",
-      "companyId": "eypsa",
-      "hourlyRate": 0.5,
-      "pricePerHour": 0.5,
-      "maxHours": 24,
-      "color": "#FF9800",
-      "description": "Zona residente - Solo con etiqueta",
-      "isActive": true,
-      "timeOptions": [
-        15,
-        30,
-        60,
-        120,
-        180,
-        240,
-        480,
-        720,
-        960,
-        1440
-      ],
-      "timeIncrement": 15,
-      "minTime": 15,
-      "createdAt": "2025-09-17T09:52:09.740Z"
+    "ey_b": {
+      "id": "ey_b",
+      "name": "Zona B - Barcelona Centro",
+      "pricePerHour": 2,
+      "maxDuration": 60,
+      "description": "Zona centro de Barcelona",
+      "companyId": "eypsa-company",
+      "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
+  "activeSessions": {
+    "1234ZZZ_1758624484914": {
+      "plate": "1234ZZZ",
+      "zoneId": "mz_b",
+      "start": "2025-09-23T12:48:04.914611",
+      "end": "2025-09-23T15:48:04.914612",
+      "totalPrice": 2.4,
+      "paymentMethod": "contactless"
+    },
+    "1234LLL_1758626484319": {
+      "plate": "1234LLL",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T13:21:24.319191",
+      "end": "2025-09-23T14:21:24.319191",
+      "totalPrice": 1.2,
+      "paymentMethod": "cash"
+    },
+    "1111AAA_1758626910794": {
+      "plate": "1111AAA",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T13:28:30.794126",
+      "end": "2025-09-23T14:28:30.794126",
+      "totalPrice": 1.2,
+      "paymentMethod": "contactless"
+    },
+    "1234MMM_1758627197616": {
+      "plate": "1234MMM",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T13:33:17.616705",
+      "end": "2025-09-23T15:33:17.616705",
+      "totalPrice": 2.4,
+      "paymentMethod": "cash"
+    },
+    "1234FFF_1758628000738": {
+      "plate": "1234FFF",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T13:46:40.738954",
+      "end": "2025-09-23T14:46:40.738955",
+      "totalPrice": 1.2,
+      "paymentMethod": "cash"
+    },
+    "1111CCC_1758628082015": {
+      "plate": "1111CCC",
+      "zoneId": "mz_b",
+      "start": "2025-09-23T13:48:02.015472",
+      "end": "2025-09-23T15:48:02.015472",
+      "totalPrice": 1.6,
+      "paymentMethod": "contactless"
+    },
+    "1234HHH_1758628604027": {
+      "plate": "1234HHH",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T13:56:44.027936",
+      "end": "2025-09-23T14:56:44.027936",
+      "totalPrice": 1.2,
+      "paymentMethod": "contactless"
+    }
+  },
+  "stats": {
+    "totalIncome": 0,
+    "todayIncome": 0,
+    "activeSessions": 7,
+    "totalCompanies": 2,
+    "totalZones": 4,
+    "totalOperators": 2
+  },
+  "techDiagnostics": {
+    "network": true,
+    "printer": true,
+    "display": true,
+    "touch": true,
+    "coins": true,
+    "cards": true,
+    "lastUpdate": "2025-09-23T11:51:38.358Z"
+  },
+  "accessibility": {},
   "paymentConfig": {
     "acceptedCoins": [
       0.05,
@@ -166,52 +168,14 @@
     ],
     "acceptedCards": [
       "Visa",
-      "Mastercard",
-      "American Express"
+      "Mastercard"
     ],
     "maxChangeAmount": 10,
     "minPaymentAmount": 0.15,
     "currency": "EUR",
     "symbol": "€"
   },
-  "activeSessions": {},
-  "stats": {
-    "totalIncome": 0,
-    "todayIncome": 0,
-    "activeSessions": 0,
-    "totalCompanies": 2,
-    "totalZones": 5,
-    "totalOperators": 2
-  },
-  "techDiagnostics": {
-    "network": true,
-    "printer": true,
-    "display": true,
-    "touch": true,
-    "coins": true,
-    "cards": true,
-    "lastUpdate": "2025-09-17T14:42:13.125Z"
-  },
-  "accessibility": {
-    "darkMode": false,
-    "highContrast": false,
-    "fontSize": "normal",
-    "reduceAnimations": false,
-    "voiceGuide": false,
-    "voiceSpeed": 0.5,
-    "voicePitch": 1,
-    "voiceVolume": 0.8,
-    "adaptiveAI": false,
-    "simplifiedMode": false,
-    "currentLanguage": "es-ES"
-  },
-  "kioscoConfig": {
-    "id": "",
-    "location": "Centro Comercial",
-    "timezone": "Europe/Madrid",
-    "maintenanceMode": false,
-    "lastRestart": "2025-09-17T09:52:09.741Z"
-  },
+  "kioscoConfig": {},
   "parkingMeters": {
     "MAD_Centro_K01": {
       "id": "MAD_Centro_K01",
@@ -532,16 +496,16 @@
       "createdAt": "2025-01-17T09:00:00.000Z",
       "isApp": false
     },
-    "MAD_Centro_K31": {
-      "id": "MAD_Centro_K31",
+    "MAD_Centro_K45": {
+      "id": "MAD_Centro_K45",
       "name": "MEYPARK App Flutter",
       "location": "Aplicación Móvil",
       "gps": {
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "online",
-      "lastConnection": "2025-09-17T14:58:24.062Z",
+      "status": "offline",
+      "lastConnection": "2025-09-23T10:55:47.886Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -558,7 +522,239 @@
       "todayIncome": 0,
       "lastError": null,
       "version": "1.0.0",
-      "createdAt": "2025-09-17T14:54:30.438Z",
+      "createdAt": "2025-09-23T10:53:01.197Z",
+      "isApp": true
+    },
+    "MAD_Centro_K37": {
+      "id": "MAD_Centro_K37",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:19:16.131Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:12:20.089Z",
+      "isApp": true
+    },
+    "MAD_Centro_K94": {
+      "id": "MAD_Centro_K94",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:26:47.517Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:20:41.194Z",
+      "isApp": true
+    },
+    "MAD_Centro_K11": {
+      "id": "MAD_Centro_K11",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:27:30.488Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:26:59.950Z",
+      "isApp": true
+    },
+    "MAD_Centro_K5": {
+      "id": "MAD_Centro_K5",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:31:49.316Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:27:39.972Z",
+      "isApp": true
+    },
+    "MAD_Centro_K95": {
+      "id": "MAD_Centro_K95",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:45:27.291Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:32:02.022Z",
+      "isApp": true
+    },
+    "MAD_Centro_K42": {
+      "id": "MAD_Centro_K42",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:49:34.662Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:45:41.141Z",
+      "isApp": true
+    },
+    "MAD_Centro_K30": {
+      "id": "MAD_Centro_K30",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-23T11:51:25.815Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:49:44.986Z",
+      "isApp": true
+    },
+    "MAD_Centro_K49": {
+      "id": "MAD_Centro_K49",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-23T11:51:38.358Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T11:51:38.358Z",
       "isApp": true
     }
   }

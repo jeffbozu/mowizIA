@@ -91,7 +91,7 @@ class Zone {
   final String name;
   final String color;
   final double pricePerHour;
-  final int maxHours;
+  final int maxDuration; // Duración máxima en minutos
   final String description;
   final bool isActive;
   final DateTime createdAt;
@@ -106,7 +106,7 @@ class Zone {
     required this.name,
     required this.color,
     required this.pricePerHour,
-    required this.maxHours,
+    required this.maxDuration,
     required this.description,
     this.isActive = true,
     required this.createdAt,
@@ -122,7 +122,7 @@ class Zone {
       name: json['name'] ?? '',
       color: json['color'] ?? '#2196F3',
       pricePerHour: (json['pricePerHour'] ?? json['hourlyRate'] ?? 0.0).toDouble(),
-      maxHours: json['maxHours'] ?? 4,
+      maxDuration: json['maxDuration'] ?? 240, // 4 horas por defecto
       description: json['description'] ?? '',
       isActive: json['isActive'] ?? true,
       createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
@@ -139,7 +139,7 @@ class Zone {
       'name': name,
       'color': color,
       'pricePerHour': pricePerHour,
-      'maxHours': maxHours,
+      'maxDuration': maxDuration,
       'description': description,
       'isActive': isActive,
       'createdAt': createdAt.toIso8601String(),
@@ -295,6 +295,7 @@ class AppState {
   static Map<String, Session> activeSessions = {};
   static PaymentContext? currentPayment;
   static Operator? currentOperator;
+  static String? currentPlate;
   
   // Configuración de WebSocket
   static String? kioscoId;
@@ -343,6 +344,11 @@ class AppState {
   // Métodos para gestión de datos
   static void setCurrentCompany(Company company) {
     currentCompany = company;
+    notifyConfigChange();
+  }
+  
+  static void setCurrentPlate(String? plate) {
+    currentPlate = plate;
     notifyConfigChange();
   }
   

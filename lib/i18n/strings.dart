@@ -219,6 +219,14 @@ class AppStrings {
       'extend.extra_amount': 'Importe adicional',
       'extend.go_pay': 'Ir a Pago',
       'extend.max_reached': 'Tiempo máximo alcanzado',
+      'extend.enter_plate': 'Por favor, ingrese una matrícula',
+      'extend.enter_plate_to_search': 'Ingrese la matrícula a buscar',
+      'extend.search_instructions': 'Escriba la matrícula del vehículo para buscar una sesión activa y poder extender el tiempo de estacionamiento.',
+      'extend.session_found': 'Sesión encontrada correctamente',
+      'extend.max_duration_exceeded': 'No se puede extender más. Máximo de zona: {maxHours}h. Quedan: {remainingMinutes} min',
+      'extend.max_allowed': 'Tiempo máximo permitido',
+      'extend.max_allowed_hours': 'Máximo {hours}h',
+      'extend.remaining_to_extend': 'Tiempo restante para extender',
 
       // Common
       'common.loading': 'Cargando...',
@@ -451,6 +459,14 @@ class AppStrings {
       'extend.extra_amount': 'Extra amount',
       'extend.go_pay': 'Go to Payment',
       'extend.max_reached': 'Maximum time reached',
+      'extend.enter_plate': 'Please enter a license plate',
+      'extend.enter_plate_to_search': 'Enter the license plate to search',
+      'extend.search_instructions': 'Enter the vehicle license plate to search for an active session and extend parking time.',
+      'extend.session_found': 'Session found successfully',
+      'extend.max_duration_exceeded': 'Cannot extend further. Zone maximum: {maxHours}h. Remaining: {remainingMinutes} min',
+      'extend.max_allowed': 'Maximum allowed time',
+      'extend.max_allowed_hours': 'Max {hours}h',
+      'extend.remaining_to_extend': 'Remaining time to extend',
 
       // Common
       'common.loading': 'Loading...',

@@ -32,7 +32,7 @@ class _TimeScreenState extends State<TimeScreen> {
 
   void _addMinutes(int minutes) {
     final newMinutes = _selectedMinutes + minutes;
-    final maxMinutes = _selectedZone.maxHours * 60;
+    final maxMinutes = _selectedZone.maxDuration;
     
     if (newMinutes <= maxMinutes) {
       setState(() {
@@ -52,9 +52,12 @@ class _TimeScreenState extends State<TimeScreen> {
 
   void _pay() {
     final price = MockData.calculatePrice(_selectedZone.pricePerHour, _selectedMinutes);
+    final plate = AppState.currentPlate ?? 'SIN_MATRICULA';
+    print('🚗 Usando matrícula para pago: $plate');
+    
     context.push('/pago', extra: {
       'extend': false,
-      'matricula': '1234ABC', // TODO: Obtener de la sesión actual
+      'matricula': plate,
       'zonaId': _selectedZone.id,
       'minutos': _selectedMinutes,
       'precio': price,
@@ -73,7 +76,7 @@ class _TimeScreenState extends State<TimeScreen> {
 
   Widget _buildContent() {
     final timeOptions = _selectedZone.timeOptions; // Usar configuración de la zona
-    final maxMinutes = _selectedZone.maxHours * 60;
+    final maxMinutes = _selectedZone.maxDuration;
     final availableOptions = timeOptions.where((minutes) => minutes <= maxMinutes).toList();
 
     return Scaffold(

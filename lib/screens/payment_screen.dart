@@ -6,6 +6,7 @@ import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
 import '../services/local_storage_service.dart';
+import '../services/centralized_websocket_service.dart';
 
 class PaymentScreen extends StatefulWidget {
   final bool isExtend;
@@ -66,7 +67,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     // Si se excedió el precio, simular devolución de cambio
     if (_insertedAmount > widget.price) {
-      _simulateChangeReturn();
+      final change = _insertedAmount - widget.price;
+      if (change > 0) {
+        _simulateChangeReturn();
+      } else {
+        // Si no hay cambio real, procesar pago directamente
+        _payNow();
+      }
+    } else if (_insertedAmount == widget.price) {
+      // Si es cantidad exacta, procesar pago directamente
+      _payNow();
     }
   }
 
@@ -152,7 +162,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             _isProcessing = false;
           });
 
-          // Crear sesión si no es extensión
+          // Crear sesión si no es extensión - REGISTRAR EN BACKEND
           if (!widget.isExtend) {
             final session = Session(
               plate: widget.plate,
@@ -162,12 +172,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
               totalPrice: widget.price,
               paymentMethod: _paymentMethod,
             );
-            MockData.addSession(session);
-            print('💾 Sesión guardada: ${session.plate} en zona ${session.zoneId}');
-            print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');
             
-            // Guardar sesiones en almacenamiento local
-            await LocalStorageService.saveSessions();
+            // Registrar sesión en el backend
+            CentralizedWebSocketService.addSession(
+              '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
+              session.toJson(),
+            );
+            
+            print('💾 Sesión registrada en backend: ${session.plate} en zona ${session.zoneId}');
+            print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');
           }
 
           // Ir al ticket
