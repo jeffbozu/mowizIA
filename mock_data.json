@@ -169,12 +169,20 @@
       "end": "2025-09-23T15:13:33.142743",
       "totalPrice": 0.8,
       "paymentMethod": "chip"
+    },
+    "1334AAA_1758629823463": {
+      "plate": "1334AAA",
+      "zoneId": "mz_a",
+      "start": "2025-09-23T14:17:03.463038",
+      "end": "2025-09-23T15:17:03.463039",
+      "totalPrice": 1.2,
+      "paymentMethod": "contactless"
     }
   },
   "stats": {
     "totalIncome": 0,
     "todayIncome": 0,
-    "activeSessions": 11,
+    "activeSessions": 12,
     "totalCompanies": 2,
     "totalZones": 4,
     "totalOperators": 2
@@ -186,7 +194,7 @@
     "touch": true,
     "coins": true,
     "cards": true,
-    "lastUpdate": "2025-09-23T12:11:45.143Z"
+    "lastUpdate": "2025-09-23T12:16:35.639Z"
   },
   "accessibility": {},
   "paymentConfig": {
@@ -826,8 +834,8 @@
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "online",
-      "lastConnection": "2025-09-23T12:11:45.142Z",
+      "status": "offline",
+      "lastConnection": "2025-09-23T12:16:27.513Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -845,6 +853,35 @@
       "lastError": null,
       "version": "1.0.0",
       "createdAt": "2025-09-23T12:11:45.142Z",
+      "isApp": true
+    },
+    "MAD_Centro_K15": {
+      "id": "MAD_Centro_K15",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-23T12:16:35.638Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-23T12:16:35.638Z",
       "isApp": true
     }
   }

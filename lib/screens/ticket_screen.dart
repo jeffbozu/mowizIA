@@ -271,7 +271,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
 
   Future<void> _openElectronicInvoice() async {
     if (_invoiceTransaction?.id != null) {
-      final url = 'http://localhost:3001/facturacion.html?transaction=${_invoiceTransaction!.id}';
+      final url = 'http://localhost:3002/facturacion.html?transaction=${_invoiceTransaction!.id}';
       final uri = Uri.parse(url);
       
       try {
