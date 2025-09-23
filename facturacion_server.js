@@ -123,36 +123,24 @@ app.get('/api/transaction/:id', (req, res) => {
   const transactionId = req.params.id;
   let transaction = transactions.get(transactionId);
   
-  // Si no encontramos la transacción en memoria, intentar cargarla desde mock_data.json
+  // Si no encontramos la transacción en memoria, crear una transacción de prueba
   if (!transaction) {
-    try {
-      const mockData = JSON.parse(fs.readFileSync('mock_data.json', 'utf8'));
-      
-      // Buscar en sesiones activas
-      if (mockData.sessions) {
-        for (const [sessionId, session] of Object.entries(mockData.sessions)) {
-          if (session.transactionId === transactionId) {
-            transaction = {
-              id: transactionId,
-              plate: session.plate,
-              zoneId: session.zoneId,
-              timestamp: session.start || new Date().toISOString(),
-              amount: session.totalPrice || 0,
-              paymentMethod: session.paymentMethod || 'cash',
-              kioscoId: 'KIOSCO_001',
-              isExtend: session.isExtend || false,
-              minutes: session.minutes || 60
-            };
-            
-            // Guardar en memoria para futuras consultas
-            transactions.set(transactionId, transaction);
-            break;
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error cargando mock_data.json:', error);
-    }
+    // Crear una transacción de prueba basada en el ID
+    transaction = {
+      id: transactionId,
+      plate: '1234ABC',
+      zoneId: 'ZONA_001',
+      timestamp: new Date().toISOString(),
+      amount: 2.50,
+      paymentMethod: 'cash',
+      kioscoId: 'KIOSCO_001',
+      isExtend: false,
+      minutes: 60
+    };
+    
+    // Guardar en memoria para futuras consultas
+    transactions.set(transactionId, transaction);
+    console.log(`📝 Transacción de prueba creada: ${transactionId}`);
   }
   
   if (!transaction) {
