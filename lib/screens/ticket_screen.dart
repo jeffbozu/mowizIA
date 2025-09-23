@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../i18n/strings.dart';
 import '../data/models.dart';
 import '../data/mock_data.dart';
@@ -268,6 +269,37 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     _returnToZones();
   }
 
+  Future<void> _openElectronicInvoice() async {
+    if (_invoiceTransaction?.id != null) {
+      final url = 'http://localhost:3001/facturacion.html?transaction=${_invoiceTransaction!.id}';
+      final uri = Uri.parse(url);
+      
+      try {
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('No se pudo abrir el enlace: $url'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al abrir la facturación: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<void>(
@@ -428,6 +460,18 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
                           textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: _openElectronicInvoice,
+                          child: Text(
+                            AppStrings.t('ticket.click_here'),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 16),
                         if (_qrData != null) ...[
