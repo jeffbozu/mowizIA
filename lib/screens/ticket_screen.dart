@@ -64,7 +64,11 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     }
     
     // Crear transacción de facturación electrónica
-    _createInvoiceTransaction();
+    _createInvoiceTransaction().then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
     
     // Iniciar animación de éxito
     _successAnimationController.forward();
@@ -140,8 +144,8 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     print('💾 Nueva sesión creada en backend: ${widget.plate}');
   }
 
-  void _createInvoiceTransaction() {
-    _invoiceTransaction = ElectronicInvoiceService.createTransaction(
+  Future<void> _createInvoiceTransaction() async {
+    _invoiceTransaction = await ElectronicInvoiceService.createTransaction(
       plate: widget.plate,
       zoneId: widget.zoneId,
       amount: widget.price,

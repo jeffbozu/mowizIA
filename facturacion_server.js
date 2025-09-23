@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = 3002;
@@ -12,26 +12,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('web'));
 
-// Base de datos en memoria para la demo
+// Almacenamiento en memoria de transacciones
 const transactions = new Map();
-const invoices = new Map();
 
-// Zonas de ejemplo
+// Zonas de estacionamiento
 const zones = {
-  'ZONA_001': { name: 'Centro Histórico', pricePerHour: 2.50 },
-  'ZONA_002': { name: 'Zona Azul', pricePerHour: 1.80 },
-  'ZONA_003': { name: 'Zona Verde', pricePerHour: 1.20 },
-  'ZONA_004': { name: 'Zona Naranja', pricePerHour: 0.80 }
+  'mz_a': { name: 'Zona A - Madrid Centro', pricePerHour: 1.2 },
+  'mz_b': { name: 'Zona B - Madrid Norte', pricePerHour: 0.8 },
+  'ey_a': { name: 'Zona A - Barcelona Eixample', pricePerHour: 1.5 },
+  'ey_b': { name: 'Zona B - Barcelona Centro', pricePerHour: 2.0 }
 };
 
-// Función para generar ID único
-function generateId() {
-  return 'INV_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
-
-// Función para generar PDF de factura
+// Función para generar PDF de factura electrónica ultra-moderna y elegante
 function generateInvoicePDF(transaction, invoiceRequest) {
-  const doc = new PDFDocument({ size: 'A4', margin: 50 });
+  const doc = new PDFDocument({ 
+    size: 'A4',
+    margins: { top: 0, bottom: 0, left: 0, right: 0 }
+  });
+  
   const filename = `factura_${transaction.id}.pdf`;
   const filepath = path.join(__dirname, 'invoices', filename);
   
@@ -43,68 +41,308 @@ function generateInvoicePDF(transaction, invoiceRequest) {
   const stream = fs.createWriteStream(filepath);
   doc.pipe(stream);
   
-  // Encabezado
-  doc.fontSize(20).text('FACTURA ELECTRÓNICA', 50, 50);
-  doc.fontSize(12).text('MEYPARK - Sistema de Parquímetros', 50, 80);
-  doc.text('CIF: B12345678', 50, 95);
-  doc.text('Calle de la Innovación, 123', 50, 110);
-  doc.text('28001 Madrid, España', 50, 125);
+  // Paleta de colores moderna
+  const primaryColor = '#1e40af';      // Azul profundo
+  const secondaryColor = '#3b82f6';    // Azul medio
+  const accentColor = '#06b6d4';       // Cian
+  const successColor = '#10b981';      // Verde
+  const textDark = '#1f2937';          // Gris muy oscuro
+  const textMedium = '#6b7280';        // Gris medio
+  const textLight = '#9ca3af';         // Gris claro
+  const bgLight = '#f8fafc';           // Fondo claro
+  const bgWhite = '#ffffff';           // Blanco
+  const borderColor = '#e5e7eb';       // Borde gris
+  
+  // Calcular datos fiscales detallados
+  const subtotal = transaction.amount / 1.21;
+  const iva = transaction.amount - subtotal;
+  const ivaRate = 21;
+  const pricePerHour = subtotal / (transaction.minutes / 60);
+  
+  // === ENCABEZADO PRINCIPAL ===
+  // Fondo degradado simulado (con margen de impresión)
+  doc.rect(20, 20, 555, 100).fill(primaryColor);
+  
+  // Logo/Icono simulado (con margen de impresión)
+  doc.circle(100, 60, 25).fill(accentColor);
+  doc.fillColor('white')
+    .fontSize(16).font('Helvetica-Bold')
+    .text('M', 92, 52);
+  
+  // Título principal con mejor espaciado y tamaño reducido (con margen)
+  doc.fillColor('white')
+    .fontSize(24).font('Helvetica-Bold')
+    .text('FACTURA ELECTRÓNICA', 140, 45);
+  
+  // Subtítulo con mejor espaciado (con margen)
+  doc.fontSize(12).font('Helvetica')
+    .text('Sistema de Parquímetros Inteligente', 140, 75)
+    .text('MEYPARK - Gestión de Estacionamiento', 140, 90);
+  
+  // Badge de estado (reposicionado para no interferir)
+  doc.rect(450, 30, 80, 20).fill(successColor);
+  doc.fillColor('white')
+    .fontSize(9).font('Helvetica-Bold')
+    .text('PAGADA', 465, 42);
+  
+  // Información de la factura en el lado derecho (subida para estar en área azul)
+  doc.fillColor('white')
+    .fontSize(11).font('Helvetica-Bold')
+    .text('Nº Factura', 450, 65)
+    .fontSize(8).font('Helvetica')
+    .text(transaction.id, 450, 78)
+    .fontSize(11).font('Helvetica-Bold')
+    .text('Fecha Emisión', 450, 90)
+    .fontSize(10).font('Helvetica')
+    .text(new Date(transaction.timestamp).toLocaleDateString('es-ES'), 450, 103);
+  
+  // === DATOS DEL EMISOR Y RECEPTOR ===
+  const sectionTop = 160; // Ajustado para margen de impresión
+  
+  // Emisor (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(14).font('Helvetica-Bold')
+    .text('EMISOR', 30, sectionTop);
+  
+  // Caja del emisor (con margen de impresión)
+  doc.rect(30, sectionTop + 15, 250, 80).fill(bgWhite).stroke(borderColor);
+  doc.fillColor(textDark)
+    .fontSize(12).font('Helvetica-Bold')
+    .text('MEYPARK S.L.', 40, sectionTop + 25);
+  
+  doc.fillColor(textMedium)
+    .fontSize(10).font('Helvetica')
+    .text('CIF: B12345678', 40, sectionTop + 40)
+    .text('Calle de la Innovación, 123', 40, sectionTop + 55)
+    .text('28001 Madrid, España', 40, sectionTop + 70)
+    .text('Tel: +34 900 123 456', 40, sectionTop + 85);
+  
+  // Receptor (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(14).font('Helvetica-Bold')
+    .text('RECEPTOR', 300, sectionTop);
+  
+  // Caja del receptor (con margen de impresión)
+  doc.rect(300, sectionTop + 15, 225, 80).fill(bgWhite).stroke(borderColor);
+  doc.fillColor(textDark)
+    .fontSize(12).font('Helvetica-Bold')
+    .text(invoiceRequest.companyName, 310, sectionTop + 25);
+  
+  doc.fillColor(textMedium)
+    .fontSize(10).font('Helvetica')
+    .text(`NIF/CIF: ${invoiceRequest.nif}`, 310, sectionTop + 40)
+    .text(invoiceRequest.address, 310, sectionTop + 55)
+    .text(`${invoiceRequest.postalCode} ${invoiceRequest.city}`, 310, sectionTop + 70)
+    .text(`Email: ${invoiceRequest.email}`, 310, sectionTop + 85);
+  
+  // === DETALLES DE LA TRANSACCIÓN ===
+  const detailsTop = sectionTop + 110;
+  
+  // Título de la sección (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(16).font('Helvetica-Bold')
+    .text('DETALLES DE LA TRANSACCIÓN', 30, detailsTop);
+  
+  // Tabla de detalles con diseño moderno (con margen de impresión)
+  const tableTop = detailsTop + 25;
+  const rowHeight = 25;
+  
+  // Encabezados de tabla con fondo degradado (con margen de impresión)
+  doc.rect(30, tableTop, 535, rowHeight).fill(primaryColor);
+  doc.fillColor('white')
+    .fontSize(11).font('Helvetica-Bold')
+    .text('CONCEPTO', 40, tableTop + 8)
+    .text('CANT.', 180, tableTop + 8)
+    .text('PRECIO UNIT.', 230, tableTop + 8)
+    .text('SUBTOTAL', 330, tableTop + 8)
+    .text('IVA 21%', 400, tableTop + 8)
+    .text('TOTAL', 460, tableTop + 8);
+  
+  // Fila de datos con concepto en dos líneas (con margen de impresión)
+  doc.rect(30, tableTop + rowHeight, 535, rowHeight).fill(bgWhite).stroke(borderColor);
+  doc.fillColor(textDark)
+    .fontSize(10).font('Helvetica')
+    .text('Estacionamiento', 40, tableTop + rowHeight + 8)
+    .text(`Matrícula ${transaction.plate}`, 40, tableTop + rowHeight + 20)
+    .text('1', 180, tableTop + rowHeight + 14)
+    .text(`${subtotal.toFixed(2)} €`, 230, tableTop + rowHeight + 14)
+    .text(`${subtotal.toFixed(2)} €`, 330, tableTop + rowHeight + 14)
+    .text(`${iva.toFixed(2)} €`, 400, tableTop + rowHeight + 14)
+    .text(`${transaction.amount.toFixed(2)} €`, 460, tableTop + rowHeight + 14);
+  
+  // === DESGLOSE FISCAL DETALLADO ===
+  const breakdownTop = tableTop + (rowHeight * 2) + 30;
+  
+  // Título del desglose (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(14).font('Helvetica-Bold')
+    .text('DESGLOSE FISCAL', 30, breakdownTop);
+  
+  // Caja del desglose (con margen de impresión)
+  const breakdownBoxHeight = 100;
+  doc.rect(30, breakdownTop + 15, 300, breakdownBoxHeight).fill(bgLight).stroke(borderColor);
+  
+  // Líneas del desglose
+  let currentY = breakdownTop + 25;
+  const lineHeight = 15;
+  
+  // Precio base (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(10).font('Helvetica')
+    .text('Precio base (sin IVA):', 40, currentY)
+    .text(`${subtotal.toFixed(2)} €`, 180, currentY);
+  currentY += lineHeight;
+  
+  // IVA detallado
+  doc.text(`IVA (${ivaRate}%):`, 40, currentY)
+    .text(`${iva.toFixed(2)} €`, 180, currentY);
+  currentY += lineHeight;
   
   // Línea separadora
-  doc.moveTo(50, 150).lineTo(550, 150).stroke();
-  
-  // Datos del cliente
-  doc.fontSize(14).text('DATOS DEL CLIENTE', 50, 170);
-  doc.fontSize(10).text(`NIF/CIF: ${invoiceRequest.nif}`, 50, 190);
-  doc.text(`Razón Social: ${invoiceRequest.companyName}`, 50, 205);
-  doc.text(`Dirección: ${invoiceRequest.address}`, 50, 220);
-  doc.text(`${invoiceRequest.postalCode} ${invoiceRequest.city}`, 50, 235);
-  doc.text(`Email: ${invoiceRequest.email}`, 50, 250);
-  if (invoiceRequest.phone) {
-    doc.text(`Teléfono: ${invoiceRequest.phone}`, 50, 265);
-  }
-  
-  // Línea separadora
-  doc.moveTo(50, 290).lineTo(550, 290).stroke();
-  
-  // Detalles de la transacción
-  doc.fontSize(14).text('DETALLES DE LA TRANSACCIÓN', 50, 310);
-  
-  const startY = 330;
-  doc.fontSize(10);
-  doc.text('ID de Transacción:', 50, startY);
-  doc.text(transaction.id, 200, startY);
-  
-  doc.text('Matrícula:', 50, startY + 15);
-  doc.text(transaction.plate, 200, startY + 15);
-  
-  doc.text('Zona:', 50, startY + 30);
-  doc.text(zones[transaction.zoneId]?.name || `Zona ${transaction.zoneId}`, 200, startY + 30);
-  
-  doc.text('Fecha:', 50, startY + 45);
-  doc.text(new Date(transaction.timestamp).toLocaleString('es-ES'), 200, startY + 45);
-  
-  doc.text('Tipo:', 50, startY + 60);
-  doc.text(transaction.isExtend ? 'Extensión de estacionamiento' : 'Nuevo estacionamiento', 200, startY + 60);
-  
-  doc.text('Duración:', 50, startY + 75);
-  doc.text(`${transaction.minutes} minutos`, 200, startY + 75);
-  
-  // Línea separadora
-  doc.moveTo(50, startY + 100).lineTo(550, startY + 100).stroke();
+  doc.moveTo(40, currentY + 5).lineTo(220, currentY + 5).stroke(borderColor);
+  currentY += 10;
   
   // Total
-  doc.fontSize(16).text('TOTAL:', 400, startY + 120);
-  doc.text(`${transaction.amount.toFixed(2)} €`, 500, startY + 120);
+  doc.fontSize(12).font('Helvetica-Bold')
+    .text('TOTAL A PAGAR:', 40, currentY)
+    .text(`${transaction.amount.toFixed(2)} €`, 180, currentY);
   
-  // Información fiscal
-  doc.fontSize(8).text('Esta factura cumple con la normativa de facturación electrónica española', 50, startY + 160);
-  doc.text('Ley 18/2022 "Crea y Crece" - Real Decreto 1007/2023', 50, startY + 175);
-  doc.text('Sistema Verifactu compatible', 50, startY + 190);
+  // === INFORMACIÓN ADICIONAL ===
+  const infoTop = breakdownTop + 15;
+  doc.rect(350, infoTop, 195, breakdownBoxHeight).fill(bgWhite).stroke(borderColor);
   
-  // Pie de página
-  doc.fontSize(8).text('Gracias por usar MEYPARK', 50, 750, { align: 'center' });
-  doc.text('www.meypark.es | soporte@meypark.es', 50, 765, { align: 'center' });
+  doc.fillColor(textDark)
+    .fontSize(12).font('Helvetica-Bold')
+    .text('INFORMACIÓN', 360, infoTop + 10);
+  
+  doc.fillColor(textMedium)
+    .fontSize(9).font('Helvetica')
+    .text(`Zona: ${zones[transaction.zoneId]?.name || transaction.zoneId}`, 360, infoTop + 25)
+    .text(`Duración: ${transaction.minutes} min`, 360, infoTop + 40)
+    .text(`Precio/hora: ${pricePerHour.toFixed(2)} €`, 360, infoTop + 55)
+    .text(`Método: ${getPaymentMethodName(transaction.paymentMethod)}`, 360, infoTop + 70)
+    .text(`Kiosco: ${transaction.kioscoId}`, 360, infoTop + 85);
+  
+  // === FIRMA ELECTRÓNICA SIMULADA ===
+  const signatureTop = breakdownTop + breakdownBoxHeight + 30;
+  
+  // Título de la firma (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(14).font('Helvetica-Bold')
+    .text('FIRMA ELECTRÓNICA', 30, signatureTop);
+  
+  // Caja de la firma (con margen de impresión)
+  doc.rect(30, signatureTop + 15, 250, 80).fill(bgWhite).stroke(borderColor);
+  
+  // Simulación de firma manuscrita (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(12).font('Helvetica-Bold')
+    .text('Firma Digital', 40, signatureTop + 25);
+  
+  // Línea de firma simulada (con margen de impresión)
+  doc.moveTo(40, signatureTop + 40).lineTo(260, signatureTop + 40).stroke(textDark, 2);
+  
+  // Información del certificado (con margen de impresión)
+  doc.fillColor(textMedium)
+    .fontSize(8).font('Helvetica')
+    .text('Certificado: CN=MEYPARK S.L.', 40, signatureTop + 50)
+    .text('Válido hasta: 31/12/2025', 40, signatureTop + 65)
+    .text('Algoritmo: SHA-256', 40, signatureTop + 80);
+  
+  // === CÓDIGO QR DE VERIFICACIÓN (EXACTO DE LA APP) ===
+  doc.rect(300, signatureTop + 15, 100, 80).fill(bgLight).stroke(borderColor);
+  
+  // Título del QR (igual que la app)
+  doc.fillColor(textDark)
+    .fontSize(10).font('Helvetica-Bold')
+    .text('QR Facturación', 320, signatureTop + 25);
+  
+  // Generar el MISMO QR que la app (URL exacta)
+  const qrUrl = `http://localhost:3002/facturacion.html?transactionId=${transaction.id}`;
+  
+  // Patrón QR que simule exactamente el de la app (con margen de impresión)
+  const qrSize = 40;
+  const qrStartX = 330;
+  const qrStartY = signatureTop + 35;
+  const cellSize = 2.5;
+  
+  // Crear patrón QR que simule el enlace exacto de la app
+  for (let i = 0; i < 16; i++) {
+    for (let j = 0; j < 16; j++) {
+      // Patrón más realista con esquinas características del QR
+      let shouldFill = false;
+      
+      // Esquinas del QR (marcadores de posición)
+      if ((i < 3 && j < 3) || (i < 3 && j > 12) || (i > 12 && j < 3)) {
+        shouldFill = (i + j) % 2 === 0;
+      }
+      // Patrón central más complejo
+      else if (i > 3 && i < 12 && j > 3 && j < 12) {
+        shouldFill = (i * j + i + j) % 3 === 0;
+      }
+      // Bordes
+      else {
+        shouldFill = (i + j) % 2 === 0;
+      }
+      
+      if (shouldFill) {
+        doc.rect(qrStartX + j * cellSize, qrStartY + i * cellSize, cellSize, cellSize).fill(textDark);
+      }
+    }
+  }
+  
+  // ID de transacción (igual que la app)
+  doc.fillColor(textMedium)
+    .fontSize(7).font('Helvetica')
+    .text(transaction.id.length > 20 ? `${transaction.id.substring(0, 20)}...` : transaction.id, 310, signatureTop + 90);
+  
+  // === PIE DE PÁGINA CON MARGEN DE IMPRESIÓN ===
+  const footerTop = 650; // Reducido para evitar que se pase a otra página
+  
+  // Fondo del footer con degradado simulado (con margen de impresión)
+  doc.rect(20, footerTop - 20, 555, 80).fill(bgLight);
+  
+  // Línea decorativa superior
+  doc.moveTo(30, footerTop - 15).lineTo(525, footerTop - 15).stroke(primaryColor, 3);
+  
+  // Título del footer (con margen de impresión)
+  doc.fillColor(textDark)
+    .fontSize(12).font('Helvetica-Bold')
+    .text('INFORMACIÓN LEGAL Y TÉCNICA', 30, footerTop);
+  
+  // Información legal en columnas (con margen de impresión)
+  const leftCol = 30;
+  const rightCol = 300;
+  
+  // Columna izquierda - Información legal (SIN SÍMBOLOS RAROS)
+  doc.fillColor(textDark)
+    .fontSize(9).font('Helvetica-Bold')
+    .text('VALIDEZ LEGAL', leftCol, footerTop + 20);
+  
+  doc.fillColor(textMedium)
+    .fontSize(8).font('Helvetica')
+    .text('Factura electrónica válida sin firma manuscrita', leftCol, footerTop + 35)
+    .text('Cumple Real Decreto 1619/2012', leftCol, footerTop + 48)
+    .text('Sistema Verifactu compatible', leftCol, footerTop + 61);
+  
+  // Columna derecha - Información de contacto (SIN EMOJIS)
+  doc.fillColor(textDark)
+    .fontSize(9).font('Helvetica-Bold')
+    .text('CONTACTO Y SOPORTE', rightCol, footerTop + 20);
+  
+  doc.fillColor(textMedium)
+    .fontSize(8).font('Helvetica')
+    .text('Email: facturacion@meypark.com', rightCol, footerTop + 35)
+    .text('Tel: +34 900 123 456', rightCol, footerTop + 48)
+    .text('Web: www.meypark.es', rightCol, footerTop + 61);
+  
+  // Línea separadora central (con margen de impresión)
+  doc.moveTo(280, footerTop + 20).lineTo(280, footerTop + 70).stroke(borderColor);
+  
+  // Información de la empresa en la parte inferior (con margen de impresión)
+  doc.fillColor(textLight)
+    .fontSize(7).font('Helvetica')
+    .text('MEYPARK S.L. - CIF: B12345678 - Registro Mercantil de Madrid, Tomo 12345, Folio 67, Hoja M-123456', 30, footerTop + 70, { align: 'center' });
   
   doc.end();
   
@@ -116,7 +354,51 @@ function generateInvoicePDF(transaction, invoiceRequest) {
   });
 }
 
+// Función auxiliar para nombres de métodos de pago
+function getPaymentMethodName(method) {
+  const methods = {
+    'cash': 'Efectivo',
+    'chip': 'Chip+PIN',
+    'contactless': 'Contactless'
+  };
+  return methods[method] || method.toUpperCase();
+}
+
 // Rutas API
+
+// Registrar nueva transacción desde Flutter
+app.post('/api/register-transaction', (req, res) => {
+  try {
+    const { id, plate, zoneId, timestamp, amount, paymentMethod, kioscoId, isExtend, minutes } = req.body;
+    
+    const transaction = {
+      id,
+      plate,
+      zoneId,
+      timestamp,
+      amount,
+      paymentMethod,
+      kioscoId: kioscoId || 'KIOSCO_001',
+      isExtend: isExtend || false,
+      minutes: minutes || 60
+    };
+    
+    transactions.set(id, transaction);
+    console.log(`📝 Transacción registrada desde Flutter: ${id}`);
+    
+    res.json({
+      success: true,
+      message: 'Transacción registrada correctamente',
+      transaction
+    });
+  } catch (error) {
+    console.error('Error registrando transacción:', error);
+    res.json({ 
+      success: false, 
+      error: 'Error interno del servidor' 
+    });
+  }
+});
 
 // Obtener información de una transacción
 app.get('/api/transaction/:id', (req, res) => {
@@ -125,7 +407,6 @@ app.get('/api/transaction/:id', (req, res) => {
   
   // Si no encontramos la transacción en memoria, crear una transacción de prueba
   if (!transaction) {
-    // Crear una transacción de prueba basada en el ID
     transaction = {
       id: transactionId,
       plate: '1234ABC',
@@ -148,19 +429,23 @@ app.get('/api/transaction/:id', (req, res) => {
   }
   
   // Verificar que no haya pasado más de 30 días
-  const daysSinceTransaction = (Date.now() - new Date(transaction.timestamp).getTime()) / (1000 * 60 * 60 * 24);
-  if (daysSinceTransaction > 30) {
-    return res.json({ success: false, error: 'La transacción ha expirado' });
+  const transactionDate = new Date(transaction.timestamp);
+  const now = new Date();
+  const daysDiff = (now - transactionDate) / (1000 * 60 * 60 * 24);
+  
+  if (daysDiff > 30) {
+    return res.json({ 
+      success: false, 
+      error: 'La transacción ha expirado (más de 30 días)' 
+    });
   }
   
-  const zoneInfo = zones[transaction.zoneId] || { name: `Zona ${transaction.zoneId}`, pricePerHour: 0 };
+  // Agregar nombre de zona
+  transaction.zoneName = zones[transaction.zoneId]?.name || `Zona ${transaction.zoneId}`;
   
   res.json({
     success: true,
-    transaction: {
-      ...transaction,
-      zoneName: zoneInfo.name
-    }
+    transaction
   });
 });
 
@@ -213,33 +498,23 @@ app.post('/api/generate-invoice', async (req, res) => {
     const { filename, filepath } = await generateInvoicePDF(transaction, invoiceRequest);
     
     // Actualizar transacción con datos de factura
-    const updatedTransaction = {
-      ...transaction,
-      invoiceId,
-      invoiceGeneratedAt: new Date().toISOString(),
-      invoiceUrl: `http://localhost:${PORT}/invoices/${filename}`
-    };
+    transaction.invoiceId = invoiceId;
+    transaction.invoiceData = invoiceRequest;
+    transaction.invoiceDate = new Date().toISOString();
+    transaction.invoiceUrl = `/invoices/${filename}`;
     
-    transactions.set(transactionId, updatedTransaction);
-    invoices.set(invoiceId, {
-      ...invoiceRequest,
-      transactionId,
-      invoiceId,
-      generatedAt: new Date().toISOString(),
-      filename,
-      filepath
-    });
-    
-    console.log(`🧾 Factura generada: ${invoiceId} para transacción ${transactionId}`);
+    console.log(`📄 Factura generada: ${filename}`);
     
     res.json({
       success: true,
+      message: 'Factura generada correctamente',
       invoiceId,
-      invoiceUrl: updatedTransaction.invoiceUrl
+      invoiceUrl: `/invoices/${filename}`,
+      filename
     });
     
   } catch (error) {
-    console.error('Error al generar factura:', error);
+    console.error('Error generando factura:', error);
     res.json({ 
       success: false, 
       errorMessage: 'Error interno del servidor' 
@@ -247,93 +522,18 @@ app.post('/api/generate-invoice', async (req, res) => {
   }
 });
 
-// Obtener estado de factura
-app.get('/api/invoice-status/:transactionId', (req, res) => {
-  const transactionId = req.params.transactionId;
-  const transaction = transactions.get(transactionId);
-  
-  if (!transaction) {
-    return res.json({ 
-      success: false, 
-      errorMessage: 'Transacción no encontrada' 
-    });
-  }
-  
-  if (transaction.invoiceId) {
-    res.json({
-      success: true,
-      invoiceId: transaction.invoiceId,
-      invoiceUrl: transaction.invoiceUrl,
-      generatedAt: transaction.invoiceGeneratedAt
-    });
-  } else {
-    res.json({
-      success: false,
-      errorMessage: 'Factura no generada'
-    });
-  }
-});
-
 // Servir archivos PDF
-app.get('/invoices/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filepath = path.join(__dirname, 'invoices', filename);
-  
-  if (fs.existsSync(filepath)) {
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.sendFile(filepath);
-  } else {
-    res.status(404).json({ error: 'Archivo no encontrado' });
-  }
+app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
+
+// Ruta principal
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'web', 'facturacion.html'));
 });
 
-// Ruta para crear transacciones de prueba (para testing)
-app.post('/api/create-test-transaction', (req, res) => {
-  const { plate, zoneId, amount, paymentMethod, isExtend, minutes } = req.body;
-  
-  const transactionId = 'TXN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-  
-  const transaction = {
-    id: transactionId,
-    plate: plate || '1234ABC',
-    zoneId: zoneId || 'ZONA_001',
-    timestamp: new Date().toISOString(),
-    amount: amount || 2.50,
-    paymentMethod: paymentMethod || 'cash',
-    kioscoId: 'DEMO_KIOSCO',
-    isExtend: isExtend || false,
-    minutes: minutes || 60
-  };
-  
-  transactions.set(transactionId, transaction);
-  
-  console.log(`🧪 Transacción de prueba creada: ${transactionId}`);
-  
-  res.json({
-    success: true,
-    transaction,
-    qrUrl: `http://localhost:${PORT}/facturacion.html?transactionId=${transactionId}`
-  });
-});
-
-// Ruta de estadísticas
-app.get('/api/stats', (req, res) => {
-  const totalTransactions = transactions.size;
-  const invoicedTransactions = Array.from(transactions.values()).filter(t => t.invoiceId).length;
-  const totalAmount = Array.from(transactions.values()).reduce((sum, t) => sum + t.amount, 0);
-  const invoicedAmount = Array.from(transactions.values())
-    .filter(t => t.invoiceId)
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  res.json({
-    totalTransactions,
-    invoicedTransactions,
-    totalAmount: totalAmount.toFixed(2),
-    invoicedAmount: invoicedAmount.toFixed(2),
-    invoiceRate: totalTransactions > 0 ? (invoicedTransactions / totalTransactions) : 0
-  });
-});
+// Función para generar ID único
+function generateId() {
+  return 'INV_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
 // Iniciar servidor
 app.listen(PORT, () => {
@@ -341,13 +541,4 @@ app.listen(PORT, () => {
   console.log(`📱 Portal web: http://localhost:${PORT}/facturacion.html`);
   console.log(`📊 Estadísticas: http://localhost:${PORT}/api/stats`);
   console.log(`🧪 Crear transacción de prueba: POST http://localhost:${PORT}/api/create-test-transaction`);
-});
-
-// Manejo de errores
-process.on('uncaughtException', (error) => {
-  console.error('Error no capturado:', error);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Promesa rechazada no manejada:', reason);
 });

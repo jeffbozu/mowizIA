@@ -15,7 +15,7 @@ class ElectronicInvoiceService {
   }
   
   /// Crea una nueva transacción de facturación electrónica
-  static ElectronicInvoiceTransaction createTransaction({
+  static Future<ElectronicInvoiceTransaction> createTransaction({
     required String plate,
     required String zoneId,
     required double amount,
@@ -23,7 +23,7 @@ class ElectronicInvoiceService {
     required String kioscoId,
     required bool isExtend,
     required int minutes,
-  }) {
+  }) async {
     final transaction = ElectronicInvoiceTransaction(
       id: _generateTransactionId(),
       plate: plate,
@@ -36,11 +36,41 @@ class ElectronicInvoiceService {
       minutes: minutes,
     );
     
-    // Guardar en memoria para la demo
+    // Guardar en memoria local
     _transactions[transaction.id] = transaction;
     
-    print('🧾 Transacción de facturación creada: ${transaction.id}');
+    // Registrar en el servidor de facturación
+    try {
+      await _registerTransactionInServer(transaction);
+      print('🧾 Transacción de facturación registrada en servidor: ${transaction.id}');
+    } catch (e) {
+      print('⚠️ Error registrando transacción en servidor: $e');
+    }
+    
     return transaction;
+  }
+
+  /// Registra la transacción en el servidor de facturación
+  static Future<void> _registerTransactionInServer(ElectronicInvoiceTransaction transaction) async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/api/register-transaction'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id': transaction.id,
+        'plate': transaction.plate,
+        'zoneId': transaction.zoneId,
+        'timestamp': transaction.timestamp.toIso8601String(),
+        'amount': transaction.amount,
+        'paymentMethod': transaction.paymentMethod,
+        'kioscoId': transaction.kioscoId,
+        'isExtend': transaction.isExtend,
+        'minutes': transaction.minutes,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error registrando transacción: ${response.statusCode}');
+    }
   }
   
   /// Obtiene una transacción por ID
