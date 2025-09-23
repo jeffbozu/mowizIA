@@ -67,7 +67,7 @@ class AppStrings {
       'pay.payment_contactless': 'Contactless',
 
       // Ticket
-      'ticket.title.new': 'Estacionamiento Registrado',
+      'ticket.title.new': 'Pago Realizado con Éxito',
       'ticket.title.extend': 'Extensión Realizada',
       'ticket.print': 'Imprimir Ticket',
       'ticket.ok': 'OK',
@@ -81,8 +81,11 @@ class AppStrings {
       'ticket.previous_end': 'Fin anterior',
       'ticket.new_end': 'Nuevo fin',
       'ticket.extra_amount': 'Importe adicional',
+      'ticket.payment_method': 'Método de pago',
       'ticket.download_pdf': 'Descargar PDF',
       'ticket.print_pdf': 'Imprimir PDF',
+      'ticket.operation_success': 'Operación completada',
+      'ticket.operation_error': 'Error en la operación',
       'ticket.download_success': 'Ticket descargado correctamente',
       'ticket.download_error': 'Error al descargar el ticket',
       'ticket.print_success': 'Ticket enviado a impresora',
@@ -307,7 +310,7 @@ class AppStrings {
       'pay.payment_contactless': 'Contactless',
 
       // Ticket
-      'ticket.title.new': 'Parking Registered',
+      'ticket.title.new': 'Payment Successful',
       'ticket.title.extend': 'Extension Completed',
       'ticket.print': 'Print Ticket',
       'ticket.ok': 'OK',
@@ -321,8 +324,11 @@ class AppStrings {
       'ticket.previous_end': 'Previous end',
       'ticket.new_end': 'New end',
       'ticket.extra_amount': 'Extra amount',
+      'ticket.payment_method': 'Payment method',
       'ticket.download_pdf': 'Download PDF',
       'ticket.print_pdf': 'Print PDF',
+      'ticket.operation_success': 'Operation completed',
+      'ticket.operation_error': 'Operation error',
       'ticket.download_success': 'Ticket downloaded successfully',
       'ticket.download_error': 'Error downloading ticket',
       'ticket.print_success': 'Ticket sent to printer',

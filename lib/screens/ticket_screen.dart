@@ -10,6 +10,8 @@ import '../services/electronic_invoice_service.dart';
 import '../services/ticket_pdf_service.dart';
 import '../services/centralized_websocket_service.dart';
 
+enum PdfOperation { download, print }
+
 class TicketScreen extends StatefulWidget {
   final bool isExtend;
   final String plate;
@@ -30,14 +32,27 @@ class TicketScreen extends StatefulWidget {
   State<TicketScreen> createState() => _TicketScreenState();
 }
 
-class _TicketScreenState extends State<TicketScreen> {
+class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMixin {
   ElectronicInvoiceTransaction? _invoiceTransaction;
   String? _qrData;
   bool _isGeneratingPdf = false;
+  late AnimationController _successAnimationController;
+  late Animation<double> _successAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    // Inicializar animaciones
+    _successAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _successAnimation = CurvedAnimation(
+      parent: _successAnimationController,
+      curve: Curves.elasticOut,
+    );
+    
     // Crear o actualizar sesión en mock data
     if (widget.isExtend) {
       _extendSession();
@@ -47,6 +62,15 @@ class _TicketScreenState extends State<TicketScreen> {
     
     // Crear transacción de facturación electrónica
     _createInvoiceTransaction();
+    
+    // Iniciar animación de éxito
+    _successAnimationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _successAnimationController.dispose();
+    super.dispose();
   }
 
   void _extendSession() {
@@ -108,7 +132,7 @@ class _TicketScreenState extends State<TicketScreen> {
     print('🧾 Transacción de facturación creada: ${_invoiceTransaction!.id}');
   }
 
-  Future<void> _printTicket() async {
+  Future<void> _handlePdfOperation(PdfOperation operation) async {
     if (_isGeneratingPdf) return;
     
     setState(() {
@@ -120,84 +144,56 @@ class _TicketScreenState extends State<TicketScreen> {
       final startTime = session?.start ?? DateTime.now();
       final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
       
-      // Generar y descargar PDF directamente
-      final filePath = await TicketPdfService.downloadTicketPdf(
-        plate: widget.plate,
-        zoneId: widget.zoneId,
-        startTime: startTime,
-        endTime: endTime,
-        price: widget.price,
-        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
-        language: AppState.currentLanguage,
-        transactionId: _invoiceTransaction?.id,
-        isExtend: widget.isExtend,
-      );
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('PDF guardado en: $filePath'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 5),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppStrings.t('ticket.print_error')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      print('Error generando PDF: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isGeneratingPdf = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _downloadPdfTicket() async {
-    if (_isGeneratingPdf) return;
-    
-    setState(() {
-      _isGeneratingPdf = true;
-    });
-
-    try {
-      final session = MockData.getSessionByPlate(widget.plate);
-      final startTime = session?.start ?? DateTime.now();
-      final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
+      String? filePath;
+      String successMessage;
+      String errorMessage;
       
-      final filePath = await TicketPdfService.downloadTicketPdf(
-        plate: widget.plate,
-        zoneId: widget.zoneId,
-        startTime: startTime,
-        endTime: endTime,
-        price: widget.price,
-        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
-        language: AppState.currentLanguage,
-        transactionId: _invoiceTransaction?.id,
-        isExtend: widget.isExtend,
-      );
+      switch (operation) {
+        case PdfOperation.download:
+          filePath = await TicketPdfService.downloadTicketPdf(
+            plate: widget.plate,
+            zoneId: widget.zoneId,
+            startTime: startTime,
+            endTime: endTime,
+            price: widget.price,
+            paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+            language: AppState.currentLanguage,
+            transactionId: _invoiceTransaction?.id,
+            isExtend: widget.isExtend,
+          );
+          successMessage = AppStrings.t('ticket.download_success');
+          errorMessage = AppStrings.t('ticket.download_error');
+          break;
+        case PdfOperation.print:
+          await TicketPdfService.printTicket(
+            plate: widget.plate,
+            zoneId: widget.zoneId,
+            startTime: startTime,
+            endTime: endTime,
+            price: widget.price,
+            paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
+            language: AppState.currentLanguage,
+            transactionId: _invoiceTransaction?.id,
+            isExtend: widget.isExtend,
+          );
+          successMessage = AppStrings.t('ticket.print_success');
+          errorMessage = AppStrings.t('ticket.print_error');
+          break;
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppStrings.t('ticket.download_success')),
+            content: Text(successMessage),
             backgroundColor: Colors.green,
-            action: SnackBarAction(
+            duration: Duration(seconds: 3),
+            action: filePath != null ? SnackBarAction(
               label: 'Ver',
               textColor: Colors.white,
               onPressed: () {
-                // Aquí podrías abrir el archivo PDF
                 print('PDF guardado en: $filePath');
               },
-            ),
+            ) : null,
           ),
         );
       }
@@ -205,12 +201,13 @@ class _TicketScreenState extends State<TicketScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppStrings.t('ticket.download_error')),
+            content: Text('${AppStrings.t('ticket.operation_error')}: ${e.toString()}'),
             backgroundColor: Colors.red,
+            duration: Duration(seconds: 4),
           ),
         );
       }
-      print('Error generando PDF: $e');
+      print('Error en operación PDF: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -220,62 +217,35 @@ class _TicketScreenState extends State<TicketScreen> {
     }
   }
 
-  Future<void> _printPdfTicket() async {
-    if (_isGeneratingPdf) return;
-    
-    setState(() {
-      _isGeneratingPdf = true;
-    });
+  Future<void> _printTicket() async {
+    await _handlePdfOperation(PdfOperation.print);
+  }
 
-    try {
-      final session = MockData.getSessionByPlate(widget.plate);
-      final startTime = session?.start ?? DateTime.now();
-      final endTime = session?.end ?? DateTime.now().add(Duration(minutes: widget.minutes));
-      
-      await TicketPdfService.printTicket(
-        plate: widget.plate,
-        zoneId: widget.zoneId,
-        startTime: startTime,
-        endTime: endTime,
-        price: widget.price,
-        paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
-        language: AppState.currentLanguage,
-        transactionId: _invoiceTransaction?.id,
-        isExtend: widget.isExtend,
-      );
+  Future<void> _downloadPdfTicket() async {
+    await _handlePdfOperation(PdfOperation.download);
+  }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppStrings.t('ticket.print_success')),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppStrings.t('ticket.print_error')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      print('Error imprimiendo PDF: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isGeneratingPdf = false;
-        });
-      }
+  String _getPaymentMethodDisplay(String method) {
+    switch (method) {
+      case 'cash':
+        return AppStrings.t('pay.payment_cash');
+      case 'chip':
+        return AppStrings.t('pay.payment_chip');
+      case 'contactless':
+        return AppStrings.t('pay.payment_contactless');
+      default:
+        return method.toUpperCase();
     }
   }
 
   void _ok() {
+    // Volver a la pantalla de zona para continuar con el mismo flujo
     context.go('/zona');
   }
 
   void _newParking() {
+    // Limpiar estado y volver al inicio del flujo
+    AppState.clearCurrentSession();
     context.go('/zona');
   }
 
@@ -303,19 +273,37 @@ class _TicketScreenState extends State<TicketScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  // Icono de éxito
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.check,
-                      size: 40,
-                      color: Colors.white,
-                    ),
+                  // Icono de éxito con animación
+                  AnimatedBuilder(
+                    animation: _successAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _successAnimation.value,
+                        child: Semantics(
+                          label: 'Pago realizado con éxito',
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              size: 40,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 24),
                   // Título
@@ -349,6 +337,10 @@ class _TicketScreenState extends State<TicketScreen> {
                         const SizedBox(height: 8),
                         _buildDetailRow(AppStrings.t('ticket.plate'), widget.plate),
                         _buildDetailRow(AppStrings.t('ticket.zone'), zone?.name ?? ''),
+                        _buildDetailRow(
+                          AppStrings.t('ticket.payment_method'), 
+                          _getPaymentMethodDisplay(AppState.currentPayment?.paymentMethod ?? 'cash')
+                        ),
                         if (widget.isExtend && session != null) ...[
                           _buildDetailRow(
                             AppStrings.t('ticket.previous_end'),
@@ -458,39 +450,95 @@ class _TicketScreenState extends State<TicketScreen> {
                   // Botones
                   Column(
                     children: [
-                      // Botón principal de impresión
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: FilledButton.icon(
-                          onPressed: _isGeneratingPdf ? null : _printTicket,
-                          icon: _isGeneratingPdf 
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
-                              : const Icon(Icons.print, size: 24),
-                          label: Text(
-                            AppStrings.t('ticket.print'),
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
+                      // Botones de PDF
                       Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton(
-                              onPressed: _ok,
-                              child: Text(AppStrings.t('ticket.ok')),
+                            child: Semantics(
+                              label: 'Imprimir ticket de estacionamiento',
+                              button: true,
+                              enabled: !_isGeneratingPdf,
+                              child: SizedBox(
+                                height: 56,
+                                child: FilledButton.icon(
+                                  onPressed: _isGeneratingPdf ? null : _printTicket,
+                                  icon: _isGeneratingPdf 
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                        )
+                                      : const Icon(Icons.print, size: 24),
+                                  label: Text(
+                                    AppStrings.t('ticket.print'),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Semantics(
+                              label: 'Descargar ticket en formato PDF',
+                              button: true,
+                              enabled: !_isGeneratingPdf,
+                              child: SizedBox(
+                                height: 56,
+                                child: OutlinedButton.icon(
+                                  onPressed: _isGeneratingPdf ? null : _downloadPdfTicket,
+                                  icon: _isGeneratingPdf 
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        )
+                                      : const Icon(Icons.download, size: 24),
+                                  label: Text(
+                                    AppStrings.t('ticket.download_pdf'),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Botones de navegación
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Semantics(
+                              label: 'Continuar con el mismo flujo de estacionamiento',
+                              button: true,
+                              child: SizedBox(
+                                height: 48,
+                                child: OutlinedButton(
+                                  onPressed: _ok,
+                                  child: Text(
+                                    AppStrings.t('ticket.ok'),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: FilledButton(
-                              onPressed: _newParking,
-                              child: Text(AppStrings.t('ticket.new_parking')),
+                            child: Semantics(
+                              label: 'Iniciar un nuevo proceso de estacionamiento',
+                              button: true,
+                              child: SizedBox(
+                                height: 48,
+                                child: FilledButton(
+                                  onPressed: _newParking,
+                                  child: Text(
+                                    AppStrings.t('ticket.new_parking'),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
