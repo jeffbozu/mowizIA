@@ -172,38 +172,6 @@ class _TopBarState extends State<TopBar> {
               );
             },
           ),
-          // Botones de accesibilidad e idioma
-          Row(
-            children: [
-              // Botón Accesibilidad
-              IconButton(
-                onPressed: () => context.push('/accesibilidad'),
-                icon: const Text('🧩', style: TextStyle(fontSize: 24)),
-                tooltip: AppStrings.t('access.title'),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Botón Idioma
-              IconButton(
-                onPressed: () => AppRouter.showLanguageModal(context),
-                icon: const Text('🌐', style: TextStyle(fontSize: 24)),
-                tooltip: AppStrings.t('lang.title'),
-                style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.2),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );

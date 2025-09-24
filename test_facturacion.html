@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Facturación</title>
+</head>
+<body>
+    <h1>Test de Facturación</h1>
+    <input type="text" id="transactionIdInput" placeholder="ID de transacción">
+    <button onclick="testSearch()">Buscar</button>
+    <div id="result"></div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const transactionIdFromUrl = urlParams.get('transaction');
+        
+        console.log('URL params:', window.location.search);
+        console.log('Transaction ID from URL:', transactionIdFromUrl);
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            if (transactionIdFromUrl) {
+                document.getElementById('transactionIdInput').value = transactionIdFromUrl;
+                console.log('Input value set to:', transactionIdFromUrl);
+            }
+        });
+        
+        async function testSearch() {
+            const transactionId = document.getElementById('transactionIdInput').value;
+            console.log('Searching for:', transactionId);
+            
+            try {
+                const response = await fetch(`http://localhost:3002/api/transaction/${transactionId}`);
+                const data = await response.json();
+                console.log('Response:', data);
+                document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('result').innerHTML = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

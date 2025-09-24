@@ -81,28 +81,11 @@
       "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
-  "activeSessions": {
-    "1235AAA_1758638755749": {
-      "plate": "1235AAA",
-      "zoneId": "ey_a",
-      "start": "2025-09-23T16:45:55.749622",
-      "end": "2025-09-23T18:15:55.749623",
-      "totalPrice": 2.25,
-      "paymentMethod": "cash"
-    },
-    "8888AAA_1758639306579": {
-      "plate": "8888AAA",
-      "zoneId": "ey_a",
-      "start": "2025-09-23T16:55:06.579537",
-      "end": "2025-09-23T17:55:06.579538",
-      "totalPrice": 1.5,
-      "paymentMethod": "chip"
-    }
-  },
+  "activeSessions": {},
   "stats": {
     "totalIncome": 0,
     "todayIncome": 0,
-    "activeSessions": 2,
+    "activeSessions": 0,
     "totalCompanies": 2,
     "totalZones": 4,
     "totalOperators": 2
@@ -114,7 +97,7 @@
     "touch": true,
     "coins": true,
     "cards": true,
-    "lastUpdate": "2025-09-23T14:40:34.635Z"
+    "lastUpdate": "2025-09-24T12:36:06.603Z"
   },
   "accessibility": {},
   "paymentConfig": {
@@ -494,7 +477,7 @@
         "lng": -3.7038
       },
       "status": "offline",
-      "lastConnection": "2025-09-23T14:59:50.368Z",
+      "lastConnection": "2025-09-24T11:33:48.445Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -511,7 +494,761 @@
       "todayIncome": 0,
       "lastError": null,
       "version": "1.0.0",
-      "createdAt": "2025-09-23T14:40:34.634Z",
+      "createdAt": "2025-09-24T11:32:57.593Z",
+      "isApp": true
+    },
+    "MAD_Centro_K11": {
+      "id": "MAD_Centro_K11",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T09:44:38.374Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T08:55:15.049Z",
+      "isApp": true
+    },
+    "MAD_Centro_K97": {
+      "id": "MAD_Centro_K97",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T09:40:27.269Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T09:12:28.910Z",
+      "isApp": true
+    },
+    "MAD_Centro_K55": {
+      "id": "MAD_Centro_K55",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T09:40:23.795Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T09:39:27.055Z",
+      "isApp": true
+    },
+    "MAD_Centro_K44": {
+      "id": "MAD_Centro_K44",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T10:20:23.761Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T09:42:20.233Z",
+      "isApp": true
+    },
+    "MAD_Centro_K27": {
+      "id": "MAD_Centro_K27",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T10:25:33.489Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T09:50:06.915Z",
+      "isApp": true
+    },
+    "MAD_Centro_K22": {
+      "id": "MAD_Centro_K22",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T10:25:28.535Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T09:57:32.455Z",
+      "isApp": true
+    },
+    "MAD_Centro_K87": {
+      "id": "MAD_Centro_K87",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T10:20:03.173Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T10:16:04.306Z",
+      "isApp": true
+    },
+    "MAD_Centro_K78": {
+      "id": "MAD_Centro_K78",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T10:42:31.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T10:26:22.629Z",
+      "isApp": true
+    },
+    "MAD_Centro_K73": {
+      "id": "MAD_Centro_K73",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:14:52.849Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T10:29:37.610Z",
+      "isApp": true
+    },
+    "MAD_Centro_K53": {
+      "id": "MAD_Centro_K53",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:33:51.302Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:13:18.249Z",
+      "isApp": true
+    },
+    "MAD_Centro_K14": {
+      "id": "MAD_Centro_K14",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:33:43.711Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:30:11.674Z",
+      "isApp": true
+    },
+    "MAD_Centro_K69": {
+      "id": "MAD_Centro_K69",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:48:53.806Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:33:57.032Z",
+      "isApp": true
+    },
+    "MAD_Centro_K7": {
+      "id": "MAD_Centro_K7",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:48:51.207Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:35:50.898Z",
+      "isApp": true
+    },
+    "MAD_Centro_K50": {
+      "id": "MAD_Centro_K50",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:07:03.723Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:51:22.956Z",
+      "isApp": true
+    },
+    "MAD_Centro_K86": {
+      "id": "MAD_Centro_K86",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:48:46.947Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:39:11.116Z",
+      "isApp": true
+    },
+    "MAD_Centro_K91": {
+      "id": "MAD_Centro_K91",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:48:44.671Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:42:32.355Z",
+      "isApp": true
+    },
+    "MAD_Centro_K95": {
+      "id": "MAD_Centro_K95",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:48:42.557Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:43:33.776Z",
+      "isApp": true
+    },
+    "MAD_Centro_K15": {
+      "id": "MAD_Centro_K15",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T11:51:02.722Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:49:18.264Z",
+      "isApp": true
+    },
+    "MAD_Centro_K62": {
+      "id": "MAD_Centro_K62",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:07:01.337Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T11:57:17.423Z",
+      "isApp": true
+    },
+    "MAD_Centro_K92": {
+      "id": "MAD_Centro_K92",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:16:32.264Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:10:33.874Z",
+      "isApp": true
+    },
+    "MAD_Centro_K37": {
+      "id": "MAD_Centro_K37",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:26:16.554Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:15:09.185Z",
+      "isApp": true
+    },
+    "MAD_Centro_K74": {
+      "id": "MAD_Centro_K74",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:26:13.934Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:19:55.336Z",
+      "isApp": true
+    },
+    "MAD_Centro_K64": {
+      "id": "MAD_Centro_K64",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:26:11.920Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:23:15.464Z",
+      "isApp": true
+    },
+    "MAD_Centro_K67": {
+      "id": "MAD_Centro_K67",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:35:47.802Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:28:25.136Z",
+      "isApp": true
+    },
+    "MAD_Centro_K63": {
+      "id": "MAD_Centro_K63",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-24T12:35:42.038Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:34:18.249Z",
+      "isApp": true
+    },
+    "MAD_Centro_K57": {
+      "id": "MAD_Centro_K57",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "online",
+      "lastConnection": "2025-09-24T12:36:06.303Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-24T12:36:06.303Z",
       "isApp": true
     }
   }

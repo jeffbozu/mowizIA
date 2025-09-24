@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/foundation.dart';
 import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/zone_screen.dart';
 import 'screens/extend_screen.dart';
 import 'screens/plate_screen.dart';
@@ -27,6 +28,21 @@ class AppRouter {
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/anular',
+        name: 'anular',
+        builder: (context, state) => const ZoneScreen(), // Por ahora redirige a zona
+      ),
+      GoRoute(
+        path: '/placa',
+        name: 'placa',
+        builder: (context, state) => const PlateScreen(),
       ),
       GoRoute(
         path: '/zona',
