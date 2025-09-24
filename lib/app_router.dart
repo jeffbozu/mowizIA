@@ -22,7 +22,7 @@ import 'web/screens/web_company_selection.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: kIsWeb ? '/web' : '/login',
+    initialLocation: kIsWeb ? '/web' : '/home', // Cambiado para desarrollo - ir directo a home
     routes: [
       GoRoute(
         path: '/login',

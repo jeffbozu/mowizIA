@@ -66,6 +66,7 @@ class _PlateScreenState extends State<PlateScreen> {
           TopBar(
             title: AppStrings.t('plate.title'),
             showBackButton: true,
+            onBack: () => context.go('/home'), // Navegar específicamente a home
           ),
           Expanded(
             child: Padding(
