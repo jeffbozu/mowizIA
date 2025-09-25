@@ -323,10 +323,12 @@ class AppState {
   static final StreamController<void> _accessibilityController = StreamController<void>.broadcast();
   static final StreamController<void> _configController = StreamController<void>.broadcast();
   static final StreamController<void> _websocketController = StreamController<void>.broadcast();
+  static final StreamController<String> _languageController = StreamController<String>.broadcast();
   
   static Stream<void> get accessibilityStream => _accessibilityController.stream;
   static Stream<void> get configStream => _configController.stream;
   static Stream<void> get websocketStream => _websocketController.stream;
+  static Stream<String> get languageStream => _languageController.stream;
   
   // Métodos para notificar cambios
   static void notifyAccessibilityChange() {
@@ -339,6 +341,10 @@ class AppState {
   
   static void notifyWebSocketChange() {
     _websocketController.add(null);
+  }
+  
+  static void notifyLanguageChange(String language) {
+    _languageController.add(language);
   }
   
   // Métodos para gestión de datos
@@ -456,6 +462,7 @@ class AppState {
     _accessibilityController.close();
     _configController.close();
     _websocketController.close();
+    _languageController.close();
   }
 }
 

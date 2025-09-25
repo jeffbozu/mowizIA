@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../i18n/strings.dart';
@@ -12,58 +13,16 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _scaleController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-
+class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
     
-    // Configurar animaciones
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeInOut,
-    ));
-
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _scaleController,
-      curve: Curves.elasticOut,
-    ));
-
-    // Iniciar animaciones
-    _fadeController.forward();
-    _scaleController.forward();
-
     // Enviar datos de pantalla al dashboard
     WebSocketService.sendScreenUpdate('home', 
       user: AppState.currentOperatorId ?? 'Sin usuario',
       action: 'Pantalla de inicio cargada'
     );
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    _scaleController.dispose();
-    super.dispose();
   }
 
   void _navigateToPayment() {
@@ -95,9 +54,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return StreamBuilder<void>(
       stream: AppState.accessibilityStream,
       builder: (context, snapshot) {
-        return _buildContent();
+        return StreamBuilder<String>(
+          stream: AppState.languageStream,
+          builder: (context, languageSnapshot) {
+            return _buildContent();
+          },
+        );
       },
     );
+  }
+
+  // Función para obtener la bandera del idioma actual
+  String _getCurrentLanguageFlag() {
+    switch (AppState.currentLanguage) {
+      case 'es-ES':
+        return '🇪🇸';
+      case 'en':
+        return '🇬🇧';
+      case 'ca-ES':
+        return '🏴'; // Catalán
+      case 'gl-ES':
+        return '🏴'; // Gallego
+      case 'eu-ES':
+        return '🏴'; // Euskera
+      case 'fr-FR':
+        return '🇫🇷';
+      case 'de-DE':
+        return '🇩🇪';
+      case 'it-IT':
+        return '🇮🇹';
+      case 'pt-PT':
+        return '🇵🇹';
+      default:
+        return '🇪🇸'; // Por defecto español
+    }
   }
 
   Widget _buildContent() {
@@ -108,57 +98,46 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-              Theme.of(context).colorScheme.tertiary.withOpacity(0.1),
+              Colors.white,
+              Colors.grey.shade100,
+              Colors.grey.shade200,
             ],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    // Header con logo y título
-                    _buildHeader(),
-                    const SizedBox(height: 40),
-                    
-                    // Botones principales
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Botón Pagar
-                          _buildMainButton(
-                            title: 'PAGAR',
-                            subtitle: 'Procesar pago de estacionamiento',
-                            icon: Icons.payment,
-                            color: Theme.of(context).colorScheme.primary,
-                            onTap: _navigateToPayment,
-                          ),
-                          const SizedBox(height: 24),
-                          
-                          // Botón Anular
-                          _buildMainButton(
-                            title: 'ANULAR',
-                            subtitle: 'Anular ticket o pago',
-                            icon: Icons.cancel,
-                            color: Theme.of(context).colorScheme.error,
-                            onTap: _navigateToCancel,
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Botones secundarios
-                    _buildSecondaryButtons(),
-                    const SizedBox(height: 20),
-                  ],
-                ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 
+                          MediaQuery.of(context).padding.top - 
+                          MediaQuery.of(context).padding.bottom - 48, // 24*2 padding
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  
+                  // Logo optimizado
+                  _buildOptimizedLogo(),
+                  const SizedBox(height: 40),
+                  
+                  // Título optimizado
+                  _buildOptimizedTitle(),
+                  const SizedBox(height: 16),
+                  
+                  // Subtítulo optimizado
+                  _buildOptimizedSubtitle(),
+                  const SizedBox(height: 60),
+                  
+                  // Botones principales optimizados
+                  _buildOptimizedMainButtons(),
+                  const SizedBox(height: 40),
+                  
+                  // Botones secundarios optimizados
+                  _buildOptimizedSecondaryButtons(),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
           ),
@@ -167,154 +146,231 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildOptimizedLogo() {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFE62144),
+            const Color(0xFFE62144).withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(60),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE62144).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: const Icon(
+        Icons.local_parking,
+        size: 60,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildOptimizedTitle() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFE62144),
+            const Color(0xFFE62144).withOpacity(0.9),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE62144).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Text(
+        AppStrings.t('home.title'),
+        style: Theme.of(context).textTheme.displayLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          letterSpacing: 3.0,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildOptimizedSubtitle() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFE62144).withOpacity(0.9),
+            const Color(0xFFE62144).withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE62144).withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Text(
+        AppStrings.t('home.subtitle'),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildOptimizedMainButtons() {
     return Column(
       children: [
-        // Logo
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary,
-                Theme.of(context).colorScheme.primary.withOpacity(0.8),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(50),
-            boxShadow: [
-              BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.local_parking,
-            size: 50,
-            color: Colors.white,
-          ),
+        // Botón Pagar
+        _buildOptimizedMainButton(
+          title: AppStrings.t('home.pay'),
+          subtitle: AppStrings.t('home.pay.subtitle'),
+          icon: Icons.payment,
+          onTap: _navigateToPayment,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         
-        // Título
-        Text(
-          'MEYPARK',
-          style: Theme.of(context).textTheme.displayLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
-            letterSpacing: 2.0,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        
-        // Subtítulo
-        Text(
-          'Sistema de Gestión de Estacionamiento',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
+        // Botón Anular
+        _buildOptimizedMainButton(
+          title: AppStrings.t('home.cancel'),
+          subtitle: AppStrings.t('home.cancel.subtitle'),
+          icon: Icons.cancel,
+          onTap: _navigateToCancel,
         ),
       ],
     );
   }
 
-  Widget _buildMainButton({
+  Widget _buildOptimizedMainButton({
     required String title,
     required String subtitle,
     required IconData icon,
-    required Color color,
     required VoidCallback onTap,
   }) {
     return Container(
       width: double.infinity,
       height: 120,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            Colors.grey.shade50,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFE62144).withOpacity(0.3),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  color,
-                  color.withOpacity(0.8),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  // Icono
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 30,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  
-                  // Texto
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+          splashColor: const Color(0xFFE62144).withOpacity(0.1),
+          highlightColor: const Color(0xFFE62144).withOpacity(0.05),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                // Icono
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFE62144),
+                        const Color(0xFFE62144).withOpacity(0.8),
                       ],
                     ),
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE62144).withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
-                  
-                  // Flecha
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white.withOpacity(0.8),
-                    size: 20,
+                  child: Icon(
+                    icon,
+                    size: 30,
+                    color: Colors.white,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 20),
+                
+                // Texto
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Color(0xFFE62144),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: const Color(0xFFE62144).withOpacity(0.7),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Flecha
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: const Color(0xFFE62144).withOpacity(0.6),
+                  size: 20,
+                ),
+              ],
             ),
           ),
         ),
@@ -322,84 +378,92 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildSecondaryButtons() {
+  Widget _buildOptimizedSecondaryButtons() {
     return Row(
       children: [
         // Botón Idioma
         Expanded(
-          child: _buildSecondaryButton(
-            title: 'IDIOMA',
-            icon: '🌐',
+          child: _buildOptimizedSecondaryButton(
+            title: AppStrings.t('home.language'),
+            icon: _getCurrentLanguageFlag(),
             onTap: _showLanguageModal,
-            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         const SizedBox(width: 16),
         
         // Botón Accesibilidad
         Expanded(
-          child: _buildSecondaryButton(
-            title: 'ACCESIBILIDAD',
-            icon: '🧩',
+          child: _buildOptimizedSecondaryButton(
+            title: AppStrings.t('home.accessibility'),
+            icon: '♿',
             onTap: _navigateToAccessibility,
-            color: Theme.of(context).colorScheme.tertiary,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSecondaryButton({
+  Widget _buildOptimizedSecondaryButton({
     required String title,
     required String icon,
     required VoidCallback onTap,
-    required Color color,
   }) {
     return Container(
-      height: 80,
+      width: 137, // 110 * 1.25 = 137.5 ≈ 137
+      height: 137, // 110 * 1.25 = 137.5 ≈ 137
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Material(
         color: Colors.transparent,
+        shape: const CircleBorder(),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  color.withOpacity(0.1),
-                  color.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: color.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
+          borderRadius: BorderRadius.circular(68), // 137 / 2 = 68.5 ≈ 68
+          splashColor: Colors.grey.withOpacity(0.1),
+          highlightColor: Colors.grey.withOpacity(0.05),
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0), // 12 * 1.25 = 15
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
                     icon,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
+                    style: const TextStyle(fontSize: 40), // 32 * 1.25 = 40
                     textAlign: TextAlign.center,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 5), // 4 * 1.25 = 5
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 14, // 11 * 1.25 = 13.75 ≈ 14
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

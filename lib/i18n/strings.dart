@@ -235,6 +235,23 @@ class AppStrings {
       'extend.max_allowed_hours': 'Máximo {hours}h',
       'extend.remaining_to_extend': 'Tiempo restante para extender',
 
+      // Home
+      'home.title': 'MEYPARK',
+      'home.subtitle': 'Sistema de Gestión de Estacionamiento',
+      'home.pay': 'PAGAR',
+      'home.pay.subtitle': 'Procesar pago de estacionamiento',
+      'home.cancel': 'ANULAR',
+      'home.cancel.subtitle': 'Anular ticket o pago',
+      'home.language': 'IDIOMA',
+      'home.accessibility': 'ACCESIBILIDAD',
+
+      // Language Modal
+      'lang.modal.title': '🌐 Seleccionar Idioma',
+      'lang.modal.confirm': 'Confirmar',
+      'lang.modal.development': 'En desarrollo',
+      'lang.modal.development.message': '{language} estará disponible próximamente.',
+      'lang.modal.understood': 'Entendido',
+
       // Common
       'common.loading': 'Cargando...',
       'common.error': 'Error',
@@ -481,6 +498,23 @@ class AppStrings {
       'extend.max_allowed': 'Maximum allowed time',
       'extend.max_allowed_hours': 'Max {hours}h',
       'extend.remaining_to_extend': 'Remaining time to extend',
+
+      // Home
+      'home.title': 'MEYPARK',
+      'home.subtitle': 'Parking Management System',
+      'home.pay': 'PAY',
+      'home.pay.subtitle': 'Process parking payment',
+      'home.cancel': 'CANCEL',
+      'home.cancel.subtitle': 'Cancel ticket or payment',
+      'home.language': 'LANGUAGE',
+      'home.accessibility': 'ACCESSIBILITY',
+
+      // Language Modal
+      'lang.modal.title': '🌐 Select Language',
+      'lang.modal.confirm': 'Confirm',
+      'lang.modal.development': 'In development',
+      'lang.modal.development.message': '{language} will be available soon.',
+      'lang.modal.understood': 'Understood',
 
       // Common
       'common.loading': 'Loading...',
