@@ -26,6 +26,9 @@ void main() async {
     print('⚠️ No se pudo inicializar TTS - la app funcionará sin guía por voz');
   }
   
+  // Inicializar empresa por defecto
+  AppState.initializeDefaultCompany();
+  
   // Inicializar servicios de accesibilidad avanzada
   AdaptiveAIService.initialize();
   SimplifiedModeService.setEnabled(AppState.simplifiedMode);

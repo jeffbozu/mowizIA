@@ -12,7 +12,7 @@ class LanguageModal extends StatefulWidget {
 }
 
 class _LanguageModalState extends State<LanguageModal> {
-  String _selectedLanguage = AppState.currentLanguage;
+  String _selectedLanguage = 'es-ES'; // Por defecto español
   
   @override
   void initState() {
@@ -25,14 +25,18 @@ class _LanguageModalState extends State<LanguageModal> {
       // Cargar configuración guardada
       await LocalStorageService.loadConfig();
       
-      // Actualizar el idioma seleccionado
+      // Actualizar el idioma seleccionado con el idioma actual del home
       setState(() {
         _selectedLanguage = AppState.currentLanguage;
       });
       
-      print('Idioma cargado: ${AppState.currentLanguage}');
+      print('Idioma cargado en modal: ${AppState.currentLanguage}');
     } catch (e) {
       print('Error al cargar idioma: $e');
+      // Si hay error, mantener español por defecto
+      setState(() {
+        _selectedLanguage = 'es-ES';
+      });
     }
   }
 

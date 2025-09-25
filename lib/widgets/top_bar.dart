@@ -28,6 +28,7 @@ class _TopBarState extends State<TopBar> {
   DateTime? _lastLogoTap;
   bool _isLongPressing = false;
   DateTime? _longPressStartTime;
+  DateTime _currentDateTime = DateTime.now();
 
   void _handleLogoTap() {
     final now = DateTime.now();
@@ -94,6 +95,34 @@ class _TopBarState extends State<TopBar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Actualizar fecha y hora cada segundo
+    _updateDateTime();
+  }
+
+  void _updateDateTime() {
+    if (mounted) {
+      setState(() {
+        _currentDateTime = DateTime.now();
+      });
+      // Programar próxima actualización
+      Future.delayed(const Duration(seconds: 1), _updateDateTime);
+    }
+  }
+
+  String _formatDateTime() {
+    final now = _currentDateTime;
+    final day = now.day.toString().padLeft(2, '0');
+    final month = now.month.toString().padLeft(2, '0');
+    final year = now.year;
+    final hour = now.hour.toString().padLeft(2, '0');
+    final minute = now.minute.toString().padLeft(2, '0');
+    
+    return '$day/$month/$year $hour:$minute';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       height: 80,
@@ -157,20 +186,23 @@ class _TopBarState extends State<TopBar> {
               ],
             ),
           ),
-          // Estado de conexión WebSocket
-          StreamBuilder<bool>(
-            stream: WebSocketService.connectionStream,
-            builder: (context, snapshot) {
-              final isConnected = snapshot.data ?? false;
-              return Container(
-                margin: const EdgeInsets.only(right: 8),
-                child: Icon(
-                  isConnected ? Icons.cloud_done : Icons.cloud_off,
-                  color: isConnected ? Colors.green : Colors.red,
-                  size: 20,
+          // Fecha y hora actual
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatDateTime(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              );
-            },
+              ],
+            ),
           ),
         ],
       ),

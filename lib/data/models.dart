@@ -458,6 +458,23 @@ class AppState {
     print('🧠 IA Adaptativa: Datos de aprendizaje reiniciados');
   }
   
+  // Inicializar empresa por defecto
+  static void initializeDefaultCompany() {
+    if (currentCompany == null) {
+      // Establecer MOWIZ como empresa por defecto
+      currentCompany = Company(
+        id: 'mowiz-company',
+        name: 'MOWIZ',
+        primaryColor: '#E62144',
+        backgroundColor: '#FFFFFF',
+        logoUrl: '',
+        createdAt: DateTime.now(),
+        isActive: true,
+      );
+      print('🏢 Empresa por defecto establecida: MOWIZ');
+    }
+  }
+  
   static void dispose() {
     _accessibilityController.close();
     _configController.close();

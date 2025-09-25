@@ -4,6 +4,7 @@ import '../i18n/strings.dart';
 import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
+import '../widgets/progress_bar.dart';
 import '../services/websocket_service.dart';
 
 class TimeScreen extends StatefulWidget {
@@ -85,6 +86,11 @@ class _TimeScreenState extends State<TimeScreen> {
           TopBar(
             title: AppStrings.t('time.title'),
             showBackButton: true,
+          ),
+          // Barra de progreso
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: ProgressBar(currentStep: 2),
           ),
           Expanded(
             child: Padding(

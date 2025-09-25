@@ -4,6 +4,7 @@ import '../i18n/strings.dart';
 import '../data/mock_data.dart';
 import '../data/models.dart';
 import '../widgets/top_bar.dart';
+import '../widgets/progress_bar.dart';
 import '../services/websocket_service.dart';
 
 class PlateScreen extends StatefulWidget {
@@ -67,6 +68,11 @@ class _PlateScreenState extends State<PlateScreen> {
             title: AppStrings.t('plate.title'),
             showBackButton: true,
             onBack: () => context.go('/home'), // Navegar específicamente a home
+          ),
+          // Barra de progreso
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: ProgressBar(currentStep: 1),
           ),
           Expanded(
             child: Padding(

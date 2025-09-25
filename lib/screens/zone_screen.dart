@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../theme/app_theme.dart';
 import '../widgets/top_bar.dart';
+import '../widgets/progress_bar.dart';
 import '../services/websocket_service.dart';
 import '../services/voice_guide_service.dart';
 import '../services/adaptive_ai_service.dart';
@@ -79,41 +80,39 @@ class _ZoneScreenState extends State<ZoneScreen> {
     return Scaffold(
       body: Column(
         children: [
-          TopBar(title: SimplifiedModeService.getSimplifiedText('zone.title')),
+          TopBar(
+            title: SimplifiedModeService.getSimplifiedText('zone.title'),
+            showBackButton: true,
+            onBack: () => context.go('/home'),
+          ),
+          // Barra de progreso interactiva
+          ProgressBar(
+            currentStep: 0,
+            onStepTap: (step) {
+              switch (step) {
+                case 0:
+                  // Ya estamos en zona
+                  break;
+                case 1:
+                  context.push('/matricula');
+                  break;
+                case 2:
+                  context.push('/tiempo');
+                  break;
+                case 3:
+                  context.push('/pago');
+                  break;
+                case 4:
+                  context.push('/ticket');
+                  break;
+              }
+            },
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  // Información de la empresa (ocultar en modo simplificado)
-                  if (AppState.currentCompany != null && !isSimplified) ...[
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.business,
-                            color: Theme.of(context).colorScheme.primary,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            AppState.currentCompany!.name,
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
                   
                   // Instrucciones simplificadas
                   if (isSimplified) ...[
@@ -165,7 +164,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: isSimplified ? 1 : 2,
-                        childAspectRatio: isSimplified ? 3.0 : 1.2,
+                        childAspectRatio: isSimplified ? 3.5 : 1.8, // Un poco más grandes
                         crossAxisSpacing: uiConfig.spacing,
                         mainAxisSpacing: uiConfig.spacing,
                       ),
@@ -251,8 +250,8 @@ class _ZoneScreenState extends State<ZoneScreen> {
       children: [
         // Color de zona
         Container(
-          width: 40,
-          height: 40,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
             color: zoneColor,
             shape: BoxShape.circle,
@@ -260,15 +259,15 @@ class _ZoneScreenState extends State<ZoneScreen> {
           child: Icon(
             Icons.local_parking,
             color: Colors.white,
-            size: 24,
+            size: 18,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         // Nombre de zona
         Text(
           zone.name,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: isSelected
                 ? zoneColor
@@ -276,12 +275,12 @@ class _ZoneScreenState extends State<ZoneScreen> {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         // Precio por hora
         Text(
           '${zone.pricePerHour.toStringAsFixed(2)} ${AppStrings.t('zone.price_per_hour')}',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
             color: Theme.of(context).colorScheme.primary,
           ),
@@ -291,7 +290,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
         Text(
           AppStrings.t('zone.max_hours', params: {'hours': (zone.maxDuration / 60).toString()}),
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10,
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
         ),

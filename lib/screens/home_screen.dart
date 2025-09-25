@@ -28,9 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToPayment() {
     WebSocketService.sendScreenUpdate('home', 
       user: AppState.currentOperatorId ?? 'Sin usuario',
-      action: 'Navegando a pantalla de pago'
+      action: 'Navegando a selección de zona'
     );
-    context.push('/placa');
+    context.push('/zona');
   }
 
   void _navigateToCancel() {
