@@ -204,6 +204,32 @@ class _LanguageModalState extends State<LanguageModal> {
     Navigator.of(context).pop();
   }
 
+  // Función para obtener el nombre del idioma traducido
+  String _getLanguageDisplayName(String languageName) {
+    switch (languageName) {
+      case 'Español':
+        return AppStrings.t('lang.es');
+      case 'Catalán':
+        return AppStrings.t('lang.ca');
+      case 'Gallego':
+        return AppStrings.t('lang.gl');
+      case 'Euskera':
+        return AppStrings.t('lang.eu');
+      case 'Inglés':
+        return AppStrings.t('lang.en');
+      case 'Francés':
+        return AppStrings.t('lang.fr');
+      case 'Alemán':
+        return AppStrings.t('lang.de');
+      case 'Italiano':
+        return AppStrings.t('lang.it');
+      case 'Portugués':
+        return AppStrings.t('lang.pt');
+      default:
+        return languageName;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -357,7 +383,7 @@ class _LanguageModalState extends State<LanguageModal> {
                   // Nombre del idioma
                   Flexible(
                     child: Text(
-                      language['name'],
+                      _getLanguageDisplayName(language['name']),
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

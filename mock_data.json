@@ -8,10 +8,10 @@
       "address": "Madrid, España",
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "eypsa-company": {
-      "id": "eypsa-company",
-      "name": "EYPSA",
-      "contact": "info@eypsa.com",
+    "eysa-company": {
+      "id": "eysa-company",
+      "name": "EYSA",
+      "contact": "info@eysa.com",
       "phone": "+34 900 789 012",
       "address": "Barcelona, España",
       "createdAt": "2025-01-01T00:00:00.000Z"
@@ -30,11 +30,11 @@
       ],
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "eypsa-admin": {
-      "id": "eypsa-admin",
-      "companyId": "eypsa-company",
-      "name": "EYPSA Admin",
-      "username": "eypsa_admin",
+    "eysa-admin": {
+      "id": "eysa-admin",
+      "companyId": "eysa-company",
+      "name": "EYSA Admin",
+      "username": "eysa_admin",
       "password": "Ey2025!",
       "role": "admin",
       "permissions": [
@@ -44,40 +44,49 @@
     }
   },
   "zones": {
-    "mz_a": {
-      "id": "mz_a",
-      "name": "Zona A - Madrid Centro",
+    "mz_coche": {
+      "id": "mz_coche",
+      "name": "Coche",
       "pricePerHour": 1.2,
       "maxDuration": 120,
       "description": "Zona céntrica de Madrid",
       "companyId": "mowiz-company",
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "mz_b": {
-      "id": "mz_b",
-      "name": "Zona B - Madrid Norte",
-      "pricePerHour": 0.8,
+    "mz_moto": {
+      "id": "mz_moto",
+      "name": "Moto",
+      "pricePerHour": 2.1,
       "maxDuration": 180,
       "description": "Zona norte de Madrid",
       "companyId": "mowiz-company",
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "ey_a": {
-      "id": "ey_a",
-      "name": "Zona A - Barcelona Eixample",
+    "ey_azul": {
+      "id": "ey_azul",
+      "name": "Azul",
       "pricePerHour": 1.5,
       "maxDuration": 90,
       "description": "Zona Eixample de Barcelona",
-      "companyId": "eypsa-company",
+      "companyId": "eysa-company",
       "createdAt": "2025-01-01T00:00:00.000Z"
     },
-    "ey_b": {
-      "id": "ey_b",
-      "name": "Zona B - Barcelona Centro",
-      "pricePerHour": 2,
-      "maxDuration": 60,
+    "ey_verde": {
+      "id": "ey_verde",
+      "name": "Verde",
+      "pricePerHour": 2.4,
+      "maxDuration": 120,
       "description": "Zona centro de Barcelona",
-      "companyId": "eypsa-company",
+      "companyId": "eysa-company",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    "ey_residente": {
+      "id": "ey_residente",
+      "name": "Residente",
+      "pricePerHour": 0.5,
+      "maxDuration": 1440,
+      "description": "Zona residente - Solo con etiqueta",
+      "companyId": "eysa-company",
       "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
@@ -1723,8 +1732,8 @@
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "online",
-      "lastConnection": "2025-09-25T11:03:52.831Z",
+      "status": "offline",
+      "lastConnection": "2025-09-25T12:12:14.444Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",

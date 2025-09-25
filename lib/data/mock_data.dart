@@ -13,8 +13,8 @@ class MockData {
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
     ),
     Company(
-      id: 'eypsa-company',
-      name: 'EYPSA Estacionamientos',
+      id: 'eysa-company',
+      name: 'EYSA Estacionamientos',
       primaryColor: '#2196F3',
       backgroundColor: '#F5F5F5',
       logoUrl: '',
@@ -31,10 +31,10 @@ class MockData {
       password: 'Mo2025!',
     ),
     Operator(
-      id: 'eypsa-admin',
-      companyId: 'eypsa-company',
-      name: 'EYPSA Admin',
-      username: 'eypsa_admin',
+      id: 'eysa-admin',
+      companyId: 'eysa-company',
+      name: 'EYSA Admin',
+      username: 'eysa_admin',
       password: 'Ey2025!',
     ),
   ];
@@ -42,30 +42,30 @@ class MockData {
   static List<Zone> zones = [
     // MOWIZ zones
     Zone(
-      id: 'MZ-A',
+      id: 'MZ-COCHE',
       companyId: 'mowiz-company',
-      name: 'MZ-A (Azul)',
+      name: 'Coche',
       color: '#2196F3',
       pricePerHour: 1.20,
       maxDuration: 240, // 4 horas
-      description: 'Zona azul - Centro comercial',
+      description: 'Zona para coches - Centro comercial',
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
     ),
     Zone(
-      id: 'MZ-V',
+      id: 'MZ-MOTO',
       companyId: 'mowiz-company',
-      name: 'MZ-V (Verde)',
+      name: 'Moto',
       color: '#4CAF50',
       pricePerHour: 2.10,
       maxDuration: 120, // 2 horas
-      description: 'Zona verde - Área residencial',
+      description: 'Zona para motos - Área residencial',
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
     ),
     // EYPSA zones
     Zone(
-      id: 'EY-A',
-      companyId: 'eypsa-company',
-      name: 'EY-A (Azul)',
+      id: 'EY-AZUL',
+      companyId: 'eysa-company',
+      name: 'Azul',
       color: '#2196F3',
       pricePerHour: 1.50,
       maxDuration: 240, // 4 horas
@@ -73,9 +73,9 @@ class MockData {
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
     Zone(
-      id: 'EY-V',
-      companyId: 'eypsa-company',
-      name: 'EY-V (Verde)',
+      id: 'EY-VERDE',
+      companyId: 'eysa-company',
+      name: 'Verde',
       color: '#4CAF50',
       pricePerHour: 2.40,
       maxDuration: 120, // 2 horas
@@ -83,9 +83,9 @@ class MockData {
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
     Zone(
-      id: 'EY-R',
-      companyId: 'eypsa-company',
-      name: 'EY-R (Residente)',
+      id: 'EY-RESIDENTE',
+      companyId: 'eysa-company',
+      name: 'Residente',
       color: '#FF9800',
       pricePerHour: 0.50,
       maxDuration: 1440, // 24 horas (1 día)

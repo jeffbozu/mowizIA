@@ -165,8 +165,15 @@ class AppStrings {
 
       // Language
       'lang.title': 'Idioma',
-      'lang.es': 'Español (España)',
+      'lang.es': 'Español',
+      'lang.ca': 'Català',
+      'lang.gl': 'Galego',
+      'lang.eu': 'Euskera',
       'lang.en': 'English',
+      'lang.fr': 'Français',
+      'lang.de': 'Deutsch',
+      'lang.it': 'Italiano',
+      'lang.pt': 'Português',
       'lang.save': 'Guardar',
       'lang.cancel': 'Cancelar',
 
@@ -429,8 +436,15 @@ class AppStrings {
 
       // Language
       'lang.title': 'Language',
-      'lang.es': 'Español (España)',
+      'lang.es': 'Spanish',
+      'lang.ca': 'Catalan',
+      'lang.gl': 'Galician',
+      'lang.eu': 'Basque',
       'lang.en': 'English',
+      'lang.fr': 'French',
+      'lang.de': 'German',
+      'lang.it': 'Italian',
+      'lang.pt': 'Portuguese',
       'lang.save': 'Save',
       'lang.cancel': 'Cancel',
 
