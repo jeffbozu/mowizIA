@@ -230,14 +230,42 @@ class _ZoneScreenState extends State<ZoneScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? zoneColor.withOpacity(0.1)
-              : Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? zoneColor : Theme.of(context).colorScheme.outline,
-            width: isSelected ? 3 : 1,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isSelected
+                ? [
+                    zoneColor.withOpacity(0.15),
+                    zoneColor.withOpacity(0.05),
+                  ]
+                : [
+                    Colors.white.withOpacity(0.95),
+                    Colors.white.withOpacity(0.85),
+                  ],
           ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected 
+                ? zoneColor.withOpacity(0.4)
+                : Colors.white.withOpacity(0.3),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected 
+                  ? zoneColor.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.08),
+              blurRadius: isSelected ? 16 : 8,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: isSelected 
+                  ? zoneColor.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.04),
+              blurRadius: isSelected ? 32 : 16,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: isSimplified ? _buildSimplifiedZoneCard(zone, isSelected, zoneColor, uiConfig) : _buildNormalZoneCard(zone, isSelected, zoneColor),
       ),
@@ -250,16 +278,30 @@ class _ZoneScreenState extends State<ZoneScreen> {
       children: [
         // Color de zona
         Container(
-          width: 32,
-          height: 32,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
-            color: zoneColor,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                zoneColor,
+                zoneColor.withOpacity(0.8),
+              ],
+            ),
             shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: zoneColor.withOpacity(0.4),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Icon(
             Icons.local_parking,
             color: Colors.white,
-            size: 18,
+            size: 20,
           ),
         ),
         const SizedBox(height: 8),
@@ -281,8 +323,10 @@ class _ZoneScreenState extends State<ZoneScreen> {
           '${zone.pricePerHour.toStringAsFixed(2)} ${AppStrings.t('zone.price_per_hour')}',
           style: TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.bold,
+            color: isSelected 
+                ? zoneColor
+                : const Color(0xFFE62144), // Rojo corporativo
           ),
         ),
         const SizedBox(height: 4),
