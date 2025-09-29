@@ -16,12 +16,8 @@ import 'i18n/strings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Cargar configuración con almacenamiento dual (local + remoto)
-  await DualStorageService.loadConfig();
-  await DualStorageService.loadSessions();
-  
-  // Habilitar auto-guardado automático
-  AppState.enableAutoSave();
+  // Cargar configuración básica
+  await AppState.loadConfig();
   
   // Inicializar servicio de guía por voz (opcional)
   try {
