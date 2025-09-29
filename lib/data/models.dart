@@ -475,6 +475,70 @@ class AppState {
     }
   }
   
+  // ===========================================
+  // ALMACENAMIENTO AUTOMÁTICO DUAL (LOCAL + REMOTO)
+  // ===========================================
+  
+  /// Guardar automáticamente en local y remoto
+  static Future<void> autoSave() async {
+    try {
+      // Importar el servicio dual dinámicamente para evitar dependencias circulares
+      final dualStorageService = await import('services/dual_storage_service.dart');
+      await dualStorageService.DualStorageService.saveConfig();
+      await dualStorageService.DualStorageService.saveSessions();
+    } catch (e) {
+      // Fallback a almacenamiento local si hay error
+      print('⚠️ Error en auto-guardado dual, usando solo local: $e');
+      try {
+        final localStorageService = await import('services/local_storage_service.dart');
+        await localStorageService.LocalStorageService.saveConfig();
+        await localStorageService.LocalStorageService.saveSessions();
+      } catch (e2) {
+        print('❌ Error crítico en auto-guardado: $e2');
+      }
+    }
+  }
+  
+  /// Configurar auto-guardado en cambios importantes
+  static void enableAutoSave() {
+    // Auto-guardar cuando cambie la empresa
+    _configController.stream.listen((_) async {
+      await autoSave();
+    });
+  }
+  
+  /// Obtener estadísticas de almacenamiento
+  static Future<Map<String, dynamic>> getStorageStats() async {
+    try {
+      final dualStorageService = await import('services/dual_storage_service.dart');
+      return await dualStorageService.DualStorageService.getStorageStats();
+    } catch (e) {
+      print('❌ Error obteniendo estadísticas: $e');
+      return {};
+    }
+  }
+  
+  /// Forzar sincronización completa
+  static Future<void> forceSync() async {
+    try {
+      final dualStorageService = await import('services/dual_storage_service.dart');
+      await dualStorageService.DualStorageService.forceSync();
+    } catch (e) {
+      print('❌ Error en sincronización forzada: $e');
+    }
+  }
+  
+  /// Crear backup completo
+  static Future<Map<String, dynamic>> createBackup() async {
+    try {
+      final dualStorageService = await import('services/dual_storage_service.dart');
+      return await dualStorageService.DualStorageService.createBackup();
+    } catch (e) {
+      print('❌ Error creando backup: $e');
+      return {};
+    }
+  }
+  
   static void dispose() {
     _accessibilityController.close();
     _configController.close();

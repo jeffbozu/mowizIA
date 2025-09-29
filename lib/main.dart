@@ -6,6 +6,7 @@ import 'data/models.dart';
 import 'data/mock_data.dart';
 import 'services/centralized_websocket_service.dart';
 import 'services/local_storage_service.dart';
+import 'services/dual_storage_service.dart';
 import 'services/voice_guide_service.dart';
 import 'services/adaptive_ai_service.dart';
 import 'services/simplified_mode_service.dart';
@@ -15,9 +16,12 @@ import 'i18n/strings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // NO CARGAR DATOS LOCALES - TODO DEBE VENIR DEL BACKEND
-  // await LocalStorageService.loadConfig();
-  // await LocalStorageService.loadSessions();
+  // Cargar configuración con almacenamiento dual (local + remoto)
+  await DualStorageService.loadConfig();
+  await DualStorageService.loadSessions();
+  
+  // Habilitar auto-guardado automático
+  AppState.enableAutoSave();
   
   // Inicializar servicio de guía por voz (opcional)
   try {

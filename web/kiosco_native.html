@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYPARK - Kiosco Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #E62144, #E62144);
+            border-radius: 60px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        h1 {
+            color: #E62144;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #E62144, #E62144);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(230, 33, 68, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #6c757d);
+        }
+
+        .status {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .status h3 {
+            color: #E62144;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-value {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .footer {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            display: none;
+            color: #E62144;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🅿️</div>
+        
+        <h1>MEYPARK</h1>
+        <p class="subtitle">Sistema de Estacionamiento Inteligente</p>
+        
+        <div class="loading" id="loading">
+            Iniciando modo web...
+        </div>
+
+        <div class="buttons" id="buttons" style="display: none;">
+            <a href="#" class="btn" onclick="startPayment()">
+                💳 Pagar Estacionamiento
+            </a>
+            <a href="#" class="btn" onclick="extendSession()">
+                ⏰ Extender Sesión
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="showHelp()">
+                ❓ Ayuda
+            </a>
+        </div>
+
+        <div class="status" id="status" style="display: none;">
+            <h3>Estado del Sistema</h3>
+            <div class="status-item">
+                <span>WebSocket:</span>
+                <span class="status-value" id="ws-status">Conectando...</span>
+            </div>
+            <div class="status-item">
+                <span>Backend:</span>
+                <span class="status-value" id="backend-status">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span>Sesiones Activas:</span>
+                <span class="status-value" id="sessions-count">0</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>MEYPARK v1.0.0 - Sistema de Gestión de Estacionamiento</p>
+            <p>Conectado al backend centralizado</p>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let isConnected = false;
+
+        // Simular carga inicial
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('buttons').style.display = 'grid';
+            document.getElementById('status').style.display = 'block';
+            connectWebSocket();
+        }, 2000);
+
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket('ws://localhost:3003');
+                
+                ws.onopen = function() {
+                    console.log('WebSocket conectado');
+                    isConnected = true;
+                    document.getElementById('ws-status').textContent = 'Conectado';
+                    document.getElementById('ws-status').style.color = '#28a745';
+                    
+                    // Solicitar datos del backend
+                    ws.send(JSON.stringify({
+                        type: 'get_data'
+                    }));
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    console.log('Mensaje recibido:', data);
+                    
+                    if (data.type === 'full_data') {
+                        updateStatus(data.data);
+                    }
+                };
+                
+                ws.onclose = function() {
+                    console.log('WebSocket desconectado');
+                    isConnected = false;
+                    document.getElementById('ws-status').textContent = 'Desconectado';
+                    document.getElementById('ws-status').style.color = '#dc3545';
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('Error WebSocket:', error);
+                    document.getElementById('ws-status').textContent = 'Error';
+                    document.getElementById('ws-status').style.color = '#dc3545';
+                };
+            } catch (error) {
+                console.error('Error conectando WebSocket:', error);
+                document.getElementById('ws-status').textContent = 'No disponible';
+                document.getElementById('ws-status').style.color = '#dc3545';
+            }
+        }
+
+        function updateStatus(data) {
+            if (data.stats) {
+                document.getElementById('sessions-count').textContent = data.stats.activeSessions || 0;
+            }
+            
+            document.getElementById('backend-status').textContent = 'Conectado';
+            document.getElementById('backend-status').style.color = '#28a745';
+        }
+
+        function startPayment() {
+            if (!isConnected) {
+                alert('No hay conexión con el backend. Intenta recargar la página.');
+                return;
+            }
+            alert('Funcionalidad de pago en desarrollo. Usa la app Flutter para funcionalidad completa.');
+        }
+
+        function extendSession() {
+            if (!isConnected) {
+                alert('No hay conexión con el backend. Intenta recargar la página.');
+                return;
+            }
+            alert('Funcionalidad de extensión en desarrollo. Usa la app Flutter para funcionalidad completa.');
+        }
+
+        function showHelp() {
+            alert('MEYPARK Web v1.0.0\n\nEsta es la versión web del sistema MEYPARK.\nPara funcionalidad completa, usa la aplicación Flutter.\n\nDashboard: http://localhost:8080/dashboard.html\nFacturación: http://localhost:8080/facturacion.html');
+        }
+
+        // Verificar conexión cada 30 segundos
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

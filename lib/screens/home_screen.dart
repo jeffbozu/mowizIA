@@ -5,6 +5,8 @@ import '../i18n/strings.dart';
 import '../app_router.dart';
 import '../data/models.dart';
 import '../services/websocket_service.dart';
+import '../modals/admin_pass_modal.dart';
+import '../modals/tech_pass_modal.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +16,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _logoTaps = 0;
+  DateTime? _lastLogoTap;
+  bool _isLongPressing = false;
+  DateTime? _longPressStartTime;
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +30,59 @@ class _HomeScreenState extends State<HomeScreen> {
       user: AppState.currentOperatorId ?? 'Sin usuario',
       action: 'Pantalla de inicio cargada'
     );
+  }
+
+  void _handleLogoTap() {
+    final now = DateTime.now();
+    
+    // Resetear contador si han pasado más de 7 segundos
+    if (_lastLogoTap != null && now.difference(_lastLogoTap!).inSeconds > 7) {
+      _logoTaps = 0;
+    }
+
+    _logoTaps++;
+    _lastLogoTap = now;
+
+    // Si hay 5 toques en 7 segundos, abrir modal admin
+    if (_logoTaps >= 5) {
+      _logoTaps = 0;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AdminPassModal(),
+      );
+    }
+  }
+
+  void _handleLongPressStart() {
+    _isLongPressing = true;
+    _longPressStartTime = DateTime.now();
+    
+    // Mostrar indicador visual
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Mantén presionado para acceso técnico...'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _handleLongPressEnd() {
+    if (_isLongPressing) {
+      _isLongPressing = false;
+      
+      // Verificar si se mantuvo presionado por al menos 3 segundos
+      if (_longPressStartTime != null) {
+        final duration = DateTime.now().difference(_longPressStartTime!);
+        if (duration.inSeconds >= 3) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const TechPassModal(),
+          );
+        }
+      }
+    }
   }
 
   void _navigateToPayment() {
@@ -147,31 +207,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildOptimizedLogo() {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFE62144),
-            const Color(0xFFE62144).withOpacity(0.8),
+    return GestureDetector(
+      onTap: _handleLogoTap,
+      onLongPressStart: (_) => _handleLongPressStart(),
+      onLongPressEnd: (_) => _handleLongPressEnd(),
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFE62144),
+              const Color(0xFFE62144).withOpacity(0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(60),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE62144).withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(60),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE62144).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: const Icon(
-        Icons.local_parking,
-        size: 60,
-        color: Colors.white,
+        child: const Icon(
+          Icons.local_parking,
+          size: 60,
+          color: Colors.white,
+        ),
       ),
     );
   }
