@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# 🚀 MEYPARK - Comando Único para Lanzar Todo el Ecosistema
+# =========================================================
+# Uso: meypark
+# Lanza: Flutter Linux + Backend + WebSocket + Facturación + Dashboard Web
+
+echo "🚀 MEYPARK - Iniciando Ecosistema Completo..."
+echo "============================================="
+
+# Cambiar al directorio del proyecto
+cd /home/i-d/flutter_projects/mi_nuevo_proyecto
+
+# Ejecutar el script principal
+./start_all.sh
+
+echo ""
+echo "✅ Comando 'meypark' ejecutado exitosamente!"
+echo "🌐 Accede a: http://localhost:8080/dashboard.html"

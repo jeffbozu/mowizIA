@@ -104,14 +104,6 @@
       "totalPrice": 4.8,
       "paymentMethod": "cash"
     },
-    "1234AAA_1759142715953": {
-      "plate": "1234AAA",
-      "zoneId": "MZ-COCHE",
-      "start": "2025-09-29T12:45:15.953670",
-      "end": "2025-09-29T13:45:15.953671",
-      "totalPrice": 1.2,
-      "paymentMethod": "chip"
-    },
     "1234BBB_1759142781778": {
       "plate": "1234BBB",
       "zoneId": "MZ-MOTO",
@@ -127,6 +119,14 @@
       "end": "2025-09-29T15:00:56.632915",
       "totalPrice": 4.8,
       "paymentMethod": "contactless"
+    },
+    "1234MMM_1759146352985": {
+      "plate": "1234MMM",
+      "zoneId": "MZ-COCHE",
+      "start": "2025-09-29T13:45:52.985505",
+      "end": "2025-09-29T17:45:52.985505",
+      "totalPrice": 4.8,
+      "paymentMethod": "chip"
     }
   },
   "stats": {
@@ -144,7 +144,7 @@
     "touch": true,
     "coins": true,
     "cards": true,
-    "lastUpdate": "2025-09-29T11:00:10.632Z"
+    "lastUpdate": "2025-09-29T12:40:46.974Z"
   },
   "accessibility": {},
   "paymentConfig": {
@@ -486,16 +486,16 @@
       "createdAt": "2025-01-17T09:00:00.000Z",
       "isApp": false
     },
-    "MAD_Centro_K55": {
-      "id": "MAD_Centro_K55",
+    "MAD_Centro_K32": {
+      "id": "MAD_Centro_K32",
       "name": "MEYPARK App Flutter",
       "location": "Aplicación Móvil",
       "gps": {
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "online",
-      "lastConnection": "2025-09-29T11:00:10.629Z",
+      "status": "offline",
+      "lastConnection": "2025-09-29T12:28:49.766Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -512,7 +512,94 @@
       "todayIncome": 0,
       "lastError": null,
       "version": "1.0.0",
-      "createdAt": "2025-09-29T11:00:10.629Z",
+      "createdAt": "2025-09-29T12:20:13.379Z",
+      "isApp": true
+    },
+    "MAD_Centro_K31": {
+      "id": "MAD_Centro_K31",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-29T12:35:06.000Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-29T12:29:21.852Z",
+      "isApp": true
+    },
+    "MAD_Centro_K52": {
+      "id": "MAD_Centro_K52",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-29T12:38:30.422Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-29T12:36:58.944Z",
+      "isApp": true
+    },
+    "MAD_Centro_K57": {
+      "id": "MAD_Centro_K57",
+      "name": "MEYPARK App Flutter",
+      "location": "Aplicación Móvil",
+      "gps": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "status": "offline",
+      "lastConnection": "2025-09-29T12:42:15.230Z",
+      "assignedCompany": "mowiz",
+      "assignedOperator": "mowiz_admin",
+      "currentScreen": "zone_selection",
+      "hardwareStatus": {
+        "display": true,
+        "touch": true,
+        "printer": false,
+        "coins": false,
+        "cards": true,
+        "network": true
+      },
+      "currentSession": null,
+      "totalSessions": 0,
+      "todayIncome": 0,
+      "lastError": null,
+      "version": "1.0.0",
+      "createdAt": "2025-09-29T12:40:46.972Z",
       "isApp": true
     }
   }
