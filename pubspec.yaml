@@ -46,6 +46,9 @@ dependencies:
   printing: ^5.12.0
   path: ^1.8.3
   url_launcher: ^6.2.2
+  
+  # Supabase para backend y sincronización en tiempo real
+  supabase_flutter: ^2.3.0
 
 dev_dependencies:
   flutter_test:

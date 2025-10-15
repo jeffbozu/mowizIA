@@ -95,44 +95,11 @@
       "createdAt": "2025-01-01T00:00:00.000Z"
     }
   },
-  "activeSessions": {
-    "1234AAA_1759141470409": {
-      "plate": "1234AAA",
-      "zoneId": "MZ-COCHE",
-      "start": "2025-09-29T12:24:30.409093",
-      "end": "2025-09-29T14:24:30.409Z",
-      "totalPrice": 4.8,
-      "paymentMethod": "cash"
-    },
-    "1234BBB_1759142781778": {
-      "plate": "1234BBB",
-      "zoneId": "MZ-MOTO",
-      "start": "2025-09-29T12:46:21.778052",
-      "end": "2025-09-29T14:46:21.778053",
-      "totalPrice": 4.2,
-      "paymentMethod": "contactless"
-    },
-    "1234NNN_1759143656634": {
-      "plate": "1234NNN",
-      "zoneId": "EY-VERDE",
-      "start": "2025-09-29T13:00:56.632915",
-      "end": "2025-09-29T15:00:56.632915",
-      "totalPrice": 4.8,
-      "paymentMethod": "contactless"
-    },
-    "1234MMM_1759146352985": {
-      "plate": "1234MMM",
-      "zoneId": "MZ-COCHE",
-      "start": "2025-09-29T13:45:52.985505",
-      "end": "2025-09-29T17:45:52.985505",
-      "totalPrice": 4.8,
-      "paymentMethod": "chip"
-    }
-  },
+  "activeSessions": {},
   "stats": {
     "totalIncome": 0,
     "todayIncome": 0,
-    "activeSessions": 4,
+    "activeSessions": 0,
     "totalCompanies": 2,
     "totalZones": 4,
     "totalOperators": 2
@@ -144,7 +111,7 @@
     "touch": true,
     "coins": true,
     "cards": true,
-    "lastUpdate": "2025-09-29T12:40:46.974Z"
+    "lastUpdate": "2025-09-29T13:22:31.072Z"
   },
   "accessibility": {},
   "paymentConfig": {
@@ -486,8 +453,8 @@
       "createdAt": "2025-01-17T09:00:00.000Z",
       "isApp": false
     },
-    "MAD_Centro_K32": {
-      "id": "MAD_Centro_K32",
+    "MAD_Centro_K22": {
+      "id": "MAD_Centro_K22",
       "name": "MEYPARK App Flutter",
       "location": "Aplicación Móvil",
       "gps": {
@@ -495,7 +462,7 @@
         "lng": -3.7038
       },
       "status": "offline",
-      "lastConnection": "2025-09-29T12:28:49.766Z",
+      "lastConnection": "2025-09-29T13:27:43.871Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -512,19 +479,19 @@
       "todayIncome": 0,
       "lastError": null,
       "version": "1.0.0",
-      "createdAt": "2025-09-29T12:20:13.379Z",
+      "createdAt": "2025-09-29T13:22:23.629Z",
       "isApp": true
     },
-    "MAD_Centro_K31": {
-      "id": "MAD_Centro_K31",
+    "MAD_Centro_K80": {
+      "id": "MAD_Centro_K80",
       "name": "MEYPARK App Flutter",
       "location": "Aplicación Móvil",
       "gps": {
         "lat": 40.4168,
         "lng": -3.7038
       },
-      "status": "offline",
-      "lastConnection": "2025-09-29T12:35:06.000Z",
+      "status": "online",
+      "lastConnection": "2025-09-29T13:22:31.064Z",
       "assignedCompany": "mowiz",
       "assignedOperator": "mowiz_admin",
       "currentScreen": "zone_selection",
@@ -541,65 +508,7 @@
       "todayIncome": 0,
       "lastError": null,
       "version": "1.0.0",
-      "createdAt": "2025-09-29T12:29:21.852Z",
-      "isApp": true
-    },
-    "MAD_Centro_K52": {
-      "id": "MAD_Centro_K52",
-      "name": "MEYPARK App Flutter",
-      "location": "Aplicación Móvil",
-      "gps": {
-        "lat": 40.4168,
-        "lng": -3.7038
-      },
-      "status": "offline",
-      "lastConnection": "2025-09-29T12:38:30.422Z",
-      "assignedCompany": "mowiz",
-      "assignedOperator": "mowiz_admin",
-      "currentScreen": "zone_selection",
-      "hardwareStatus": {
-        "display": true,
-        "touch": true,
-        "printer": false,
-        "coins": false,
-        "cards": true,
-        "network": true
-      },
-      "currentSession": null,
-      "totalSessions": 0,
-      "todayIncome": 0,
-      "lastError": null,
-      "version": "1.0.0",
-      "createdAt": "2025-09-29T12:36:58.944Z",
-      "isApp": true
-    },
-    "MAD_Centro_K57": {
-      "id": "MAD_Centro_K57",
-      "name": "MEYPARK App Flutter",
-      "location": "Aplicación Móvil",
-      "gps": {
-        "lat": 40.4168,
-        "lng": -3.7038
-      },
-      "status": "offline",
-      "lastConnection": "2025-09-29T12:42:15.230Z",
-      "assignedCompany": "mowiz",
-      "assignedOperator": "mowiz_admin",
-      "currentScreen": "zone_selection",
-      "hardwareStatus": {
-        "display": true,
-        "touch": true,
-        "printer": false,
-        "coins": false,
-        "cards": true,
-        "network": true
-      },
-      "currentSession": null,
-      "totalSessions": 0,
-      "todayIncome": 0,
-      "lastError": null,
-      "version": "1.0.0",
-      "createdAt": "2025-09-29T12:40:46.972Z",
+      "createdAt": "2025-09-29T13:22:31.064Z",
       "isApp": true
     }
   }

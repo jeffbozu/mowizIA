@@ -5,44 +5,67 @@ const path = require('path');
 
 // Crear servidor HTTP
 const server = http.createServer((req, res) => {
-    // Servir archivos estáticos del dashboard
+    // Obtener la ruta del archivo solicitado
+    let filePath;
+    
     if (req.url === '/' || req.url === '/dashboard') {
-        const filePath = path.join(__dirname, 'web', 'dashboard.html');
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                res.writeHead(404);
-                res.end('Dashboard no encontrado');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(data);
-        });
+        filePath = path.join(__dirname, 'web', 'dashboard.html');
+    } else if (req.url === '/dashboard.html') {
+        filePath = path.join(__dirname, 'web', 'dashboard.html');
+    } else if (req.url === '/facturacion.html') {
+        filePath = path.join(__dirname, 'web', 'facturacion.html');
+    } else if (req.url === '/kiosco.html') {
+        filePath = path.join(__dirname, 'web', 'kiosco.html');
+    } else if (req.url === '/kiosco_native.html') {
+        filePath = path.join(__dirname, 'web', 'kiosco_native.html');
+    } else if (req.url === '/index.html') {
+        filePath = path.join(__dirname, 'web', 'index.html');
     } else if (req.url.endsWith('.css')) {
-        const filePath = path.join(__dirname, 'web', 'dashboard.css');
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                res.writeHead(404);
-                res.end('CSS no encontrado');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'text/css' });
-            res.end(data);
-        });
+        const fileName = path.basename(req.url);
+        filePath = path.join(__dirname, 'web', fileName);
     } else if (req.url.endsWith('.js')) {
-        const filePath = path.join(__dirname, 'web', 'dashboard.js');
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                res.writeHead(404);
-                res.end('JS no encontrado');
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'application/javascript' });
-            res.end(data);
-        });
+        const fileName = path.basename(req.url);
+        filePath = path.join(__dirname, 'web', fileName);
+    } else if (req.url.endsWith('.png') || req.url.endsWith('.ico')) {
+        filePath = path.join(__dirname, 'web', req.url);
     } else {
         res.writeHead(404);
         res.end('Archivo no encontrado');
+        return;
     }
+    
+    // Determinar el tipo de contenido
+    const ext = path.extname(filePath).toLowerCase();
+    let contentType = 'text/html';
+    
+    switch (ext) {
+        case '.css':
+            contentType = 'text/css';
+            break;
+        case '.js':
+            contentType = 'application/javascript';
+            break;
+        case '.png':
+            contentType = 'image/png';
+            break;
+        case '.ico':
+            contentType = 'image/x-icon';
+            break;
+        case '.json':
+            contentType = 'application/json';
+            break;
+    }
+    
+    // Leer y servir el archivo
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            res.writeHead(404);
+            res.end(`Archivo no encontrado: ${req.url}`);
+            return;
+        }
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(data);
+    });
 });
 
 // Crear servidor WebSocket

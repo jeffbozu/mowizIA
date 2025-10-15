@@ -1,0 +1,103 @@
+# Reglas de Cursor para Proyecto MEYPARK - Migración Supabase
+
+## Principios Fundamentales
+- NUNCA hardcodear datos en el código
+- TODO debe venir de Supabase (empresas, zonas, tarifas, textos, traducciones)
+- Priorizar sincronización en tiempo real
+- Mantener compatibilidad durante migración
+- Documentar cada cambio importante
+
+## Arquitectura de Datos
+- Usar Supabase como única fuente de verdad
+- Implementar caché local solo para performance
+- Invalidar caché cuando llegan cambios en tiempo real
+- Siempre tener fallback si falla conexión a Supabase
+
+## Traducciones y Textos UI
+- NUNCA hardcodear textos en pantallas
+- Cargar textos desde tabla ui_texts en Supabase
+- Cada empresa puede tener sus propios textos
+- Soportar múltiples idiomas (es-ES, en-US, etc.)
+- Usar caché ui_translations_cache para performance
+- Permitir habilitar/deshabilitar elementos UI desde ui_elements_config
+
+## Motor de Tarifas
+- Precios y configuración de zonas SIEMPRE desde Supabase
+- Nunca calcular tarifas con valores fijos
+- Respetar time_options, time_increment, min_time de cada zona
+- Permitir configuración diferente por empresa
+
+## Colores y Branding
+- Primary color, background color desde tabla companies
+- Logo desde logo_url (Supabase Storage)
+- Aplicar tema dinámicamente según empresa actual
+- No usar valores hex hardcodeados
+
+## Seguridad
+- Usar Row Level Security (RLS) en todas las tablas
+- Hashear contraseñas con bcrypt antes de guardar
+- Validar permisos antes de cada operación
+- Sanitizar inputs del usuario
+
+## Performance
+- Implementar caché local para datos que no cambian frecuentemente
+- Usar ui_translations_cache para traducciones
+- Suscribirse solo a canales necesarios en Realtime
+- Desuscribirse al salir de pantallas
+
+## Manejo de Errores
+- Siempre manejar errores de red
+- Mostrar mensajes claros al usuario
+- Tener fallback a datos en caché
+- Registrar errores en Supabase para debugging
+
+## Sincronización en Tiempo Real
+- Usar Supabase Realtime para cambios instantáneos
+- Actualizar UI automáticamente cuando cambian datos
+- Manejar conflictos de forma inteligente
+- Notificar al usuario de cambios importantes
+
+## Código Flutter
+- Servicios en lib/services/ para lógica de negocio
+- Modelos en lib/data/models.dart
+- Pantallas en lib/screens/ solo para UI
+- Widgets reutilizables en lib/widgets/
+- Configuración en lib/config/
+
+## Naming Conventions
+- Tablas en Supabase: snake_case (companies, ui_texts)
+- Clases Dart: PascalCase (SupabaseService)
+- Métodos y variables: camelCase (loadCompanies)
+- Constantes: UPPER_SNAKE_CASE (SUPABASE_URL)
+
+## Testing
+- Probar cambios en Supabase antes de desplegar
+- Verificar sincronización en tiempo real
+- Probar con y sin conexión
+- Validar permisos y RLS
+
+## Migración de Servidores
+- Mantener compatibilidad durante transición
+- Mover lógica a Supabase Edge Functions
+- Usar Supabase Storage para archivos
+- Eliminar servidores solo después de validar
+
+## Documentación
+- Documentar cada tabla en SUPABASE_SCHEMA.md
+- Actualizar GUIA_SUPABASE.md con ejemplos
+- Comentar código complejo
+- Mantener README actualizado
+
+## Estructura de Archivos
+- lib/services/supabase_service.dart - Servicio principal de Supabase
+- lib/services/supabase_realtime_service.dart - Sincronización en tiempo real
+- lib/services/dynamic_translations_service.dart - Traducciones dinámicas
+- lib/config/supabase_config.dart - Configuración de Supabase
+- docs/supabase/ - Documentación de Supabase
+- docs/guides/ - Guías de uso
+
+## Comandos Útiles
+- flutter pub get - Instalar dependencias
+- flutter clean - Limpiar build
+- dart analyze - Analizar código
+- flutter test - Ejecutar tests

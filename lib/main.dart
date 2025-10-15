@@ -11,10 +11,39 @@ import 'services/voice_guide_service.dart';
 import 'services/adaptive_ai_service.dart';
 import 'services/simplified_mode_service.dart';
 import 'services/geographic_id_service.dart';
+import 'services/supabase_service.dart';
+import 'services/supabase_realtime_service.dart';
+import 'services/dynamic_translations_service.dart';
 import 'i18n/strings.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // ========================================
+  // INICIALIZACIÓN DE SUPABASE
+  // ========================================
+  
+  try {
+    // Inicializar Supabase
+    await SupabaseService.instance.initialize();
+    print('✅ Supabase inicializado correctamente');
+    
+    // Inicializar servicio de Realtime
+    await SupabaseRealtimeService.instance.initialize();
+    print('✅ Supabase Realtime inicializado correctamente');
+    
+    // Inicializar servicio de traducciones dinámicas
+    await DynamicTranslationsService.instance.initialize();
+    print('✅ Traducciones dinámicas inicializadas correctamente');
+    
+  } catch (e) {
+    print('❌ Error inicializando Supabase: $e');
+    print('⚠️ La app funcionará con datos locales como fallback');
+  }
+  
+  // ========================================
+  // CONFIGURACIÓN BÁSICA (FALLBACK)
+  // ========================================
   
   // Cargar configuración básica
   await AppState.loadConfig();
@@ -26,7 +55,7 @@ void main() async {
     print('⚠️ No se pudo inicializar TTS - la app funcionará sin guía por voz');
   }
   
-  // Inicializar empresa por defecto
+  // Inicializar empresa por defecto (fallback)
   AppState.initializeDefaultCompany();
   
   // Inicializar servicios de accesibilidad avanzada
@@ -46,9 +75,17 @@ void main() async {
   print('Idioma cargado: ${AppState.currentLanguage}');
   print('Traducción de zone.title: ${AppStrings.t('zone.title')}');
   
+  // ========================================
+  // CONFIGURACIÓN DEL KIOSCO
+  // ========================================
+  
   // GENERAR ID GEOGRÁFICO PARA EL KIOSKO
   AppState.kioscoId = 'MAD_Centro_K${DateTime.now().millisecondsSinceEpoch % 100}';
   print('🏢 ID Geográfico asignado: ${AppState.kioscoId}');
+  
+  // ========================================
+  // CONEXIÓN AL BACKEND
+  // ========================================
   
   // CONECTAR AL BACKEND PRIMERO - NO USAR DATOS LOCALES
   CentralizedWebSocketService.connect(AppState.kioscoId!);
@@ -68,6 +105,10 @@ void main() async {
       'coins': true,
       'cards': true,
     });
+  
+  // ========================================
+  // INICIAR APLICACIÓN
+  // ========================================
   
   runApp(const MEYPARKApp());
 }
