@@ -6,6 +6,7 @@ import '../data/models.dart';
 import '../widgets/top_bar.dart';
 import '../widgets/progress_bar.dart';
 import '../services/websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class PlateScreen extends StatefulWidget {
   const PlateScreen({super.key});
@@ -65,7 +66,7 @@ class _PlateScreenState extends State<PlateScreen> {
       body: Column(
         children: [
           TopBar(
-            title: AppStrings.t('plate.title'),
+            title: DynamicTranslationsService.instance.t('plate.title', defaultValue: 'Matrícula'),
             showBackButton: true,
             onBack: () => context.go('/home'), // Navegar específicamente a home
           ),
@@ -97,7 +98,7 @@ class _PlateScreenState extends State<PlateScreen> {
                   const SizedBox(height: 32),
                   // Título
                   Text(
-                    AppStrings.t('plate.title'),
+                    DynamicTranslationsService.instance.t('plate.title', defaultValue: 'Matrícula'),
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -106,7 +107,7 @@ class _PlateScreenState extends State<PlateScreen> {
                   const SizedBox(height: 8),
                   // Subtítulo
                   Text(
-                    AppStrings.t('plate.hint'),
+                    DynamicTranslationsService.instance.t('plate.hint', defaultValue: 'Introduce la matrícula de tu vehículo'),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                     ),
@@ -165,8 +166,8 @@ class _PlateScreenState extends State<PlateScreen> {
                   if (_plateController.text.isNotEmpty)
                     Text(
                       _isValid
-                          ? AppStrings.t('plate.valid')
-                          : AppStrings.t('plate.invalid_format'),
+                          ? DynamicTranslationsService.instance.t('plate.valid', defaultValue: 'Matrícula válida')
+                          : DynamicTranslationsService.instance.t('plate.invalid_format', defaultValue: 'Formato de matrícula inválido'),
                       style: TextStyle(
                         color: _isValid
                             ? Theme.of(context).colorScheme.primary
@@ -181,14 +182,14 @@ class _PlateScreenState extends State<PlateScreen> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
-                          child: Text(AppStrings.t('plate.back')),
+                          child: Text(DynamicTranslationsService.instance.t('plate.back', defaultValue: 'Atrás')),
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: FilledButton(
                           onPressed: _isValid ? _next : null,
-                          child: Text(AppStrings.t('plate.next')),
+                          child: Text(DynamicTranslationsService.instance.t('plate.next', defaultValue: 'Continuar')),
                         ),
                       ),
                     ],

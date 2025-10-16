@@ -7,6 +7,7 @@ import '../widgets/top_bar.dart';
 import '../services/websocket_service.dart';
 import '../services/local_storage_service.dart';
 import '../services/centralized_websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class PaymentScreen extends StatefulWidget {
   final bool isExtend;
@@ -92,13 +93,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             Icon(Icons.monetization_on, color: Colors.green),
             const SizedBox(width: 8),
-            Text('Devolución de Cambio'),
+            Text(DynamicTranslationsService.instance.t('payment.change_return', defaultValue: 'Devolución de Cambio')),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Se ha insertado más dinero del necesario.'),
+            Text(DynamicTranslationsService.instance.t('payment.overpaid', defaultValue: 'Se ha insertado más dinero del necesario.')),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
@@ -113,7 +114,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   Icon(Icons.money, color: Colors.green[800]),
                   const SizedBox(width: 8),
                   Text(
-                    'Cambio: ${change.toStringAsFixed(2)} €',
+                    '${DynamicTranslationsService.instance.t('payment.change', defaultValue: 'Cambio')}: ${change.toStringAsFixed(2)} €',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -125,7 +126,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'El cambio se devolverá automáticamente.',
+              DynamicTranslationsService.instance.t('payment.change_automatic', defaultValue: 'El cambio se devolverá automáticamente.'),
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
@@ -142,7 +143,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 );
               });
             },
-            child: Text('Entendido'),
+            child: Text(DynamicTranslationsService.instance.t('payment.understood', defaultValue: 'Entendido')),
           ),
         ],
       ),
@@ -221,7 +222,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       body: Column(
         children: [
           TopBar(
-            title: AppStrings.t('pay.title'),
+            title: DynamicTranslationsService.instance.t('pay.title', defaultValue: 'Pago'),
             showBackButton: true,
           ),
           Expanded(
@@ -242,8 +243,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       children: [
                         Text(
                           widget.isExtend
-                              ? AppStrings.t('pay.extend_session')
-                              : AppStrings.t('pay.new_parking'),
+                              ? DynamicTranslationsService.instance.t('pay.extend_session', defaultValue: 'Extender Sesión')
+                              : DynamicTranslationsService.instance.t('pay.new_parking', defaultValue: 'Nuevo Estacionamiento'),
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,
@@ -254,7 +255,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              AppStrings.t('pay.zone'),
+                              DynamicTranslationsService.instance.t('pay.zone', defaultValue: 'Zona'),
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             Text(
@@ -270,7 +271,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              AppStrings.t('pay.duration'),
+                              DynamicTranslationsService.instance.t('pay.duration', defaultValue: 'Duración'),
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             Text(
@@ -286,7 +287,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              AppStrings.t('pay.total'),
+                              DynamicTranslationsService.instance.t('pay.total', defaultValue: 'Total'),
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -306,7 +307,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   const SizedBox(height: 32),
                   // Métodos de pago
                   Text(
-                    AppStrings.t('pay.select_method'),
+                    DynamicTranslationsService.instance.t('pay.select_method', defaultValue: 'Seleccionar Método de Pago'),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -318,7 +319,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         child: _buildPaymentMethodCard(
                           'cash',
                           Icons.monetization_on,
-                          AppStrings.t('pay.method.cash'),
+                          DynamicTranslationsService.instance.t('pay.method.cash', defaultValue: 'Efectivo'),
                           _paymentMethod == 'cash',
                         ),
                       ),
@@ -327,7 +328,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         child: _buildPaymentMethodCard(
                           'chip',
                           Icons.credit_card,
-                          AppStrings.t('pay.method.chip'),
+                          DynamicTranslationsService.instance.t('pay.method.chip', defaultValue: 'Chip+PIN'),
                           _paymentMethod == 'chip',
                         ),
                       ),
@@ -336,7 +337,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         child: _buildPaymentMethodCard(
                           'contactless',
                           Icons.tap_and_play,
-                          AppStrings.t('pay.method.contactless'),
+                          DynamicTranslationsService.instance.t('pay.method.contactless', defaultValue: 'Contactless'),
                           _paymentMethod == 'contactless',
                         ),
                       ),
@@ -346,7 +347,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   // Insertar monedas (solo para pago en efectivo)
                   if (_paymentMethod == 'cash') ...[
                     Text(
-                      AppStrings.t('pay.insert_coins'),
+                      DynamicTranslationsService.instance.t('pay.insert_coins', defaultValue: 'Insertar Monedas'),
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -385,7 +386,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            AppStrings.t('pay.inserted'),
+                            DynamicTranslationsService.instance.t('pay.inserted', defaultValue: 'Insertado'),
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           Text(
@@ -404,7 +405,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     // Información de estado
                     if (_insertedAmount < widget.price) ...[
                       Text(
-                        AppStrings.t('pay.remaining') + ': ${(widget.price - _insertedAmount).toStringAsFixed(2)} €',
+                        DynamicTranslationsService.instance.t('pay.remaining', defaultValue: 'Faltan') + ': ${(widget.price - _insertedAmount).toStringAsFixed(2)} €',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.error,
                         ),
@@ -416,7 +417,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           Icon(Icons.check_circle, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            '¡Cantidad exacta! Puedes pagar ahora',
+                            DynamicTranslationsService.instance.t('pay.exact_amount', defaultValue: '¡Cantidad exacta! Puedes pagar ahora'),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.green[800],
                               fontWeight: FontWeight.bold,
@@ -431,7 +432,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           Icon(Icons.monetization_on, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Cambio: ${(_insertedAmount - widget.price).toStringAsFixed(2)} €',
+                            '${DynamicTranslationsService.instance.t('payment.change', defaultValue: 'Cambio')}: ${(_insertedAmount - widget.price).toStringAsFixed(2)} €',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.green[800],
                               fontWeight: FontWeight.bold,
@@ -473,7 +474,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                Text(AppStrings.t('pay.authorizing')),
+                                Text(DynamicTranslationsService.instance.t('pay.authorizing', defaultValue: 'Autorizando...')),
                               ],
                             )
                           : Row(
@@ -492,12 +493,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 ],
                                 Text(
                                   _isProcessing 
-                                      ? AppStrings.t('pay.authorizing')
+                                      ? DynamicTranslationsService.instance.t('pay.authorizing', defaultValue: 'Autorizando...')
                                       : (_insertedAmount == widget.price 
-                                          ? AppStrings.t('pay.pay_exact')
+                                          ? DynamicTranslationsService.instance.t('pay.pay_exact', defaultValue: 'Pagar')
                                           : (_insertedAmount > widget.price 
-                                              ? AppStrings.t('pay.pay_change')
-                                              : AppStrings.t('pay.pay_now'))),
+                                              ? DynamicTranslationsService.instance.t('pay.pay_change', defaultValue: 'Pagar con Cambio')
+                                              : DynamicTranslationsService.instance.t('pay.pay_now', defaultValue: 'Pagar Ahora'))),
                                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -511,7 +512,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     height: 48,
                     child: OutlinedButton(
                       onPressed: () => context.pop(),
-                      child: Text(AppStrings.t('pay.cancel')),
+                      child: Text(DynamicTranslationsService.instance.t('pay.cancel', defaultValue: 'Cancelar')),
                     ),
                   ),
                 ],

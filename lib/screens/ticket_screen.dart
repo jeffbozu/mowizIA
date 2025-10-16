@@ -11,6 +11,7 @@ import '../services/websocket_service.dart';
 import '../services/electronic_invoice_service.dart';
 import '../services/ticket_pdf_service.dart';
 import '../services/centralized_websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 enum PdfOperation { download, print }
 
@@ -189,8 +190,8 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
             transactionId: _invoiceTransaction?.id,
             isExtend: widget.isExtend,
           );
-          successMessage = AppStrings.t('ticket.download_success');
-          errorMessage = AppStrings.t('ticket.download_error');
+          successMessage = DynamicTranslationsService.instance.t('ticket.download_success', defaultValue: 'Ticket descargado correctamente');
+          errorMessage = DynamicTranslationsService.instance.t('ticket.download_error', defaultValue: 'Error al descargar el ticket');
           break;
         case PdfOperation.print:
           await TicketPdfService.printTicket(
@@ -204,8 +205,8 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
             transactionId: _invoiceTransaction?.id,
             isExtend: widget.isExtend,
           );
-          successMessage = AppStrings.t('ticket.print_success');
-          errorMessage = AppStrings.t('ticket.print_error');
+          successMessage = DynamicTranslationsService.instance.t('ticket.print_success', defaultValue: 'Ticket enviado a impresión');
+          errorMessage = DynamicTranslationsService.instance.t('ticket.print_error', defaultValue: 'Error al imprimir el ticket');
           break;
       }
 
@@ -216,7 +217,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
             backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
             action: filePath != null ? SnackBarAction(
-              label: 'Ver',
+              label: DynamicTranslationsService.instance.t('ticket.view', defaultValue: 'Ver'),
               textColor: Colors.white,
               onPressed: () {
                 print('PDF guardado en: $filePath');
@@ -229,7 +230,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${AppStrings.t('ticket.operation_error')}: ${e.toString()}'),
+            content: Text('${DynamicTranslationsService.instance.t('ticket.operation_error', defaultValue: 'Error en la operación')}: ${e.toString()}'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 4),
           ),
@@ -256,11 +257,11 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
   String _getPaymentMethodDisplay(String method) {
     switch (method) {
       case 'cash':
-        return AppStrings.t('pay.payment_cash');
+        return DynamicTranslationsService.instance.t('pay.payment_cash', defaultValue: 'Efectivo');
       case 'chip':
-        return AppStrings.t('pay.payment_chip');
+        return DynamicTranslationsService.instance.t('pay.payment_chip', defaultValue: 'Chip+PIN');
       case 'contactless':
-        return AppStrings.t('pay.payment_contactless');
+        return DynamicTranslationsService.instance.t('pay.payment_contactless', defaultValue: 'Contactless');
       default:
         return method.toUpperCase();
     }
@@ -285,7 +286,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('No se pudo abrir el enlace: $url'),
+                content: Text('${DynamicTranslationsService.instance.t('ticket.cannot_open_link', defaultValue: 'No se pudo abrir el enlace')}: $url'),
                 backgroundColor: Colors.red,
               ),
             );
@@ -295,7 +296,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error al abrir la facturación: $e'),
+              content: Text('${DynamicTranslationsService.instance.t('ticket.invoice_error', defaultValue: 'Error al abrir la facturación')}: $e'),
               backgroundColor: Colors.red,
             ),
           );
@@ -335,7 +336,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                       return Transform.scale(
                         scale: _successAnimation.value,
                         child: Semantics(
-                          label: 'Pago realizado con éxito',
+                          label: DynamicTranslationsService.instance.t('ticket.payment_success', defaultValue: 'Pago realizado con éxito'),
                           child: Container(
                             width: 80,
                             height: 80,
@@ -363,7 +364,8 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                   const SizedBox(height: 24),
                   // Título
                   Text(
-                    AppStrings.t(widget.isExtend ? 'ticket.title.extend' : 'ticket.title.new'),
+                    DynamicTranslationsService.instance.t(widget.isExtend ? 'ticket.title.extend' : 'ticket.title.new', 
+                      defaultValue: widget.isExtend ? 'Sesión Extendida' : 'Nuevo Estacionamiento'),
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -384,42 +386,42 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                     child: Column(
                       children: [
                         Text(
-                          AppStrings.t('ticket.details'),
+                          DynamicTranslationsService.instance.t('ticket.details', defaultValue: 'Detalles del Ticket'),
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        _buildDetailRow(AppStrings.t('ticket.plate'), widget.plate),
-                        _buildDetailRow(AppStrings.t('ticket.zone'), zone?.name ?? ''),
+                        _buildDetailRow(DynamicTranslationsService.instance.t('ticket.plate', defaultValue: 'Matrícula'), widget.plate),
+                        _buildDetailRow(DynamicTranslationsService.instance.t('ticket.zone', defaultValue: 'Zona'), zone?.name ?? ''),
                         _buildDetailRow(
-                          AppStrings.t('ticket.payment_method'), 
+                          DynamicTranslationsService.instance.t('ticket.payment_method', defaultValue: 'Método de Pago'), 
                           _getPaymentMethodDisplay(AppState.currentPayment?.paymentMethod ?? 'cash')
                         ),
                         if (widget.isExtend && session != null) ...[
                           _buildDetailRow(
-                            AppStrings.t('ticket.previous_end'),
+                            DynamicTranslationsService.instance.t('ticket.previous_end', defaultValue: 'Fin Anterior'),
                             '${session.end.hour.toString().padLeft(2, '0')}:${session.end.minute.toString().padLeft(2, '0')}',
                           ),
                           _buildDetailRow(
-                            AppStrings.t('ticket.new_end'),
+                            DynamicTranslationsService.instance.t('ticket.new_end', defaultValue: 'Nuevo Fin'),
                             '${session.end.add(Duration(minutes: widget.minutes)).hour.toString().padLeft(2, '0')}:${session.end.add(Duration(minutes: widget.minutes)).minute.toString().padLeft(2, '0')}',
                           ),
                           _buildDetailRow(
-                            AppStrings.t('ticket.extra_amount'),
+                            DynamicTranslationsService.instance.t('ticket.extra_amount', defaultValue: 'Cantidad Extra'),
                             '${widget.price.toStringAsFixed(2)} €',
                           ),
                         ] else ...[
                           _buildDetailRow(
-                            AppStrings.t('ticket.start'),
+                            DynamicTranslationsService.instance.t('ticket.start', defaultValue: 'Inicio'),
                             '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
                           ),
                           _buildDetailRow(
-                            AppStrings.t('ticket.end'),
+                            DynamicTranslationsService.instance.t('ticket.end', defaultValue: 'Fin'),
                             '${DateTime.now().add(Duration(minutes: widget.minutes)).hour.toString().padLeft(2, '0')}:${DateTime.now().add(Duration(minutes: widget.minutes)).minute.toString().padLeft(2, '0')}',
                           ),
                           _buildDetailRow(
-                            AppStrings.t('ticket.amount'),
+                            DynamicTranslationsService.instance.t('ticket.amount', defaultValue: 'Cantidad'),
                             '${widget.price.toStringAsFixed(2)} €',
                           ),
                         ],
@@ -449,7 +451,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              AppStrings.t('ticket.electronic_invoice'),
+                              DynamicTranslationsService.instance.t('ticket.electronic_invoice', defaultValue: 'Facturación Electrónica'),
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).colorScheme.primary,
@@ -459,7 +461,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          AppStrings.t('ticket.electronic_invoice_description'),
+                          DynamicTranslationsService.instance.t('ticket.electronic_invoice_description', defaultValue: 'Accede a tu factura electrónica'),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
@@ -469,7 +471,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         GestureDetector(
                           onTap: _openElectronicInvoice,
                           child: Text(
-                            AppStrings.t('ticket.click_here'),
+                            DynamicTranslationsService.instance.t('ticket.click_here', defaultValue: 'Haz clic aquí'),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                               decoration: TextDecoration.underline,
@@ -505,7 +507,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         ],
                         const SizedBox(height: 12),
                         Text(
-                          AppStrings.t('ticket.valid_for_days'),
+                          DynamicTranslationsService.instance.t('ticket.valid_for_days', defaultValue: 'Válido por 30 días'),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.7),
                           ),
@@ -522,7 +524,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         children: [
                           Expanded(
                             child: Semantics(
-                              label: 'Imprimir ticket de estacionamiento',
+                              label: DynamicTranslationsService.instance.t('ticket.print_label', defaultValue: 'Imprimir ticket de estacionamiento'),
                               button: true,
                               enabled: !_isGeneratingPdf,
                               child: SizedBox(
@@ -537,7 +539,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                                         )
                                       : const Icon(Icons.print, size: 24),
                                   label: Text(
-                                    AppStrings.t('ticket.print'),
+                                    DynamicTranslationsService.instance.t('ticket.print', defaultValue: 'Imprimir'),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -547,7 +549,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                           const SizedBox(width: 12),
                           Expanded(
                             child: Semantics(
-                              label: 'Descargar ticket en formato PDF',
+                              label: DynamicTranslationsService.instance.t('ticket.download_label', defaultValue: 'Descargar ticket en formato PDF'),
                               button: true,
                               enabled: !_isGeneratingPdf,
                               child: SizedBox(
@@ -562,7 +564,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                                         )
                                       : const Icon(Icons.download, size: 24),
                                   label: Text(
-                                    AppStrings.t('ticket.download_pdf'),
+                                    DynamicTranslationsService.instance.t('ticket.download_pdf', defaultValue: 'Descargar PDF'),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                 ),
@@ -577,12 +579,12 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
                         width: double.infinity,
                         height: 56,
                         child: Semantics(
-                          label: 'Continuar - Volver a la pantalla de zonas',
+                          label: DynamicTranslationsService.instance.t('ticket.continue_label', defaultValue: 'Continuar - Volver a la pantalla de zonas'),
                           button: true,
                           child: FilledButton(
                             onPressed: _continue,
                             child: Text(
-                              AppStrings.t('ticket.ok'),
+                              DynamicTranslationsService.instance.t('ticket.ok', defaultValue: 'Continuar'),
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                           ),

@@ -6,6 +6,7 @@ import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../widgets/progress_bar.dart';
 import '../services/websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class TimeScreen extends StatefulWidget {
   const TimeScreen({super.key});
@@ -84,7 +85,7 @@ class _TimeScreenState extends State<TimeScreen> {
       body: Column(
         children: [
           TopBar(
-            title: AppStrings.t('time.title'),
+            title: DynamicTranslationsService.instance.t('time.title', defaultValue: 'Tiempo de Estacionamiento'),
             showBackButton: true,
           ),
           // Barra de progreso
@@ -137,7 +138,7 @@ class _TimeScreenState extends State<TimeScreen> {
                                 ),
                               ),
                               Text(
-                                '${_selectedZone.pricePerHour.toStringAsFixed(2)} ${AppStrings.t('zone.price_per_hour')}',
+                                '${_selectedZone.pricePerHour.toStringAsFixed(2)} ${DynamicTranslationsService.instance.t('zone.price_per_hour', defaultValue: '€/hora')}',
                                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
@@ -168,7 +169,7 @@ class _TimeScreenState extends State<TimeScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          AppStrings.t('time.until') + ' ${_formatEndTime()}',
+                          DynamicTranslationsService.instance.t('time.until', defaultValue: 'Hasta') + ' ${_formatEndTime()}',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
@@ -177,7 +178,7 @@ class _TimeScreenState extends State<TimeScreen> {
                   const SizedBox(height: 32),
                   // Opciones de tiempo rápidas
                   Text(
-                    AppStrings.t('time.quick_select'),
+                    DynamicTranslationsService.instance.t('time.quick_select', defaultValue: 'Selección Rápida'),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -266,7 +267,7 @@ class _TimeScreenState extends State<TimeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppStrings.t('time.total'),
+                          DynamicTranslationsService.instance.t('time.total', defaultValue: 'Total'),
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -289,7 +290,7 @@ class _TimeScreenState extends State<TimeScreen> {
                     child: FilledButton(
                       onPressed: _pay,
                       child: Text(
-                        AppStrings.t('time.pay'),
+                        DynamicTranslationsService.instance.t('time.pay', defaultValue: 'Continuar al Pago'),
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),

@@ -10,6 +10,7 @@ import '../services/websocket_service.dart';
 import '../services/voice_guide_service.dart';
 import '../services/adaptive_ai_service.dart';
 import '../services/simplified_mode_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 // Función para convertir string de color a Color
 Color _parseColor(String colorString) {
@@ -50,9 +51,9 @@ class _ZoneScreenState extends State<ZoneScreen> {
     if (AppState.voiceGuideEnabled) {
       // Esperar un poco para que la pantalla se cargue completamente
       Future.delayed(const Duration(milliseconds: 500), () {
-        VoiceGuideService.speak(AppStrings.t('voice.zone.title'));
+        VoiceGuideService.speak(DynamicTranslationsService.instance.t('voice.zone.title', defaultValue: 'Selecciona una zona'));
         Future.delayed(const Duration(seconds: 2), () {
-          VoiceGuideService.speak(AppStrings.t('voice.zone.instruction'));
+          VoiceGuideService.speak(DynamicTranslationsService.instance.t('voice.zone.instruction', defaultValue: 'Toca la zona donde quieres estacionar'));
         });
       });
     }
@@ -81,7 +82,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
       body: Column(
         children: [
           TopBar(
-            title: SimplifiedModeService.getSimplifiedText('zone.title'),
+            title: DynamicTranslationsService.instance.t('zone.title', defaultValue: 'Seleccionar Zona'),
             showBackButton: true,
             onBack: () => context.go('/home'),
           ),
@@ -144,7 +145,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
                         onPressed: () => context.push('/extender'),
                         icon: const Icon(Icons.schedule, size: 28),
                         label: Text(
-                          AppStrings.t('zone.extend'),
+                          DynamicTranslationsService.instance.t('zone.extend', defaultValue: 'Extender Sesión'),
                           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -184,7 +185,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
                     child: FilledButton(
                       onPressed: selectedZoneId != null ? _next : null,
                       child: Text(
-                        SimplifiedModeService.getSimplifiedText('zone.next'),
+                        DynamicTranslationsService.instance.t('zone.next', defaultValue: 'Continuar'),
                         style: TextStyle(
                           fontSize: uiConfig.fontSize,
                           fontWeight: FontWeight.bold,
@@ -217,7 +218,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
         
         // Reproducir guía por voz de selección
         if (AppState.voiceGuideEnabled) {
-          VoiceGuideService.speak('${AppStrings.t('voice.zone.selected')} ${zone.name}');
+          VoiceGuideService.speak('${DynamicTranslationsService.instance.t('voice.zone.selected', defaultValue: 'Zona seleccionada')} ${zone.name}');
         }
         
         // Enviar datos de pantalla al dashboard
@@ -380,7 +381,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
               const SizedBox(height: 8),
               // Precio por hora (más grande)
               Text(
-                '${zone.pricePerHour.toStringAsFixed(2)} ${AppStrings.t('zone.price_per_hour')}',
+                '${zone.pricePerHour.toStringAsFixed(2)} ${DynamicTranslationsService.instance.t('zone.price_per_hour', defaultValue: '€/hora')}',
                 style: TextStyle(
                   fontSize: uiConfig.fontSize * 0.8,
                   fontWeight: FontWeight.w600,
@@ -390,7 +391,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
               const SizedBox(height: 4),
               // Máximo de horas
               Text(
-                AppStrings.t('zone.max_hours', params: {'hours': (zone.maxDuration / 60).toString()}),
+                DynamicTranslationsService.instance.t('zone.max_hours', defaultValue: 'Máximo ${(zone.maxDuration / 60).toString()} horas'),
                 style: TextStyle(
                   fontSize: uiConfig.fontSize * 0.6,
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -414,7 +415,7 @@ class _ZoneScreenState extends State<ZoneScreen> {
     if (selectedZoneId != null) {
       // Reproducir guía por voz de confirmación
       if (AppState.voiceGuideEnabled) {
-        VoiceGuideService.speak(AppStrings.t('voice.zone.selected'));
+        VoiceGuideService.speak(DynamicTranslationsService.instance.t('voice.zone.selected', defaultValue: 'Zona seleccionada'));
       }
       context.push('/matricula');
     }

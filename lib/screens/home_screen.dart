@@ -7,6 +7,7 @@ import '../data/models.dart';
 import '../services/websocket_service.dart';
 import '../modals/admin_pass_modal.dart';
 import '../modals/tech_pass_modal.dart';
+import '../services/dynamic_translations_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -263,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Text(
-        AppStrings.t('home.title'),
+        DynamicTranslationsService.instance.t('home.title', defaultValue: 'MEYPARK'),
         style: Theme.of(context).textTheme.displayLarge?.copyWith(
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -296,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Text(
-        AppStrings.t('home.subtitle'),
+        DynamicTranslationsService.instance.t('home.subtitle', defaultValue: 'Sistema de Estacionamiento Inteligente'),
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
           color: Colors.white,
           fontWeight: FontWeight.w500,
@@ -311,8 +312,8 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         // Botón Pagar
         _buildOptimizedMainButton(
-          title: AppStrings.t('home.pay'),
-          subtitle: AppStrings.t('home.pay.subtitle'),
+          title: DynamicTranslationsService.instance.t('home.pay', defaultValue: 'Pagar'),
+          subtitle: DynamicTranslationsService.instance.t('home.pay.subtitle', defaultValue: 'Nuevo estacionamiento'),
           icon: Icons.payment,
           onTap: _navigateToPayment,
         ),
@@ -320,8 +321,8 @@ class _HomeScreenState extends State<HomeScreen> {
         
         // Botón Anular
         _buildOptimizedMainButton(
-          title: AppStrings.t('home.cancel'),
-          subtitle: AppStrings.t('home.cancel.subtitle'),
+          title: DynamicTranslationsService.instance.t('home.cancel', defaultValue: 'Anular'),
+          subtitle: DynamicTranslationsService.instance.t('home.cancel.subtitle', defaultValue: 'Cancelar sesión activa'),
           icon: Icons.cancel,
           onTap: _navigateToCancel,
         ),
@@ -449,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Botón Idioma
         Expanded(
           child: _buildOptimizedSecondaryButton(
-            title: AppStrings.t('home.language'),
+            title: DynamicTranslationsService.instance.t('home.language', defaultValue: 'Idioma'),
             icon: _getCurrentLanguageFlag(),
             onTap: _showLanguageModal,
           ),
@@ -459,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Botón Accesibilidad
         Expanded(
           child: _buildOptimizedSecondaryButton(
-            title: AppStrings.t('home.accessibility'),
+            title: DynamicTranslationsService.instance.t('home.accessibility', defaultValue: 'Accesibilidad'),
             icon: '♿',
             onTap: _navigateToAccessibility,
           ),
