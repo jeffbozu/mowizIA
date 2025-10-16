@@ -1,204 +1,183 @@
-# 🚀 MOWIZIA - MEYPARK Sistema de Parquímetro
+# Supabase CLI
 
-![MEYPARK Logo](https://img.shields.io/badge/MEYPARK-Parquímetro%20Inteligente-E62144?style=for-the-badge&logo=flutter)
+[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
+](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
 
-## 📋 Descripción
+[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
 
-**MOWIZIA** es un sistema completo de parquímetro inteligente desarrollado en Flutter con dashboard web de gestión remota. Simula un kiosco físico de parquímetro con capacidades de gestión en tiempo real.
+This repository contains all the functionality for Supabase CLI.
 
-## ✨ Características Principales
+- [x] Running Supabase locally
+- [x] Managing database migrations
+- [x] Creating and deploying Supabase Functions
+- [x] Generating types directly from your database schema
+- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
 
-### 🎯 **App Flutter (Kiosco)**
-- **Pantallas completas**: Login, Selección de Zona, Matrícula, Tiempo, Pago, Ticket
-- **Gestos ocultos**: Modo Admin (5 taps), Modo Técnico (3s long-press)
-- **Accesibilidad completa**: Modo oscuro, alto contraste, tamaños de fuente
-- **Multiidioma**: Español e Inglés con traducción instantánea
-- **WebSocket**: Comunicación en tiempo real con dashboard
+## Getting started
 
-### 🌐 **Dashboard Web**
-- **Gestión de empresas**: Crear, editar, eliminar empresas
-- **Gestión de zonas**: Configurar zonas de estacionamiento y tarifas
-- **Monitoreo en vivo**: Visualización en tiempo real de la pantalla del kiosco
-- **Gestión de operadores**: Cambiar credenciales de acceso
-- **Sincronización**: Actualización automática de precios y configuraciones
-- **Accesibilidad**: Modo oscuro, alto contraste, tamaños de fuente
+### Install the CLI
 
-### 🔄 **Sincronización en Tiempo Real**
-- **WebSocket bidireccional**: Comunicación instantánea
-- **Actualización de credenciales**: Cambios en tiempo real
-- **Sincronización de precios**: Tarifas actualizables desde dashboard
-- **Monitoreo de pantalla**: Visualización en vivo del kiosco
+Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
 
-## 🛠️ Tecnologías Utilizadas
-
-- **Flutter 3.x** - Framework principal
-- **Material 3** - Sistema de diseño
-- **WebSocket** - Comunicación en tiempo real
-- **Node.js** - Servidor WebSocket
-- **HTML/CSS/JavaScript** - Dashboard web
-- **GitHub Pages** - Despliegue del dashboard
-
-## 🚀 Instalación y Uso
-
-### **Prerrequisitos**
-- Flutter 3.x instalado
-- Node.js instalado
-- Navegador web moderno
-
-### **1. Clonar el repositorio**
 ```bash
-git clone https://github.com/jeffbozu/mowizIA.git
-cd mowizIA
+npm i supabase --save-dev
 ```
 
-### **2. Instalar dependencias Flutter**
+To install the beta release channel:
+
 ```bash
-flutter pub get
+npm i supabase@beta --save-dev
 ```
 
-### **3. Instalar dependencias Node.js**
+When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
+
+```
+NODE_OPTIONS=--no-experimental-fetch yarn add supabase
+```
+
+> **Note**
+For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+
+<details>
+  <summary><b>macOS</b></summary>
+
+  Available via [Homebrew](https://brew.sh). To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To install the beta release channel:
+  
+  ```sh
+  brew install supabase/tap/supabase-beta
+  brew link --overwrite supabase-beta
+  ```
+  
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Windows</b></summary>
+
+  Available via [Scoop](https://scoop.sh). To install:
+
+  ```powershell
+  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+  scoop install supabase
+  ```
+
+  To upgrade:
+
+  ```powershell
+  scoop update supabase
+  ```
+</details>
+
+<details>
+  <summary><b>Linux</b></summary>
+
+  Available via [Homebrew](https://brew.sh) and Linux packages.
+
+  #### via Homebrew
+
+  To install:
+
+  ```sh
+  brew install supabase/tap/supabase
+  ```
+
+  To upgrade:
+
+  ```sh
+  brew upgrade supabase
+  ```
+
+  #### via Linux packages
+
+  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
+
+  ```sh
+  sudo apk add --allow-untrusted <...>.apk
+  ```
+
+  ```sh
+  sudo dpkg -i <...>.deb
+  ```
+
+  ```sh
+  sudo rpm -i <...>.rpm
+  ```
+
+  ```sh
+  sudo pacman -U <...>.pkg.tar.zst
+  ```
+</details>
+
+<details>
+  <summary><b>Other Platforms</b></summary>
+
+  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
+
+  ```sh
+  go install github.com/supabase/cli@latest
+  ```
+
+  Add a symlink to the binary in `$PATH` for easier access:
+
+  ```sh
+  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
+  ```
+
+  This works on other non-standard Linux distros.
+</details>
+
+<details>
+  <summary><b>Community Maintained Packages</b></summary>
+
+  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
+  To install in your working directory:
+
+  ```bash
+  pkgx install supabase
+  ```
+
+  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
+</details>
+
+### Run the CLI
+
 ```bash
-npm install
+supabase bootstrap
 ```
 
-### **4. Iniciar el sistema completo**
+Or using npx:
+
 ```bash
-./start_dashboard.sh
+npx supabase bootstrap
 ```
 
-### **5. Acceder al dashboard**
-Abrir `web/dashboard.html` en el navegador
+The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
 
-## 📱 Funcionalidades del Kiosco
+## Docs
 
-### **Pantallas Principales**
-1. **Login**: Autenticación de operadores
-2. **Selección de Zona**: Elegir zona de estacionamiento
-3. **Matrícula**: Introducir matrícula del vehículo
-4. **Tiempo**: Seleccionar duración del estacionamiento
-5. **Pago**: Procesar pago (monedas, tarjeta)
-6. **Ticket**: Generar y mostrar ticket
+Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
 
-### **Gestos Ocultos**
-- **Modo Admin**: 5 taps en el logo MEYPARK
-- **Modo Técnico**: 3 segundos de presión larga en el logo
+## Breaking changes
 
-### **Accesibilidad**
-- Modo oscuro/claro
-- Alto contraste
-- Tamaños de fuente (Pequeño, Normal, Grande)
-- Reducir animaciones
+We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
 
-## 🌐 Funcionalidades del Dashboard
+However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
 
-### **Gestión de Empresas**
-- Crear nuevas empresas
-- Editar información existente
-- Cambiar credenciales de acceso
-- Configurar colores y branding
+## Developing
 
-### **Gestión de Zonas**
-- Crear zonas de estacionamiento
-- Configurar tarifas por hora
-- Establecer tiempo máximo
-- Ajustar precios en tiempo real
+To run from source:
 
-### **Monitoreo en Vivo**
-- Visualización de la pantalla del kiosco
-- Estado de conexión
-- Diagnósticos del sistema
-- Estadísticas en tiempo real
-
-## 🔧 Configuración
-
-### **Empresas por Defecto**
-- **MOWIZ**: `mowiz_admin` / `Mo2025!`
-- **EYPSA**: `eypsa_admin` / `Ey2025!`
-
-### **Zonas de Estacionamiento**
-- **MOWIZ MZ-V**: 2.10€/h, máximo 24h
-- **EYPSA EY-V**: 2.40€/h, máximo 24h
-- **EYPSA EY-R**: 0.50€/h, máximo 24h
-
-## 📊 Estructura del Proyecto
-
+```sh
+# Go >= 1.22
+go run . help
 ```
-mowizIA/
-├── lib/                    # Código Flutter
-│   ├── main.dart          # Punto de entrada
-│   ├── screens/           # Pantallas de la app
-│   ├── services/          # Servicios WebSocket
-│   ├── data/              # Datos mock
-│   ├── i18n/              # Internacionalización
-│   └── theme/             # Temas y estilos
-├── web/                   # Dashboard web
-│   ├── dashboard.html     # Interfaz principal
-│   ├── dashboard.js       # Lógica JavaScript
-│   └── dashboard.css      # Estilos
-├── websocket_server.js    # Servidor WebSocket
-├── start_dashboard.sh     # Script de inicio
-└── package.json           # Dependencias Node.js
-```
-
-## 🎯 Casos de Uso
-
-### **Para Operadores**
-1. Iniciar sesión en el kiosco
-2. Seleccionar zona de estacionamiento
-3. Introducir matrícula del vehículo
-4. Seleccionar tiempo de estacionamiento
-5. Procesar pago
-6. Generar ticket
-
-### **Para Administradores**
-1. Acceder al dashboard web
-2. Gestionar empresas y zonas
-3. Monitorear kioscos en tiempo real
-4. Actualizar precios y configuraciones
-5. Ver estadísticas y reportes
-
-## 🔒 Seguridad
-
-- **Autenticación**: Sistema de login seguro
-- **WebSocket**: Comunicación encriptada
-- **Validación**: Verificación de datos de entrada
-- **Acceso**: Gestión de permisos por roles
-
-## 📈 Roadmap
-
-- [ ] Integración con sistemas de pago reales
-- [ ] Aplicación móvil para usuarios
-- [ ] Sistema de notificaciones
-- [ ] Reportes avanzados
-- [ ] Integración con sensores IoT
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
-
-## 👥 Autores
-
-- **Desarrollado por**: Equipo MOWIZIA
-- **Contacto**: [GitHub](https://github.com/jeffbozu)
-
-## 🙏 Agradecimientos
-
-- Flutter Team por el framework
-- Material Design por el sistema de diseño
-- Comunidad open source por las librerías utilizadas
-
----
-
-**¡Gracias por usar MOWIZIA! 🚀**
-
-*Sistema de parquímetro inteligente con gestión remota en tiempo real*

@@ -5,6 +5,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// Script para probar sincronización en tiempo real con Supabase
+
+void main(List<String> args) async {
+  await SupabaseTester.main(args);
+}
 /// 
 /// Este script simula cambios en Supabase y verifica que se reflejen
 /// en la aplicación Flutter en tiempo real.
@@ -159,7 +163,7 @@ class SupabaseTester {
   Future<void> testNewCompanyCreation() async {
     print('\n🔍 TEST 5: Creación de nueva empresa');
     
-    const testCompanyId = 'test-company-${DateTime.now().millisecondsSinceEpoch}';
+    final testCompanyId = 'test-company-${DateTime.now().millisecondsSinceEpoch}';
     const testCompanyName = 'Empresa de Prueba';
     
     print('   🏢 ID de empresa: $testCompanyId');
