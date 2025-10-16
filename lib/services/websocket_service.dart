@@ -167,7 +167,7 @@ class WebSocketService {
     print('Operadores actualizados: ${data.length}');
     print('Nuevos operadores:');
     for (var op in AppState.operators.values) {
-      print('  ${op.username} / ${op.password}');
+      print('  ${op.username} / ${op.passwordHash}');
     }
   }
   
@@ -281,7 +281,7 @@ class WebSocketService {
   }
   
   // Enviar sesión activa
-  static void sendActiveSession(Session session) {
+  static void sendActiveSession(ParkingSession session) {
     sendMessage({
       'type': 'active_session',
       'kioscoId': _kioscoId,

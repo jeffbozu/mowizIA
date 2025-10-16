@@ -446,10 +446,10 @@ class SupabaseService {
   }
   
   /// Obtener sesiones activas
-  Future<List<Session>> getActiveSessions() async {
+  Future<List<ParkingSession>> getActiveSessions() async {
     try {
       final data = await getAll(SupabaseConfig.tableActiveSessions);
-      return data.map((json) => Session.fromJson(json)).toList();
+      return data.map((json) => ParkingSession.fromJson(json)).toList();
     } catch (e) {
       print('❌ Error obteniendo sesiones activas: $e');
       return [];
@@ -457,10 +457,10 @@ class SupabaseService {
   }
   
   /// Crear nueva sesión
-  Future<Session?> createSession(Session session) async {
+  Future<ParkingSession?> createSession(ParkingSession session) async {
     try {
       final data = await insert(SupabaseConfig.tableActiveSessions, session.toJson());
-      return data != null ? Session.fromJson(data) : null;
+      return data != null ? ParkingSession.fromJson(data) : null;
     } catch (e) {
       print('❌ Error creando sesión: $e');
       return null;

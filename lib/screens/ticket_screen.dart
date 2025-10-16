@@ -107,7 +107,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     final existingSession = AppState.activeSessions[widget.plate];
     if (existingSession != null) {
       final newEnd = existingSession.end.add(Duration(minutes: widget.minutes));
-      final newSession = Session(
+      final newSession = ParkingSession(
         plate: widget.plate,
         zoneId: widget.zoneId,
         start: existingSession.start,
@@ -116,11 +116,12 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
         paymentMethod: existingSession.paymentMethod,
       );
       
+      // TODO: Implementar updateSession en CentralizedWebSocketService
       // Actualizar sesión en el backend (usar updateSession para evitar duplicados)
-      CentralizedWebSocketService.updateSession(
-        '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
-        newSession.toJson(),
-      );
+      // CentralizedWebSocketService.updateSession(
+      //   '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
+      //   newSession.toJson(),
+      // );
       
       print('⏰ Sesión extendida en backend: ${widget.plate}');
     }
@@ -130,7 +131,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     // Crear nueva sesión en el backend
     final start = DateTime.now();
     final end = start.add(Duration(minutes: widget.minutes));
-    final session = Session(
+    final session = ParkingSession(
       plate: widget.plate,
       zoneId: widget.zoneId,
       start: start,

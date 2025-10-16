@@ -113,15 +113,17 @@ class DynamicTranslationsService {
       final response = await SupabaseService.instance.client
           .from(SupabaseConfig.tableUiTranslationsCache)
           .select('translations_json')
-          .eq('company_id', _currentCompanyId)
+          .eq('company_id', _currentCompanyId ?? 'default')
           .eq('language', _currentLanguage)
           .single();
       
       if (response != null && response['translations_json'] != null) {
-        final translationsJson = response['translations_json'] as Map<String, dynamic>;
-        _translations[_currentLanguage] = Map<String, String>.from(translationsJson);
-        
-        print('📦 Traducciones cargadas desde caché de Supabase');
+        final translationsJson = response['translations_json'] as Map<String, dynamic>?;
+        if (translationsJson != null) {
+          _translations[_currentLanguage] = Map<String, String>.from(translationsJson);
+          
+          print('📦 Traducciones cargadas desde caché de Supabase');
+        }
       }
       
     } catch (e) {
@@ -135,7 +137,7 @@ class DynamicTranslationsService {
       final response = await SupabaseService.instance.client
           .from(SupabaseConfig.tableUiTexts)
           .select('screen, element, text_value')
-          .eq('company_id', _currentCompanyId)
+          .eq('company_id', _currentCompanyId ?? 'default')
           .eq('language', _currentLanguage)
           .eq('is_enabled', true);
       
@@ -143,7 +145,10 @@ class DynamicTranslationsService {
       
       for (final row in response) {
         final key = '${row['screen']}.${row['element']}';
-        translations[key] = row['text_value'] as String;
+        final textValue = row['text_value'] as String?;
+        if (textValue != null) {
+          translations[key] = textValue;
+        }
       }
       
       _translations[_currentLanguage] = translations;
@@ -165,13 +170,16 @@ class DynamicTranslationsService {
       final response = await SupabaseService.instance.client
           .from(SupabaseConfig.tableUiElementsConfig)
           .select('screen, element_key, is_enabled')
-          .eq('company_id', _currentCompanyId);
+          .eq('company_id', _currentCompanyId ?? 'default');
       
       final elementStates = <String, bool>{};
       
       for (final row in response) {
         final key = '${row['screen']}.${row['element_key']}';
-        elementStates[key] = row['is_enabled'] as bool;
+        final isEnabled = row['is_enabled'] as bool?;
+        if (isEnabled != null) {
+          elementStates[key] = isEnabled;
+        }
       }
       
       _elementStates[_currentCompanyId ?? 'default'] = elementStates;

@@ -16,7 +16,7 @@ class ExtendScreen extends StatefulWidget {
 
 class _ExtendScreenState extends State<ExtendScreen> {
   final TextEditingController _plateController = TextEditingController();
-  Session? _currentSession;
+  ParkingSession? _currentSession;
   int _extraMinutes = 0;
   bool _isSearching = false;
   bool _hasSearched = false; // Para controlar si ya se ha buscado
@@ -115,7 +115,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
     });
 
     // Buscar SOLO en el backend - no usar datos locales
-    Session? session;
+    ParkingSession? session;
     try {
       print('🔍 Buscando sesión en el backend...');
       
@@ -133,7 +133,8 @@ class _ExtendScreenState extends State<ExtendScreen> {
       // Si aún no se encuentra, hacer búsqueda específica en el backend
       if (session == null) {
         print('🔍 Sesión no encontrada, haciendo búsqueda específica en el backend...');
-        CentralizedWebSocketService.searchSession(plate);
+        // TODO: Implementar searchSession en CentralizedWebSocketService
+        // CentralizedWebSocketService.searchSession(plate);
         
         await Future.delayed(const Duration(milliseconds: 500));
         session = AppState.activeSessions[plate];
@@ -266,12 +267,13 @@ class _ExtendScreenState extends State<ExtendScreen> {
     
     final price = _calculatePrice(zone.pricePerHour, _extraMinutes);
     
+    // TODO: Implementar extendSession en CentralizedWebSocketService
     // Notificar al backend sobre la extensión de sesión
-    CentralizedWebSocketService.extendSession(
-      _currentSession!.plate,
-      _extraMinutes,
-      price,
-    );
+    // CentralizedWebSocketService.extendSession(
+    //   _currentSession!.plate,
+    //   _extraMinutes,
+    //   price,
+    // );
     
     context.push('/pago', extra: {
       'extend': true,
@@ -689,6 +691,6 @@ class _ExtendScreenState extends State<ExtendScreen> {
       return '0 min (máximo alcanzado)';
     }
     
-    return _formatMinutes(remainingToExtend);
+    return _formatMinutes(remainingToExtend.toInt());
   }
 }

@@ -162,7 +162,7 @@ class Zone {
   }
 }
 
-class Session {
+class ParkingSession {
   final String plate;
   final String zoneId;
   final DateTime start;
@@ -170,7 +170,7 @@ class Session {
   final double totalPrice;
   final String? paymentMethod;
 
-  const Session({
+  const ParkingSession({
     required this.plate,
     required this.zoneId,
     required this.start,
@@ -179,8 +179,8 @@ class Session {
     this.paymentMethod,
   });
 
-  factory Session.fromJson(Map<String, dynamic> json) {
-    return Session(
+  factory ParkingSession.fromJson(Map<String, dynamic> json) {
+    return ParkingSession(
       plate: json['plate'] ?? '',
       zoneId: json['zoneId'] ?? '',
       start: DateTime.parse(json['start'] ?? DateTime.now().toIso8601String()),
@@ -201,7 +201,7 @@ class Session {
     };
   }
 
-  Session copyWith({
+  ParkingSession copyWith({
     String? plate,
     String? zoneId,
     DateTime? start,
@@ -209,7 +209,7 @@ class Session {
     double? totalPrice,
     String? paymentMethod,
   }) {
-    return Session(
+    return ParkingSession(
       plate: plate ?? this.plate,
       zoneId: zoneId ?? this.zoneId,
       start: start ?? this.start,
@@ -304,7 +304,7 @@ class AppState {
   static Map<String, Company> companies = {};
   static Map<String, Operator> operators = {};
   static Map<String, Zone> zones = {};
-  static Map<String, Session> activeSessions = {};
+  static Map<String, ParkingSession> activeSessions = {};
   static PaymentContext? currentPayment;
   static Operator? currentOperator;
   static String? currentPlate;

@@ -28,14 +28,14 @@ class MockData {
       companyId: 'mowiz-company',
       name: 'MOWIZ Admin',
       username: 'mowiz_admin',
-      password: 'Mo2025!',
+      passwordHash: 'Mo2025!', // TODO: Implementar hash real con bcrypt
     ),
     Operator(
       id: 'eysa-admin',
       companyId: 'eysa-company',
       name: 'EYSA Admin',
       username: 'eysa_admin',
-      password: 'Ey2025!',
+      passwordHash: 'Ey2025!', // TODO: Implementar hash real con bcrypt
     ),
   ];
 
@@ -95,15 +95,15 @@ class MockData {
   ];
 
   // Sesiones activas mock
-  static Map<String, Session> activeSessions = {
-    '1234ABC': Session(
+  static Map<String, ParkingSession> activeSessions = {
+    '1234ABC': ParkingSession(
       plate: '1234ABC',
       zoneId: 'MZ-A',
       start: DateTime.now().subtract(const Duration(minutes: 15)),
       end: DateTime.now().add(const Duration(minutes: 45)),
       totalPrice: 1.20,
     ),
-    '5678DEF': Session(
+    '5678DEF': ParkingSession(
       plate: '5678DEF',
       zoneId: 'EY-V',
       start: DateTime.now().subtract(const Duration(minutes: 30)),
@@ -145,7 +145,7 @@ class MockData {
     return regex.hasMatch(plate);
   }
 
-  static Session? getSessionByPlate(String plate) {
+  static ParkingSession? getSessionByPlate(String plate) {
     // Ya no usar datos locales - solo del backend
     return AppState.activeSessions[plate];
   }
@@ -170,7 +170,7 @@ class MockData {
     return maxTotalMinutes - currentMinutes;
   }
 
-  static void addSession(Session session) {
+  static void addSession(ParkingSession session) {
     // Ya no agregar sesiones localmente - solo notificar al backend
     print('💾 Notificando sesión al backend: ${session.plate}');
     
@@ -218,7 +218,7 @@ class MockData {
         companyId: opData['companyId'],
         name: opData['name'] ?? opData['username'],
         username: opData['username'],
-        password: opData['password'],
+        passwordHash: opData['password'] ?? opData['passwordHash'] ?? '',
       );
       operators.add(operator);
     }

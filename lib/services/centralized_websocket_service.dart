@@ -119,13 +119,13 @@ class CentralizedWebSocketService {
         _handleAccessibilityUpdated(message);
         break;
       case 'session_added':
-        _handleSessionAdded(message);
+        _handleParkingSessionAdded(message);
         break;
       case 'session_removed':
-        _handleSessionRemoved(message);
+        _handleParkingSessionRemoved(message);
         break;
       case 'session_found':
-        _handleSessionFound(message);
+        _handleParkingSessionFound(message);
         break;
       case 'tech_diagnostics':
         _handleTechDiagnostics(message);
@@ -134,10 +134,10 @@ class CentralizedWebSocketService {
         _handleStatsUpdate(message);
         break;
       case 'session_extended':
-        _handleSessionExtended(message);
+        _handleParkingSessionExtended(message);
         break;
       case 'session_found':
-        _handleSessionFound(message);
+        _handleParkingSessionFound(message);
         break;
       default:
         print('❓ Tipo de mensaje no reconocido: ${message['type']}');
@@ -178,7 +178,7 @@ class CentralizedWebSocketService {
     if (data['activeSessions'] != null) {
       AppState.activeSessions.clear();
       (data['activeSessions'] as Map<String, dynamic>).forEach((key, value) {
-        AppState.activeSessions[key] = Session.fromJson(value);
+        AppState.activeSessions[key] = ParkingSession.fromJson(value);
       });
     }
     
@@ -258,7 +258,7 @@ class CentralizedWebSocketService {
     if (data['activeSessions'] != null) {
       AppState.activeSessions.clear();
       (data['activeSessions'] as Map<String, dynamic>).forEach((key, value) {
-        AppState.activeSessions[key] = Session.fromJson(value);
+        AppState.activeSessions[key] = ParkingSession.fromJson(value);
       });
     }
     
@@ -383,9 +383,9 @@ class CentralizedWebSocketService {
   }
   
   // Manejar sesión agregada
-  static void _handleSessionAdded(Map<String, dynamic> message) {
+  static void _handleParkingSessionAdded(Map<String, dynamic> message) {
     if (message['success'] == true && message['session'] != null) {
-      final session = Session.fromJson(message['session']);
+      final session = ParkingSession.fromJson(message['session']);
       // Usar plate como clave para búsqueda por matrícula
       AppState.activeSessions[session.plate] = session;
       AppState.notifyConfigChange();
@@ -395,7 +395,7 @@ class CentralizedWebSocketService {
   }
   
   // Manejar sesión removida
-  static void _handleSessionRemoved(Map<String, dynamic> message) {
+  static void _handleParkingSessionRemoved(Map<String, dynamic> message) {
     if (message['success'] == true && message['sessionId'] != null) {
       AppState.activeSessions.remove(message['sessionId']);
       AppState.notifyConfigChange();
@@ -404,9 +404,9 @@ class CentralizedWebSocketService {
   }
 
   // Manejar sesión encontrada
-  static void _handleSessionFound(Map<String, dynamic> message) {
+  static void _handleParkingSessionFound(Map<String, dynamic> message) {
     if (message['success'] == true && message['session'] != null) {
-      final session = Session.fromJson(message['session']);
+      final session = ParkingSession.fromJson(message['session']);
       final plate = message['plate'] as String;
       
       // Agregar/actualizar sesión en el estado local
@@ -485,7 +485,7 @@ class CentralizedWebSocketService {
   }
   
   // Extender sesión
-  static void extendSession(String plate, int extraMinutes, double extraPrice) {
+  static void extendParkingSession(String plate, int extraMinutes, double extraPrice) {
     sendMessage({
       'type': 'extend_session',
       'plate': plate,
@@ -496,7 +496,7 @@ class CentralizedWebSocketService {
   }
   
   // Buscar sesión específica
-  static void searchSession(String plate) {
+  static void searchParkingSession(String plate) {
     sendMessage({
       'type': 'search_session',
       'plate': plate
@@ -512,7 +512,7 @@ class CentralizedWebSocketService {
   }
   
   // Agregar sesión
-  static void addSession(String sessionId, Map<String, dynamic> sessionData) {
+  static void addParkingSession(String sessionId, Map<String, dynamic> sessionData) {
     sendMessage({
       'type': 'add_session',
       'sessionId': sessionId,
@@ -521,7 +521,7 @@ class CentralizedWebSocketService {
   }
   
   // Actualizar sesión existente
-  static void updateSession(String sessionId, Map<String, dynamic> sessionData) {
+  static void updateParkingSession(String sessionId, Map<String, dynamic> sessionData) {
     sendMessage({
       'type': 'update_session',
       'sessionId': sessionId,
@@ -530,7 +530,7 @@ class CentralizedWebSocketService {
   }
   
   // Remover sesión
-  static void removeSession(String sessionId) {
+  static void removeParkingSession(String sessionId) {
     sendMessage({
       'type': 'remove_session',
       'sessionId': sessionId
@@ -593,9 +593,9 @@ class CentralizedWebSocketService {
   }
   
   // Manejar sesión extendida
-  static void _handleSessionExtended(Map<String, dynamic> message) {
+  static void _handleParkingSessionExtended(Map<String, dynamic> message) {
     if (message['success'] == true && message['session'] != null) {
-      final session = Session.fromJson(message['session']);
+      final session = ParkingSession.fromJson(message['session']);
       AppState.activeSessions[session.plate] = session;
       AppState.notifyConfigChange();
       print('⏰ Sesión extendida: ${session.plate} - ${message['extraMinutes']} minutos adicionales');

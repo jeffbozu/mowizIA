@@ -78,12 +78,12 @@ class LocalStorageService {
   }
   
   // Guardar sesiones activas
-  static Future<void> saveSessions() async {
+  static Future<void> saveParkingSessions() async {
     try {
       final sessions = AppState.activeSessions.map((key, value) => 
           MapEntry(key, value.toJson()));
       
-      final file = await _getSessionsFile();
+      final file = await _getParkingSessionsFile();
       await file.writeAsString(jsonEncode(sessions));
       print('Sesiones guardadas localmente');
     } catch (e) {
@@ -92,15 +92,15 @@ class LocalStorageService {
   }
   
   // Cargar sesiones activas
-  static Future<void> loadSessions() async {
+  static Future<void> loadParkingSessions() async {
     try {
-      final file = await _getSessionsFile();
+      final file = await _getParkingSessionsFile();
       if (await file.exists()) {
         final content = await file.readAsString();
         final sessionsMap = Map<String, dynamic>.from(jsonDecode(content));
         
         for (final entry in sessionsMap.entries) {
-          AppState.activeSessions[entry.key] = Session.fromJson(entry.value);
+          AppState.activeSessions[entry.key] = ParkingSession.fromJson(entry.value);
         }
         
         print('Sesiones cargadas desde almacenamiento local');
@@ -117,7 +117,7 @@ class LocalStorageService {
   }
   
   // Obtener archivo de sesiones
-  static Future<File> _getSessionsFile() async {
+  static Future<File> _getParkingSessionsFile() async {
     final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/$_sessionsFileName');
   }
@@ -126,7 +126,7 @@ class LocalStorageService {
   static Future<void> clearAllData() async {
     try {
       final configFile = await _getConfigFile();
-      final sessionsFile = await _getSessionsFile();
+      final sessionsFile = await _getParkingSessionsFile();
       
       if (await configFile.exists()) {
         await configFile.delete();
@@ -205,13 +205,13 @@ class LocalStorageService {
       if (config['activeSessions'] != null) {
         final sessionsMap = Map<String, dynamic>.from(config['activeSessions']);
         for (final entry in sessionsMap.entries) {
-          AppState.activeSessions[entry.key] = Session.fromJson(entry.value);
+          AppState.activeSessions[entry.key] = ParkingSession.fromJson(entry.value);
         }
       }
       
       // Guardar configuración importada
       await saveConfig();
-      await saveSessions();
+      await saveParkingSessions();
       
       print('Configuración importada exitosamente');
     } catch (e) {

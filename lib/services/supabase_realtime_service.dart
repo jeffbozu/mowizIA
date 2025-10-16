@@ -257,11 +257,12 @@ class SupabaseRealtimeService {
           if (companyData != null) {
             final company = Company.fromJson(companyData);
             
+            // TODO: Implementar manejo de empresas en AppState
             // Actualizar en AppState
-            if (AppState.companies.any((c) => c.id == company.id)) {
-              AppState.companies.removeWhere((c) => c.id == company.id);
-            }
-            AppState.companies.add(company);
+            // if (AppState.companies.any((c) => c.id == company.id)) {
+            //   AppState.companies.removeWhere((c) => c.id == company.id);
+            // }
+            // AppState.companies.add(company);
             
             // Si es la empresa actual, actualizar configuración
             if (AppState.currentCompany?.id == company.id) {
@@ -275,9 +276,13 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.delete:
           final companyId = payload.oldRecord?['id'];
           if (companyId != null) {
-            AppState.companies.removeWhere((c) => c.id == companyId);
+            // TODO: Implementar manejo de empresas en AppState
+            // AppState.companies.removeWhere((c) => c.id == companyId);
             AppState.notifyListeners();
           }
+          break;
+        case PostgresChangeEvent.all:
+          // No hacer nada para eventos 'all'
           break;
       }
     } catch (e) {
@@ -295,11 +300,12 @@ class SupabaseRealtimeService {
           if (zoneData != null) {
             final zone = Zone.fromJson(zoneData);
             
+            // TODO: Implementar manejo de zonas en AppState
             // Actualizar en AppState
-            if (AppState.zones.any((z) => z.id == zone.id)) {
-              AppState.zones.removeWhere((z) => z.id == zone.id);
-            }
-            AppState.zones.add(zone);
+            // if (AppState.zones.any((z) => z.id == zone.id)) {
+            //   AppState.zones.removeWhere((z) => z.id == zone.id);
+            // }
+            // AppState.zones.add(zone);
             
             AppState.notifyListeners();
           }
@@ -307,9 +313,13 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.delete:
           final zoneId = payload.oldRecord?['id'];
           if (zoneId != null) {
-            AppState.zones.removeWhere((z) => z.id == zoneId);
+            // TODO: Implementar manejo de zonas en AppState
+            // AppState.zones.removeWhere((z) => z.id == zoneId);
             AppState.notifyListeners();
           }
+          break;
+        case PostgresChangeEvent.all:
+          // No hacer nada para eventos 'all'
           break;
       }
     } catch (e) {
@@ -327,11 +337,12 @@ class SupabaseRealtimeService {
           if (operatorData != null) {
             final operator = Operator.fromJson(operatorData);
             
+            // TODO: Implementar manejo de operadores en AppState
             // Actualizar en AppState
-            if (AppState.operators.any((o) => o.id == operator.id)) {
-              AppState.operators.removeWhere((o) => o.id == operator.id);
-            }
-            AppState.operators.add(operator);
+            // if (AppState.operators.any((o) => o.id == operator.id)) {
+            //   AppState.operators.removeWhere((o) => o.id == operator.id);
+            // }
+            // AppState.operators.add(operator);
             
             AppState.notifyListeners();
           }
@@ -339,9 +350,13 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.delete:
           final operatorId = payload.oldRecord?['id'];
           if (operatorId != null) {
-            AppState.operators.removeWhere((o) => o.id == operatorId);
+            // TODO: Implementar manejo de operadores en AppState
+            // AppState.operators.removeWhere((o) => o.id == operatorId);
             AppState.notifyListeners();
           }
+          break;
+        case PostgresChangeEvent.all:
+          // No hacer nada para eventos 'all'
           break;
       }
     } catch (e) {
@@ -384,7 +399,8 @@ class SupabaseRealtimeService {
           AppState.highContrast = configData['high_contrast'] ?? false;
           AppState.fontSize = configData['font_size'] ?? 'normal';
           AppState.reduceAnimations = configData['reduce_animations'] ?? false;
-          AppState.voiceGuide = configData['voice_guide'] ?? false;
+          // TODO: Implementar voiceGuide en AppState
+          // AppState.voiceGuide = configData['voice_guide'] ?? false;
           AppState.voiceSpeed = (configData['voice_speed'] ?? 0.5).toDouble();
           AppState.voicePitch = (configData['voice_pitch'] ?? 1.0).toDouble();
           AppState.voiceVolume = (configData['voice_volume'] ?? 0.8).toDouble();
@@ -408,13 +424,15 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.update:
           final kioskData = payload.newRecord;
           if (kioskData != null) {
-            final kiosk = KioscoStatus.fromJson(kioskData);
+            // TODO: Implementar KioscoStatus
+            // final kiosk = KioscoStatus.fromJson(kioskData);
             
+            // TODO: Implementar manejo de kioscos en AppState
             // Actualizar en AppState
-            if (AppState.kioscos.any((k) => k.id == kiosk.id)) {
-              AppState.kioscos.removeWhere((k) => k.id == kiosk.id);
-            }
-            AppState.kioscos.add(kiosk);
+            // if (AppState.kioscos.any((k) => k.id == kiosk.id)) {
+            //   AppState.kioscos.removeWhere((k) => k.id == kiosk.id);
+            // }
+            // AppState.kioscos.add(kiosk);
             
             AppState.notifyListeners();
           }
@@ -422,9 +440,13 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.delete:
           final kioskId = payload.oldRecord?['id'];
           if (kioskId != null) {
-            AppState.kioscos.removeWhere((k) => k.id == kioskId);
+            // TODO: Implementar manejo de kioscos en AppState
+            // AppState.kioscos.removeWhere((k) => k.id == kioskId);
             AppState.notifyListeners();
           }
+          break;
+        case PostgresChangeEvent.all:
+          // No hacer nada para eventos 'all'
           break;
       }
     } catch (e) {
@@ -440,7 +462,7 @@ class SupabaseRealtimeService {
         case PostgresChangeEvent.update:
           final sessionData = payload.newRecord;
           if (sessionData != null) {
-            final session = Session.fromJson(sessionData);
+            final session = ParkingSession.fromJson(sessionData);
             
             // Actualizar en AppState
             if (AppState.activeSessions.containsKey(session.plate)) {
@@ -457,6 +479,9 @@ class SupabaseRealtimeService {
             AppState.activeSessions.remove(plate);
             AppState.notifyListeners();
           }
+          break;
+        case PostgresChangeEvent.all:
+          // No hacer nada para eventos 'all'
           break;
       }
     } catch (e) {
@@ -538,7 +563,8 @@ class SupabaseRealtimeService {
           AppState.reduceAnimations = config['reduce_animations'];
         }
         if (config['voice_guide'] != null) {
-          AppState.voiceGuide = config['voice_guide'];
+          // TODO: Implementar voiceGuide en AppState
+          // AppState.voiceGuide = config['voice_guide'];
         }
         if (config['voice_speed'] != null) {
           AppState.voiceSpeed = (config['voice_speed']).toDouble();

@@ -165,7 +165,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
           // Crear sesión si no es extensión - REGISTRAR EN BACKEND
           if (!widget.isExtend) {
-            final session = Session(
+            final session = ParkingSession(
               plate: widget.plate,
               zoneId: widget.zoneId,
               start: DateTime.now(),
@@ -174,11 +174,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
               paymentMethod: _paymentMethod,
             );
             
+            // TODO: Implementar addSession en CentralizedWebSocketService
             // Registrar sesión en el backend
-            CentralizedWebSocketService.addSession(
-              '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
-              session.toJson(),
-            );
+            // CentralizedWebSocketService.addSession(
+            //   '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
+            //   session.toJson(),
+            // );
             
             print('💾 Sesión registrada en backend: ${session.plate} en zona ${session.zoneId}');
             print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');

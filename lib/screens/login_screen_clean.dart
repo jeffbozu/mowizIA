@@ -41,7 +41,7 @@ class _LoginScreenCleanState extends State<LoginScreenClean> {
   Operator? getOperatorByCredentials(String username, String password) {
     try {
       return AppState.operators.values.firstWhere(
-        (op) => op.username == username && op.password == password,
+        (op) => op.username == username && op.passwordHash == password,
       );
     } catch (e) {
       return null;

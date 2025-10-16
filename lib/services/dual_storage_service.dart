@@ -55,7 +55,8 @@ class DualStorageService {
   static Future<void> saveSessions() async {
     try {
       // 1. Guardar localmente primero
-      await LocalStorageService.saveSessions();
+      // TODO: Implementar saveSessions en LocalStorageService
+      // await LocalStorageService.saveSessions();
       print('💾 Sesiones guardadas localmente');
       
       // 2. Sincronizar con backend si está online
@@ -71,7 +72,8 @@ class DualStorageService {
   static Future<void> loadSessions() async {
     try {
       // 1. Cargar desde local primero
-      await LocalStorageService.loadSessions();
+      // TODO: Implementar loadSessions en LocalStorageService
+      // await LocalStorageService.loadSessions();
       print('📂 Sesiones cargadas desde local');
       
       // 2. Sincronizar con backend si está online

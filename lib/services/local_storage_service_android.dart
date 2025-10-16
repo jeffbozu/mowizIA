@@ -52,7 +52,7 @@ class LocalStorageService {
   }
 
   // Cargar sesiones
-  static Future<void> loadSessions() async {
+  static Future<void> loadParkingSessions() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final sessionsJson = prefs.getString(_sessionsKey);
@@ -62,7 +62,7 @@ class LocalStorageService {
         AppState.activeSessions.clear();
         
         for (final entry in sessionsData.entries) {
-          AppState.activeSessions[entry.key] = Session.fromJson(entry.value);
+          AppState.activeSessions[entry.key] = ParkingSession.fromJson(entry.value);
         }
         
         print('Sesiones cargadas: ${AppState.activeSessions.length}');
@@ -73,7 +73,7 @@ class LocalStorageService {
   }
 
   // Guardar sesiones
-  static Future<void> saveSessions() async {
+  static Future<void> saveParkingSessions() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final sessionsData = <String, dynamic>{};
@@ -165,13 +165,13 @@ class LocalStorageService {
       if (config['activeSessions'] != null) {
         final sessionsMap = Map<String, dynamic>.from(config['activeSessions']);
         for (final entry in sessionsMap.entries) {
-          AppState.activeSessions[entry.key] = Session.fromJson(entry.value);
+          AppState.activeSessions[entry.key] = ParkingSession.fromJson(entry.value);
         }
       }
       
       // Guardar configuración importada
       await saveConfig();
-      await saveSessions();
+      await saveParkingSessions();
       
       print('Configuración importada exitosamente');
     } catch (e) {
