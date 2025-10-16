@@ -36,6 +36,10 @@ void main() async {
     await DynamicTranslationsService.instance.initialize();
     print('✅ Traducciones dinámicas inicializadas correctamente');
     
+    // Cargar datos desde Supabase
+    await AppState.loadFromSupabase();
+    print('✅ Datos cargados desde Supabase');
+    
   } catch (e) {
     print('❌ Error inicializando Supabase: $e');
     print('⚠️ La app funcionará con datos locales como fallback');

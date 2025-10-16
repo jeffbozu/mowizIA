@@ -1,5 +1,8 @@
 import 'dart:async';
 import '../services/local_storage_service.dart';
+import '../services/supabase_service.dart';
+import '../services/supabase_realtime_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 // Modelo para empresas personalizables
 class Company {
@@ -25,11 +28,11 @@ class Company {
     return Company(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      primaryColor: json['primaryColor'] ?? '#E62144',
-      backgroundColor: json['backgroundColor'] ?? '#FFFFFF',
-      logoUrl: json['logoUrl'] ?? '',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      isActive: json['isActive'] ?? true,
+      primaryColor: json['primary_color'] ?? '#E62144', // Supabase usa snake_case
+      backgroundColor: json['background_color'] ?? '#FFFFFF',
+      logoUrl: json['logo_url'] ?? '',
+      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      isActive: json['is_active'] ?? true,
     );
   }
 
@@ -37,11 +40,11 @@ class Company {
     return {
       'id': id,
       'name': name,
-      'primaryColor': primaryColor,
-      'backgroundColor': backgroundColor,
-      'logoUrl': logoUrl,
-      'createdAt': createdAt.toIso8601String(),
-      'isActive': isActive,
+      'primary_color': primaryColor, // Supabase usa snake_case
+      'background_color': backgroundColor,
+      'logo_url': logoUrl,
+      'created_at': createdAt.toIso8601String(),
+      'is_active': isActive,
     };
   }
 }
@@ -51,7 +54,9 @@ class Operator {
   final String companyId;
   final String name;
   final String username;
-  final String password;
+  final String passwordHash; // Cambiado a passwordHash para Supabase
+  final String role;
+  final List<String> permissions;
   final bool isActive;
 
   const Operator({
@@ -59,29 +64,35 @@ class Operator {
     required this.companyId,
     required this.name,
     required this.username,
-    required this.password,
+    required this.passwordHash,
+    this.role = 'operator',
+    this.permissions = const [],
     this.isActive = true,
   });
 
   factory Operator.fromJson(Map<String, dynamic> json) {
     return Operator(
       id: json['id'] ?? '',
-      companyId: json['companyId'] ?? '',
+      companyId: json['company_id'] ?? '', // Supabase usa snake_case
       name: json['name'] ?? '',
       username: json['username'] ?? '',
-      password: json['password'] ?? '',
-      isActive: json['isActive'] ?? true,
+      passwordHash: json['password_hash'] ?? '',
+      role: json['role'] ?? 'operator',
+      permissions: List<String>.from(json['permissions'] ?? []),
+      isActive: json['is_active'] ?? true,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'companyId': companyId,
+      'company_id': companyId, // Supabase usa snake_case
       'name': name,
       'username': username,
-      'password': password,
-      'isActive': isActive,
+      'password_hash': passwordHash,
+      'role': role,
+      'permissions': permissions,
+      'is_active': isActive,
     };
   }
 }
@@ -119,34 +130,34 @@ class Zone {
   factory Zone.fromJson(Map<String, dynamic> json) {
     return Zone(
       id: json['id'] ?? '',
-      companyId: json['companyId'] ?? '',
+      companyId: json['company_id'] ?? '', // Supabase usa snake_case
       name: json['name'] ?? '',
       color: json['color'] ?? '#2196F3',
-      pricePerHour: (json['pricePerHour'] ?? json['hourlyRate'] ?? 0.0).toDouble(),
-      maxDuration: json['maxDuration'] ?? 240, // 4 horas por defecto
+      pricePerHour: (json['price_per_hour'] ?? 0.0).toDouble(), // Supabase usa snake_case
+      maxDuration: json['max_duration'] ?? 240, // Supabase usa snake_case
       description: json['description'] ?? '',
-      isActive: json['isActive'] ?? true,
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
-      timeOptions: (json['timeOptions'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [15, 30, 60, 120, 180, 240],
-      timeIncrement: json['timeIncrement'] ?? 15,
-      minTime: json['minTime'] ?? 15,
+      isActive: json['is_active'] ?? true, // Supabase usa snake_case
+      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()), // Supabase usa snake_case
+      timeOptions: (json['time_options'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [15, 30, 60, 120, 180, 240], // Supabase usa snake_case
+      timeIncrement: json['time_increment'] ?? 15, // Supabase usa snake_case
+      minTime: json['min_time'] ?? 15, // Supabase usa snake_case
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'companyId': companyId,
+      'company_id': companyId, // Supabase usa snake_case
       'name': name,
       'color': color,
-      'pricePerHour': pricePerHour,
-      'maxDuration': maxDuration,
+      'price_per_hour': pricePerHour, // Supabase usa snake_case
+      'max_duration': maxDuration, // Supabase usa snake_case
       'description': description,
-      'isActive': isActive,
-      'createdAt': createdAt.toIso8601String(),
-      'timeOptions': timeOptions,
-      'timeIncrement': timeIncrement,
-      'minTime': minTime,
+      'is_active': isActive, // Supabase usa snake_case
+      'created_at': createdAt.toIso8601String(), // Supabase usa snake_case
+      'time_options': timeOptions, // Supabase usa snake_case
+      'time_increment': timeIncrement, // Supabase usa snake_case
+      'min_time': minTime, // Supabase usa snake_case
     };
   }
 }
@@ -307,13 +318,13 @@ class AppState {
   static double todayIncome = 0.0;
   static int activeSessionsCount = 0;
   
-  // Configuración de pagos
-  static List<double> acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
-  static List<String> acceptedCards = ['Visa', 'Mastercard', 'American Express'];
-  static double maxChangeAmount = 10.0;
-  static double minPaymentAmount = 0.15;
-  static String currency = 'EUR';
-  static String currencySymbol = '€';
+  // Configuración de pagos (cargada desde Supabase)
+  static List<double> acceptedCoins = []; // Se carga desde Supabase
+  static List<String> acceptedCards = []; // Se carga desde Supabase
+  static double maxChangeAmount = 0.0; // Se carga desde Supabase
+  static double minPaymentAmount = 0.0; // Se carga desde Supabase
+  static String currency = ''; // Se carga desde Supabase
+  static String currencySymbol = ''; // Se carga desde Supabase
   
   // Configuración del kiosco
   static String kioscoLocation = 'Centro Comercial';
@@ -498,6 +509,241 @@ class AppState {
     } catch (e) {
       print('❌ Error cargando configuración: $e');
     }
+  }
+  
+  // ========================================
+  // MÉTODOS DE SUPABASE
+  // ========================================
+  
+  /// Cargar todos los datos desde Supabase
+  static Future<void> loadFromSupabase() async {
+    try {
+      print('🔄 Cargando datos desde Supabase...');
+      
+      // Cargar empresas
+      await _loadCompanies();
+      
+      // Cargar operadores
+      await _loadOperators();
+      
+      // Cargar zonas
+      await _loadZones();
+      
+      // Cargar configuración de pagos
+      await _loadPaymentConfig();
+      
+      // Cargar configuración de accesibilidad
+      await _loadAccessibilityConfig();
+      
+      // Cargar sesiones activas
+      await _loadActiveSessions();
+      
+      // Configurar empresa por defecto si no hay ninguna
+      if (currentCompany == null && companies.isNotEmpty) {
+        currentCompany = companies.values.first;
+        print('🏢 Empresa por defecto establecida: ${currentCompany!.name}');
+      }
+      
+      // Notificar cambios
+      notifyConfigChange();
+      
+      print('✅ Datos cargados desde Supabase correctamente');
+      
+    } catch (e) {
+      print('❌ Error cargando datos desde Supabase: $e');
+      // Usar datos por defecto como fallback
+      _loadDefaultData();
+    }
+  }
+  
+  /// Cargar empresas desde Supabase
+  static Future<void> _loadCompanies() async {
+    try {
+      final companiesList = await SupabaseService.instance.getCompanies();
+      companies.clear();
+      
+      for (final company in companiesList) {
+        companies[company.id] = company;
+      }
+      
+      print('📊 Empresas cargadas: ${companies.length}');
+      
+    } catch (e) {
+      print('❌ Error cargando empresas: $e');
+    }
+  }
+  
+  /// Cargar operadores desde Supabase
+  static Future<void> _loadOperators() async {
+    try {
+      if (currentCompany == null) return;
+      
+      final operatorsList = await SupabaseService.instance.getOperatorsByCompany(currentCompany!.id);
+      operators.clear();
+      
+      for (final operator in operatorsList) {
+        operators[operator.id] = operator;
+      }
+      
+      print('👥 Operadores cargados: ${operators.length}');
+      
+    } catch (e) {
+      print('❌ Error cargando operadores: $e');
+    }
+  }
+  
+  /// Cargar zonas desde Supabase
+  static Future<void> _loadZones() async {
+    try {
+      if (currentCompany == null) return;
+      
+      final zonesList = await SupabaseService.instance.getZonesByCompany(currentCompany!.id);
+      zones.clear();
+      
+      for (final zone in zonesList) {
+        zones[zone.id] = zone;
+      }
+      
+      print('🅿️ Zonas cargadas: ${zones.length}');
+      
+    } catch (e) {
+      print('❌ Error cargando zonas: $e');
+    }
+  }
+  
+  /// Cargar configuración de pagos desde Supabase
+  static Future<void> _loadPaymentConfig() async {
+    try {
+      if (currentCompany == null) return;
+      
+      final config = await SupabaseService.instance.getCompanyCompleteConfig(currentCompany!.id);
+      if (config != null) {
+        acceptedCoins = List<double>.from(config['accepted_coins'] ?? []);
+        acceptedCards = List<String>.from(config['accepted_cards'] ?? []);
+        maxChangeAmount = (config['max_change_amount'] ?? 10.0).toDouble();
+        minPaymentAmount = (config['min_payment_amount'] ?? 0.15).toDouble();
+        currency = config['currency'] ?? 'EUR';
+        currencySymbol = config['currency_symbol'] ?? '€';
+        
+        print('💳 Configuración de pagos cargada');
+      }
+      
+    } catch (e) {
+      print('❌ Error cargando configuración de pagos: $e');
+    }
+  }
+  
+  /// Cargar configuración de accesibilidad desde Supabase
+  static Future<void> _loadAccessibilityConfig() async {
+    try {
+      if (currentCompany == null) return;
+      
+      final config = await SupabaseService.instance.getCompanyCompleteConfig(currentCompany!.id);
+      if (config != null) {
+        darkMode = config['dark_mode'] ?? false;
+        highContrast = config['high_contrast'] ?? false;
+        fontSize = config['font_size'] ?? 'normal';
+        reduceAnimations = config['reduce_animations'] ?? false;
+        voiceGuideEnabled = config['voice_guide'] ?? false;
+        voiceSpeed = (config['voice_speed'] ?? 0.5).toDouble();
+        voicePitch = (config['voice_pitch'] ?? 1.0).toDouble();
+        voiceVolume = (config['voice_volume'] ?? 0.8).toDouble();
+        adaptiveAI = config['adaptive_ai'] ?? false;
+        simplifiedMode = config['simplified_mode'] ?? false;
+        currentLanguage = config['current_language'] ?? 'es-ES';
+        
+        print('♿ Configuración de accesibilidad cargada');
+      }
+      
+    } catch (e) {
+      print('❌ Error cargando configuración de accesibilidad: $e');
+    }
+  }
+  
+  /// Cargar sesiones activas desde Supabase
+  static Future<void> _loadActiveSessions() async {
+    try {
+      final sessionsList = await SupabaseService.instance.getActiveSessions();
+      activeSessions.clear();
+      
+      for (final session in sessionsList) {
+        activeSessions[session.plate] = session;
+      }
+      
+      activeSessionsCount = activeSessions.length;
+      
+      print('📋 Sesiones activas cargadas: ${activeSessions.length}');
+      
+    } catch (e) {
+      print('❌ Error cargando sesiones activas: $e');
+    }
+  }
+  
+  /// Cargar datos por defecto como fallback
+  static void _loadDefaultData() {
+    print('⚠️ Cargando datos por defecto como fallback');
+    
+    // Configuración de pagos por defecto
+    acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
+    acceptedCards = ['Visa', 'Mastercard', 'American Express'];
+    maxChangeAmount = 10.0;
+    minPaymentAmount = 0.15;
+    currency = 'EUR';
+    currencySymbol = '€';
+    
+    // Configuración de accesibilidad por defecto
+    darkMode = false;
+    highContrast = false;
+    fontSize = 'normal';
+    reduceAnimations = false;
+    voiceGuideEnabled = false;
+    voiceSpeed = 0.5;
+    voicePitch = 1.0;
+    voiceVolume = 0.8;
+    adaptiveAI = false;
+    simplifiedMode = false;
+    currentLanguage = 'es-ES';
+    
+    // Empresa por defecto
+    if (currentCompany == null) {
+      initializeDefaultCompany();
+    }
+  }
+  
+  /// Notificar cambios (método unificado)
+  static void notifyListeners() {
+    notifyConfigChange();
+    notifyAccessibilityChange();
+  }
+  
+  /// Cambiar empresa actual
+  static Future<void> changeCompany(String companyId) async {
+    try {
+      final company = companies[companyId];
+      if (company != null) {
+        currentCompany = company;
+        
+        // Recargar datos específicos de la empresa
+        await _loadOperators();
+        await _loadZones();
+        await _loadPaymentConfig();
+        await _loadAccessibilityConfig();
+        
+        // Cambiar traducciones
+        await DynamicTranslationsService.instance.changeCompany(companyId);
+        
+        notifyListeners();
+        
+        print('🏢 Empresa cambiada a: ${company.name}');
+      }
+    } catch (e) {
+      print('❌ Error cambiando empresa: $e');
+    }
+  }
+  
+  /// Recargar datos desde Supabase
+  static Future<void> reloadFromSupabase() async {
+    await loadFromSupabase();
   }
   
   static void dispose() {

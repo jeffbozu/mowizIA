@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../services/local_storage_service.dart';
 import '../services/websocket_service.dart';
 import '../services/centralized_websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,8 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Operator? getOperatorByCredentials(String username, String password) {
     try {
+      // TODO: Implementar verificación de hash con bcrypt
+      // Por ahora, usar comparación directa para desarrollo
       return AppState.operators.values.firstWhere(
-        (op) => op.username == username && op.password == password,
+        (op) => op.username == username && op.passwordHash == password,
       );
     } catch (e) {
       return null;
@@ -51,8 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() async {
     if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, completa todos los campos'),
+        SnackBar(
+          content: Text(DynamicTranslationsService.instance.t('login.error_complete_fields', defaultValue: 'Por favor, completa todos los campos')),
           backgroundColor: Colors.red,
         ),
       );
@@ -102,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${AppStrings.t('login.welcome')} ${operator.name}! Zonas cargadas: ${zones.length}'),
+            content: Text('${DynamicTranslationsService.instance.t('login.welcome', defaultValue: 'Bienvenido')} ${operator.name}! Zonas cargadas: ${zones.length}'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
@@ -115,8 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Credenciales incorrectas'),
+          SnackBar(
+            content: Text(DynamicTranslationsService.instance.t('login.error_invalid', defaultValue: 'Credenciales incorrectas')),
             backgroundColor: Colors.red,
           ),
         );
@@ -207,10 +210,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildTitle() {
     return Text(
-      'MEYPARK',
+      DynamicTranslationsService.instance.t('login.title', defaultValue: 'MEYPARK'),
       style: Theme.of(context).textTheme.headlineLarge?.copyWith(
         fontWeight: FontWeight.bold,
-        color: const Color(0xFFE62144),
+        color: AppState.currentCompany?.primaryColor != null 
+            ? Color(int.parse(AppState.currentCompany!.primaryColor.replaceFirst('#', '0xFF')))
+            : const Color(0xFFE62144),
         letterSpacing: 2,
       ),
     );
@@ -218,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildSubtitle() {
     return Text(
-      'Sistema de Gestión de Parquímetros',
+      DynamicTranslationsService.instance.t('login.subtitle', defaultValue: 'Sistema de Gestión de Parquímetros'),
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
         color: Colors.grey.shade600,
         fontWeight: FontWeight.w500,
@@ -244,17 +249,19 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           Text(
-            'Iniciar Sesión',
+            DynamicTranslationsService.instance.t('login.form_title', defaultValue: 'Iniciar Sesión'),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-              color: const Color(0xFFE62144),
+              color: AppState.currentCompany?.primaryColor != null 
+                  ? Color(int.parse(AppState.currentCompany!.primaryColor.replaceFirst('#', '0xFF')))
+                  : const Color(0xFFE62144),
             ),
           ),
           const SizedBox(height: 32),
           _buildTextField(
             controller: _usernameController,
             focusNode: _usernameFocus,
-            label: 'Usuario',
+            label: DynamicTranslationsService.instance.t('login.username', defaultValue: 'Usuario'),
             icon: Icons.person,
             keyboardType: TextInputType.text,
           ),
@@ -262,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _buildTextField(
             controller: _passwordController,
             focusNode: _passwordFocus,
-            label: 'Contraseña',
+            label: DynamicTranslationsService.instance.t('login.password', defaultValue: 'Contraseña'),
             icon: Icons.lock,
             keyboardType: TextInputType.text,
             obscureText: !_showPassword,
@@ -295,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     )
                   : Text(
-                      'Iniciar Sesión',
+                      DynamicTranslationsService.instance.t('login.button_login', defaultValue: 'Iniciar Sesión'),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
