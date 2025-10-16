@@ -6,6 +6,7 @@ import '../widgets/top_bar.dart';
 import '../services/voice_guide_service.dart';
 import '../services/adaptive_ai_service.dart';
 import '../services/simplified_mode_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class AccessibilityScreen extends StatefulWidget {
   const AccessibilityScreen({super.key});
@@ -35,7 +36,7 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
       body: Column(
         children: [
           TopBar(
-            title: AppStrings.t('access.title'),
+            title: DynamicTranslationsService.instance.t('access.title', defaultValue: 'Accesibilidad'),
             showBackButton: true,
           ),
           Expanded(
@@ -61,7 +62,7 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                   const SizedBox(height: 24),
                   // Título
             Text(
-              AppStrings.t('access.title'),
+              DynamicTranslationsService.instance.t('access.title', defaultValue: 'Accesibilidad'),
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -78,11 +79,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
               child: SwitchListTile(
                 title: Text(
-                  AppStrings.t('access.dark_mode'),
+                  DynamicTranslationsService.instance.t('access.dark_mode', defaultValue: 'Modo Oscuro'),
                                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 subtitle: Text(
-                                  AppStrings.t('access.dark_mode.desc'),
+                                  DynamicTranslationsService.instance.t('access.dark_mode.desc', defaultValue: 'Cambiar entre tema claro y oscuro'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -108,11 +109,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
               child: SwitchListTile(
                 title: Text(
-                  AppStrings.t('access.high_contrast'),
+                  DynamicTranslationsService.instance.t('access.high_contrast', defaultValue: 'Alto Contraste'),
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 subtitle: Text(
-                                  AppStrings.t('access.high_contrast.desc'),
+                                  DynamicTranslationsService.instance.t('access.high_contrast.desc', defaultValue: 'Mejorar el contraste de colores'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -138,11 +139,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
                               child: ListTile(
                                 title: Text(
-                                  AppStrings.t('access.font_size'),
+                                  DynamicTranslationsService.instance.t('access.font_size', defaultValue: 'Tamaño de Fuente'),
                                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 subtitle: Text(
-                                  AppStrings.t('access.font_size.desc'),
+                                  DynamicTranslationsService.instance.t('access.font_size.desc', defaultValue: 'Ajustar el tamaño del texto'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -181,11 +182,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
                               child: SwitchListTile(
                                 title: Text(
-                                  AppStrings.t('access.voice_guide'),
+                                  DynamicTranslationsService.instance.t('access.voice_guide', defaultValue: 'Guía por Voz'),
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 subtitle: Text(
-                                  AppStrings.t('access.voice_guide.desc'),
+                                  DynamicTranslationsService.instance.t('access.voice_guide.desc', defaultValue: 'Activar asistencia por voz'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -213,11 +214,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                               Expanded(
                                 child: ListTile(
                                   title: Text(
-                                    AppStrings.t('access.voice_speed'),
+                                    DynamicTranslationsService.instance.t('access.voice_speed', defaultValue: 'Velocidad de Voz'),
                                     style: Theme.of(context).textTheme.titleLarge,
                                   ),
                                   subtitle: Text(
-                                    AppStrings.t('access.voice_speed.desc'),
+                                    DynamicTranslationsService.instance.t('access.voice_speed.desc', defaultValue: 'Ajustar la velocidad del habla'),
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                     ),
@@ -252,11 +253,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                               Expanded(
                                 child: ListTile(
                                   title: Text(
-                                    AppStrings.t('access.voice_pitch'),
+                                    DynamicTranslationsService.instance.t('access.voice_pitch', defaultValue: 'Tono de Voz'),
                                     style: Theme.of(context).textTheme.titleLarge,
                                   ),
                                   subtitle: Text(
-                                    AppStrings.t('access.voice_pitch.desc'),
+                                    DynamicTranslationsService.instance.t('access.voice_pitch.desc', defaultValue: 'Ajustar el tono del habla'),
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                     ),
@@ -291,11 +292,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                               Expanded(
                                 child: ListTile(
                                   title: Text(
-                                    AppStrings.t('access.voice_volume'),
+                                    DynamicTranslationsService.instance.t('access.voice_volume', defaultValue: 'Volumen de Voz'),
                                     style: Theme.of(context).textTheme.titleLarge,
                                   ),
                                   subtitle: Text(
-                                    AppStrings.t('access.voice_volume.desc'),
+                                    DynamicTranslationsService.instance.t('access.voice_volume.desc', defaultValue: 'Ajustar el volumen del habla'),
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                     ),
@@ -331,11 +332,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
                               child: SwitchListTile(
                                 title: Text(
-                                  AppStrings.t('access.adaptive_ai'),
+                                  DynamicTranslationsService.instance.t('access.adaptive_ai', defaultValue: 'IA Adaptativa'),
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 subtitle: Text(
-                                  AppStrings.t('access.adaptive_ai.desc'),
+                                  DynamicTranslationsService.instance.t('access.adaptive_ai.desc', defaultValue: 'Aprender de tus preferencias'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -361,11 +362,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
                               child: SwitchListTile(
                                 title: Text(
-                                  AppStrings.t('access.simplified_mode'),
+                                  DynamicTranslationsService.instance.t('access.simplified_mode', defaultValue: 'Modo Simplificado'),
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 subtitle: Text(
-                                  AppStrings.t('access.simplified_mode.desc'),
+                                  DynamicTranslationsService.instance.t('access.simplified_mode.desc', defaultValue: 'Interfaz simplificada y clara'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -391,11 +392,11 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                             Expanded(
                               child: SwitchListTile(
                                 title: Text(
-                                  AppStrings.t('access.reduce_animations'),
+                                  DynamicTranslationsService.instance.t('access.reduce_animations', defaultValue: 'Reducir Animaciones'),
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                                 subtitle: Text(
-                                  AppStrings.t('access.reduce_animations.desc'),
+                                  DynamicTranslationsService.instance.t('access.reduce_animations.desc', defaultValue: 'Reducir efectos visuales'),
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
@@ -424,14 +425,14 @@ class _AccessibilityScreenState extends State<AccessibilityScreen> {
                 Expanded(
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
-                    child: Text(AppStrings.t('access.back')),
+                    child: Text(DynamicTranslationsService.instance.t('access.back', defaultValue: 'Atrás')),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                         child: FilledButton(
                           onPressed: _apply,
-                    child: Text(AppStrings.t('access.apply')),
+                    child: Text(DynamicTranslationsService.instance.t('access.apply', defaultValue: 'Aplicar')),
                   ),
                 ),
               ],

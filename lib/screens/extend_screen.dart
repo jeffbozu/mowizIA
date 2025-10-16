@@ -5,6 +5,7 @@ import '../data/models.dart';
 import '../data/mock_data.dart';
 import '../widgets/top_bar.dart';
 import '../services/centralized_websocket_service.dart';
+import '../services/dynamic_translations_service.dart';
 
 class ExtendScreen extends StatefulWidget {
   const ExtendScreen({super.key});
@@ -168,7 +169,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppStrings.t('extend.session_found')),
+          content: Text(DynamicTranslationsService.instance.t('extend.session_found', defaultValue: 'Sesión encontrada')),
           backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
@@ -176,7 +177,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
       // Mostrar mensaje de no encontrado
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppStrings.t('extend.no_session')),
+          content: Text(DynamicTranslationsService.instance.t('extend.no_session', defaultValue: 'No se encontró sesión activa')),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -197,7 +198,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
     if (minutes > maxTotalMinutes - sessionDuration) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: ${maxTotalMinutes - sessionDuration} min'),
+          content: Text('${DynamicTranslationsService.instance.t('extend.cannot_extend_more', defaultValue: 'No se puede extender más. Máximo de zona')}: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. ${DynamicTranslationsService.instance.t('extend.remaining', defaultValue: 'Quedan')}: ${maxTotalMinutes - sessionDuration} min'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -223,7 +224,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
     if (newExtra > maxTotalMinutes - sessionDuration) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: ${maxTotalMinutes - sessionDuration} min'),
+          content: Text('${DynamicTranslationsService.instance.t('extend.cannot_extend_more', defaultValue: 'No se puede extender más. Máximo de zona')}: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. ${DynamicTranslationsService.instance.t('extend.remaining', defaultValue: 'Quedan')}: ${maxTotalMinutes - sessionDuration} min'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -256,7 +257,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
     if (_extraMinutes > maxExtra) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('No se puede extender más. Máximo de zona: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. Quedan: $maxExtra min'),
+          content: Text('${DynamicTranslationsService.instance.t('extend.cannot_extend_more', defaultValue: 'No se puede extender más. Máximo de zona')}: ${(zone.maxDuration / 60).toStringAsFixed(1)}h. ${DynamicTranslationsService.instance.t('extend.remaining', defaultValue: 'Quedan')}: $maxExtra min'),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -327,7 +328,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
       body: Column(
         children: [
           TopBar(
-            title: AppStrings.t('extend.title'),
+            title: DynamicTranslationsService.instance.t('extend.title', defaultValue: 'Extender Sesión'),
             showBackButton: true,
           ),
           Expanded(
@@ -346,7 +347,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                       letterSpacing: 2,
                     ),
                     decoration: InputDecoration(
-                      labelText: AppStrings.t('plate.title'),
+                      labelText: DynamicTranslationsService.instance.t('plate.title', defaultValue: 'Matrícula'),
                       hintText: '1234ABC',
                       hintStyle: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
@@ -388,7 +389,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                             )
                           : const Icon(Icons.search),
                       label: Text(
-                        _isSearching ? AppStrings.t('common.loading') : AppStrings.t('extend.search'),
+                        _isSearching ? DynamicTranslationsService.instance.t('common.loading', defaultValue: 'Cargando...') : DynamicTranslationsService.instance.t('extend.search', defaultValue: 'Buscar'),
                       ),
                     ),
                   ),
@@ -407,7 +408,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            AppStrings.t('extend.no_session'),
+                            DynamicTranslationsService.instance.t('extend.no_session', defaultValue: 'No se encontró sesión activa'),
                             style: Theme.of(context).textTheme.headlineSmall,
                             textAlign: TextAlign.center,
                           ),
@@ -417,14 +418,14 @@ class _ExtendScreenState extends State<ExtendScreen> {
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: _backToZones,
-                                  child: Text(AppStrings.t('extend.back_to_zones')),
+                                  child: Text(DynamicTranslationsService.instance.t('extend.back_to_zones', defaultValue: 'Volver a Zonas')),
                                 ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
                                 child: FilledButton(
                                   onPressed: _startNew,
-                                  child: Text(AppStrings.t('extend.start_new')),
+                                  child: Text(DynamicTranslationsService.instance.t('extend.start_new', defaultValue: 'Nuevo Estacionamiento')),
                                 ),
                               ),
                             ],
@@ -445,13 +446,13 @@ class _ExtendScreenState extends State<ExtendScreen> {
                           ),
                           const SizedBox(height: 24),
                           Text(
-                            AppStrings.t('extend.enter_plate_to_search'),
+                            DynamicTranslationsService.instance.t('extend.enter_plate_to_search', defaultValue: 'Introduce la matrícula para buscar'),
                             style: Theme.of(context).textTheme.headlineSmall,
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            AppStrings.t('extend.search_instructions'),
+                            DynamicTranslationsService.instance.t('extend.search_instructions', defaultValue: 'Busca tu sesión activa para extender el tiempo'),
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                             ),
@@ -475,29 +476,29 @@ class _ExtendScreenState extends State<ExtendScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  AppStrings.t('extend.title'),
+                                  DynamicTranslationsService.instance.t('extend.title', defaultValue: 'Extender Sesión'),
                                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                _buildSessionInfo(AppStrings.t('ticket.plate'), _currentSession!.plate),
-                                _buildSessionInfo(AppStrings.t('ticket.zone'), _currentSession!.zoneId),
+                                _buildSessionInfo(DynamicTranslationsService.instance.t('ticket.plate', defaultValue: 'Matrícula'), _currentSession!.plate),
+                                _buildSessionInfo(DynamicTranslationsService.instance.t('ticket.zone', defaultValue: 'Zona'), _currentSession!.zoneId),
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.current_end'),
+                                  DynamicTranslationsService.instance.t('extend.current_end', defaultValue: 'Fin Actual'),
                                   '${_currentEnd.hour.toString().padLeft(2, '0')}:${_currentEnd.minute.toString().padLeft(2, '0')}',
                                 ),
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.remaining'),
+                                  DynamicTranslationsService.instance.t('extend.remaining', defaultValue: 'Tiempo Restante'),
                                   _formatMinutes(_currentSession!.remainingMinutes),
                                 ),
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.max_allowed'),
+                                  DynamicTranslationsService.instance.t('extend.max_allowed', defaultValue: 'Máximo Permitido'),
                                   _getMaxAllowedTime(),
                                 ),
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.remaining_to_extend'),
+                                  DynamicTranslationsService.instance.t('extend.remaining_to_extend', defaultValue: 'Tiempo Restante para Extender'),
                                   _getRemainingTimeToExtend(),
                                 ),
                               ],
@@ -506,7 +507,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                           const SizedBox(height: 32),
                           // Selector de tiempo extra
                           Text(
-                            AppStrings.t('extend.extra_time'),
+                            DynamicTranslationsService.instance.t('extend.extra_time', defaultValue: 'Tiempo Extra'),
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 16),
@@ -570,11 +571,11 @@ class _ExtendScreenState extends State<ExtendScreen> {
                             child: Column(
                               children: [
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.new_end'),
+                                  DynamicTranslationsService.instance.t('extend.new_end', defaultValue: 'Nuevo Fin'),
                                   '${_newEnd.hour.toString().padLeft(2, '0')}:${_newEnd.minute.toString().padLeft(2, '0')}',
                                 ),
                                 _buildSessionInfo(
-                                  AppStrings.t('extend.extra_amount'),
+                                  DynamicTranslationsService.instance.t('extend.extra_amount', defaultValue: 'Cantidad Extra'),
                                   '${_extraPrice.toStringAsFixed(2)} €',
                                 ),
                               ],
@@ -587,7 +588,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
                             height: 56,
                             child: FilledButton(
                               onPressed: _extraMinutes > 0 ? _goToPayment : null,
-                              child: Text(AppStrings.t('extend.go_pay')),
+                              child: Text(DynamicTranslationsService.instance.t('extend.go_pay', defaultValue: 'Ir a Pago')),
                             ),
                           ),
                         ],
