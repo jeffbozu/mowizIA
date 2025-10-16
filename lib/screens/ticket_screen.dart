@@ -116,12 +116,14 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
         paymentMethod: existingSession.paymentMethod,
       );
       
-      // TODO: Implementar updateSession en CentralizedWebSocketService
-      // Actualizar sesión en el backend (usar updateSession para evitar duplicados)
-      // CentralizedWebSocketService.updateSession(
-      //   '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
-      //   newSession.toJson(),
-      // );
+      // Actualizar sesión en el backend usando Edge Functions
+      final sessionId = '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}';
+      final result = await CentralizedWebSocketService.updateSession(sessionId, newSession);
+      if (result != null && result['success'] == true) {
+        print('✅ Sesión actualizada exitosamente con Edge Functions');
+      } else {
+        print('❌ Error actualizando sesión con Edge Functions: ${result?['error'] ?? 'Error desconocido'}');
+      }
       
       print('⏰ Sesión extendida en backend: ${widget.plate}');
     }

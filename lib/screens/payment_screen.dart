@@ -174,12 +174,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
               paymentMethod: _paymentMethod,
             );
             
-            // TODO: Implementar addSession en CentralizedWebSocketService
-            // Registrar sesión en el backend
-            // CentralizedWebSocketService.addSession(
-            //   '${widget.plate}_${DateTime.now().millisecondsSinceEpoch}',
-            //   session.toJson(),
-            // );
+            // Registrar sesión en el backend usando Edge Functions
+            final result = await CentralizedWebSocketService.addSession(session);
+            if (result != null && result['success'] == true) {
+              print('✅ Sesión agregada exitosamente con Edge Functions');
+            } else {
+              print('❌ Error agregando sesión con Edge Functions: ${result?['error'] ?? 'Error desconocido'}');
+            }
             
             print('💾 Sesión registrada en backend: ${session.plate} en zona ${session.zoneId}');
             print('📊 Total de sesiones activas: ${AppState.activeSessions.length}');

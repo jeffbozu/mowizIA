@@ -133,8 +133,16 @@ class _ExtendScreenState extends State<ExtendScreen> {
       // Si aún no se encuentra, hacer búsqueda específica en el backend
       if (session == null) {
         print('🔍 Sesión no encontrada, haciendo búsqueda específica en el backend...');
-        // TODO: Implementar searchSession en CentralizedWebSocketService
-        // CentralizedWebSocketService.searchSession(plate);
+        // Buscar sesión usando Edge Functions
+        final result = await CentralizedWebSocketService.searchSession(plate);
+        if (result != null && result['success'] == true && result['session'] != null) {
+          final foundSession = ParkingSession.fromJson(result['session']);
+          AppState.activeSessions[plate] = foundSession;
+          session = foundSession;
+          print('✅ Sesión encontrada con Edge Functions');
+        } else {
+          print('❌ Error buscando sesión con Edge Functions: ${result?['error'] ?? 'Error desconocido'}');
+        }
         
         await Future.delayed(const Duration(milliseconds: 500));
         session = AppState.activeSessions[plate];
@@ -267,13 +275,17 @@ class _ExtendScreenState extends State<ExtendScreen> {
     
     final price = _calculatePrice(zone.pricePerHour, _extraMinutes);
     
-    // TODO: Implementar extendSession en CentralizedWebSocketService
-    // Notificar al backend sobre la extensión de sesión
-    // CentralizedWebSocketService.extendSession(
-    //   _currentSession!.plate,
-    //   _extraMinutes,
-    //   price,
-    // );
+    // Notificar al backend sobre la extensión de sesión usando Edge Functions
+    final result = await CentralizedWebSocketService.extendSession(
+      _currentSession!.plate,
+      _extraMinutes,
+      price,
+    );
+    if (result != null && result['success'] == true) {
+      print('✅ Extensión de sesión procesada con Edge Functions');
+    } else {
+      print('❌ Error extendiendo sesión con Edge Functions: ${result?['error'] ?? 'Error desconocido'}');
+    }
     
     context.push('/pago', extra: {
       'extend': true,

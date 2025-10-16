@@ -4,6 +4,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:flutter/foundation.dart';
 import '../data/models.dart';
+import 'supabase_edge_functions_service.dart';
 
 class CentralizedWebSocketService {
   static WebSocketChannel? _channel;
@@ -37,6 +38,9 @@ class CentralizedWebSocketService {
     return value.map((e) => _safeToDouble(e, 0.0)).toList();
   }
   static bool get isConnected => _isConnected;
+  
+  // Instancia del servicio de Edge Functions
+  static final SupabaseEdgeFunctionsService _edgeFunctions = SupabaseEdgeFunctionsService();
   
   // Conectar al backend centralizado
   static Future<void> connect(String clientId, {String serverUrl = 'ws://localhost:8082'}) async {
@@ -601,6 +605,98 @@ class CentralizedWebSocketService {
       print('⏰ Sesión extendida: ${session.plate} - ${message['extraMinutes']} minutos adicionales');
     } else {
       print('❌ Error extendiendo sesión: ${message['error'] ?? 'Error desconocido'}');
+    }
+  }
+
+  // ========================================
+  // MÉTODOS QUE USAN EDGE FUNCTIONS (NUEVOS)
+  // ========================================
+
+  /// Agregar sesión usando Edge Functions
+  static Future<Map<String, dynamic>?> addSession(ParkingSession session) async {
+    try {
+      return await _edgeFunctions.addSession(session);
+    } catch (e) {
+      print('❌ Error agregando sesión con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Buscar sesión usando Edge Functions
+  static Future<Map<String, dynamic>?> searchSession(String plate) async {
+    try {
+      return await _edgeFunctions.searchSession(plate);
+    } catch (e) {
+      print('❌ Error buscando sesión con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Extender sesión usando Edge Functions
+  static Future<Map<String, dynamic>?> extendSession(String plate, int extraMinutes, double price) async {
+    try {
+      return await _edgeFunctions.extendSession(plate, extraMinutes, price);
+    } catch (e) {
+      print('❌ Error extendiendo sesión con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Actualizar sesión usando Edge Functions
+  static Future<Map<String, dynamic>?> updateSession(String sessionId, ParkingSession session) async {
+    try {
+      return await _edgeFunctions.updateSession(sessionId, session);
+    } catch (e) {
+      print('❌ Error actualizando sesión con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Eliminar sesión usando Edge Functions
+  static Future<bool> removeSession(String plate) async {
+    try {
+      return await _edgeFunctions.removeSession(plate);
+    } catch (e) {
+      print('❌ Error eliminando sesión con Edge Functions: $e');
+      return false;
+    }
+  }
+
+  /// Obtener datos de empresa usando Edge Functions
+  static Future<Map<String, dynamic>?> getCompanyData(String companyId) async {
+    try {
+      return await _edgeFunctions.getCompanyData(companyId);
+    } catch (e) {
+      print('❌ Error obteniendo datos de empresa con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Generar factura usando Edge Functions
+  static Future<Map<String, dynamic>?> generateInvoice({
+    required String transactionId,
+    required String email,
+    required String name,
+  }) async {
+    try {
+      return await _edgeFunctions.generateInvoice(
+        transactionId: transactionId,
+        email: email,
+        name: name,
+      );
+    } catch (e) {
+      print('❌ Error generando factura con Edge Functions: $e');
+      return null;
+    }
+  }
+
+  /// Verificar salud de Edge Functions
+  static Future<bool> checkEdgeFunctionsHealth() async {
+    try {
+      return await _edgeFunctions.checkEdgeFunctionsHealth();
+    } catch (e) {
+      print('❌ Error verificando salud de Edge Functions: $e');
+      return false;
     }
   }
 }
