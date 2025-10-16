@@ -15,8 +15,8 @@ void main(List<String> args) async {
 
 class SupabaseTester {
   static const String supabaseUrl = 'https://thfmuoqcrkhxduxuygro.supabase.co';
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b2FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.5n3YqmCV1t39aoDZDLfvKG432o9M79WkM6wQu9JTmFc';
-  static const String supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b2FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImiYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.CV7qGEl0GvReQJW8aWZ7U_0SWufBBIW4QLHgsm9foY';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b3FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.5n3YqmCV1t39aoDZDLfvKG432o9M79WkM6wQu9JTmFc';
+  static const String supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b3FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDQ3OTUxNCwiZXhwIjoyMDc2MDU1NTE0fQ.CV7qGEl0GvReQJW8aWZ7U_0SWufzXBIW4QLhgsm9foY';
 
   static Future<void> main(List<String> args) async {
     print('🧪 INICIANDO TESTING DE SINCRONIZACIÓN EN TIEMPO REAL');
@@ -54,7 +54,7 @@ class SupabaseTester {
     print('\n🔍 TEST 1: Cambio de tarifa de zona');
     
     // Obtener zona actual
-    final zone = await _getZone('zona-1');
+    final zone = await _getZone('550e8400-e29b-41d4-a716-446655440002');
     final originalPrice = zone['price_per_hour'];
     final newPrice = originalPrice + 0.50;
     
@@ -62,11 +62,11 @@ class SupabaseTester {
     print('   📊 Tarifa nueva: \$${newPrice.toStringAsFixed(2)}');
     
     // Cambiar tarifa en Supabase
-    await _updateZone('zona-1', {'price_per_hour': newPrice});
+    await _updateZone('550e8400-e29b-41d4-a716-446655440002', {'price_per_hour': newPrice});
     print('   ✅ Tarifa actualizada en Supabase');
     
     // Verificar cambio
-    final updatedZone = await _getZone('zona-1');
+    final updatedZone = await _getZone('550e8400-e29b-41d4-a716-446655440002');
     if (updatedZone['price_per_hour'] == newPrice) {
       print('   ✅ Cambio verificado en Supabase');
       print('   🎯 La app debería mostrar la nueva tarifa en < 2 segundos');
@@ -75,7 +75,7 @@ class SupabaseTester {
     }
     
     // Restaurar tarifa original
-    await _updateZone('zona-1', {'price_per_hour': originalPrice});
+    await _updateZone('550e8400-e29b-41d4-a716-446655440002', {'price_per_hour': originalPrice});
     print('   🔄 Tarifa restaurada a valor original');
   }
 
@@ -90,11 +90,11 @@ class SupabaseTester {
     print('   📝 Texto nuevo: "$newText"');
     
     // Cambiar texto en Supabase
-    await _updateUIText('mowiz', 'payment', 'pay_button', 'es-ES', newText);
+    await _updateUIText('550e8400-e29b-41d4-a716-446655440000', 'payment', 'pay_button', 'es-ES', newText);
     print('   ✅ Texto actualizado en Supabase');
     
     // Verificar cambio
-    final updatedText = await _getUIText('mowiz', 'payment', 'pay_button', 'es-ES');
+    final updatedText = await _getUIText('550e8400-e29b-41d4-a716-446655440000', 'payment', 'pay_button', 'es-ES');
     if (updatedText == newText) {
       print('   ✅ Cambio verificado en Supabase');
       print('   🎯 La app debería mostrar "$newText" en < 2 segundos');
@@ -103,7 +103,7 @@ class SupabaseTester {
     }
     
     // Restaurar texto original
-    await _updateUIText('mowiz', 'payment', 'pay_button', 'es-ES', originalText);
+    await _updateUIText('550e8400-e29b-41d4-a716-446655440000', 'payment', 'pay_button', 'es-ES', originalText);
     print('   🔄 Texto restaurado a valor original');
   }
 
@@ -112,7 +112,7 @@ class SupabaseTester {
     print('\n🔍 TEST 3: Cambio de colores de empresa');
     
     // Obtener colores actuales
-    final company = await _getCompany('mowiz');
+    final company = await _getCompany('550e8400-e29b-41d4-a716-446655440000');
     final originalColor = company['primary_color'];
     final newColor = '#FF6B35'; // Naranja
     
@@ -120,11 +120,11 @@ class SupabaseTester {
     print('   🎨 Color nuevo: $newColor');
     
     // Cambiar color en Supabase
-    await _updateCompany('mowiz', {'primary_color': newColor});
+    await _updateCompany('550e8400-e29b-41d4-a716-446655440000', {'primary_color': newColor});
     print('   ✅ Color actualizado en Supabase');
     
     // Verificar cambio
-    final updatedCompany = await _getCompany('mowiz');
+    final updatedCompany = await _getCompany('550e8400-e29b-41d4-a716-446655440000');
     if (updatedCompany['primary_color'] == newColor) {
       print('   ✅ Cambio verificado en Supabase');
       print('   🎯 La app debería mostrar el nuevo color en < 2 segundos');
@@ -133,7 +133,7 @@ class SupabaseTester {
     }
     
     // Restaurar color original
-    await _updateCompany('mowiz', {'primary_color': originalColor});
+    await _updateCompany('550e8400-e29b-41d4-a716-446655440000', {'primary_color': originalColor});
     print('   🔄 Color restaurado a valor original');
   }
 

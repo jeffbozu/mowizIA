@@ -551,8 +551,8 @@ class AppState {
       
     } catch (e) {
       print('❌ Error cargando datos desde Supabase: $e');
-      // Usar datos por defecto como fallback
-      _loadDefaultData();
+      // NO usar fallback - TODO debe venir de Supabase según las reglas
+      rethrow;
     }
   }
   
@@ -679,35 +679,12 @@ class AppState {
     }
   }
   
-  /// Cargar datos por defecto como fallback
+  /// Cargar datos por defecto como fallback - ELIMINADO
+  /// Según las reglas: TODO debe venir de Supabase, NO datos hardcodeados
   static void _loadDefaultData() {
-    print('⚠️ Cargando datos por defecto como fallback');
-    
-    // Configuración de pagos por defecto
-    acceptedCoins = [0.05, 0.10, 0.20, 0.50, 1.00, 2.00];
-    acceptedCards = ['Visa', 'Mastercard', 'American Express'];
-    maxChangeAmount = 10.0;
-    minPaymentAmount = 0.15;
-    currency = 'EUR';
-    currencySymbol = '€';
-    
-    // Configuración de accesibilidad por defecto
-    darkMode = false;
-    highContrast = false;
-    fontSize = 'normal';
-    reduceAnimations = false;
-    voiceGuideEnabled = false;
-    voiceSpeed = 0.5;
-    voicePitch = 1.0;
-    voiceVolume = 0.8;
-    adaptiveAI = false;
-    simplifiedMode = false;
-    currentLanguage = 'es-ES';
-    
-    // Empresa por defecto
-    if (currentCompany == null) {
-      initializeDefaultCompany();
-    }
+    print('❌ ERROR: No se pueden cargar datos hardcodeados');
+    print('❌ TODO debe venir de Supabase según las reglas establecidas');
+    throw Exception('Sistema configurado para depender únicamente de Supabase');
   }
   
   /// Notificar cambios (método unificado)
