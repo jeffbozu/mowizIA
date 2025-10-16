@@ -3,14 +3,14 @@ import 'dart:async';
 import 'app_router.dart';
 import 'theme/app_theme.dart';
 import 'data/models.dart';
-import 'data/mock_data.dart';
+// import 'data/mock_data.dart'; // Comentado temporalmente
 import 'services/centralized_websocket_service.dart';
 import 'services/local_storage_service.dart';
-import 'services/dual_storage_service.dart';
+// import 'services/dual_storage_service.dart'; // Comentado temporalmente
 import 'services/voice_guide_service.dart';
 import 'services/adaptive_ai_service.dart';
 import 'services/simplified_mode_service.dart';
-import 'services/geographic_id_service.dart';
+// import 'services/geographic_id_service.dart'; // Comentado temporalmente
 import 'services/supabase_service.dart';
 import 'services/supabase_realtime_service.dart';
 import 'services/dynamic_translations_service.dart';
