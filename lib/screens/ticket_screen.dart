@@ -102,7 +102,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     context.go('/zona');
   }
 
-  void _extendSession() {
+  Future<void> _extendSession() async {
     // Extender sesión en el backend
     final existingSession = AppState.activeSessions[widget.plate];
     if (existingSession != null) {

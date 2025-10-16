@@ -254,7 +254,7 @@ class _ExtendScreenState extends State<ExtendScreen> {
     }
   }
 
-  void _goToPayment() {
+  Future<void> _goToPayment() async {
     if (_currentSession == null) return;
     
     final zone = AppState.zones[_currentSession!.zoneId];
