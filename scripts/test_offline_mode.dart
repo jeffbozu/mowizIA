@@ -4,6 +4,10 @@ import 'dart:io';
 import 'dart:convert';
 
 /// Script para probar funcionamiento en modo offline
+
+void main(List<String> args) async {
+  await OfflineModeTester.main(args);
+}
 /// 
 /// Este script verifica que la aplicación funcione correctamente
 /// sin conexión a internet, usando solo datos en caché local.

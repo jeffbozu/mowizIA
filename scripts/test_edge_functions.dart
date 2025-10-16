@@ -5,6 +5,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 /// Script para probar Edge Functions de Supabase
+
+void main(List<String> args) async {
+  await EdgeFunctionsTester.main(args);
+}
 /// 
 /// Este script verifica que todas las Edge Functions estén funcionando
 /// correctamente y respondan como se espera.

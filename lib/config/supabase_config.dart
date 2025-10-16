@@ -15,10 +15,10 @@ class SupabaseConfig {
   static const String supabaseUrl = 'https://thfmuoqcrkhxduxuygro.supabase.co';
   
   /// API Key pública (anon key)
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b3FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.5n3YqmCV1t39aoDZDLfvKG432o9M79WkM6wQu9JTmFc';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b2FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.5n3YqmCV1t39aoDZDLfvKG432o9M79WkM6wQu9JTmFc';
   
   /// Service Role Key (solo para operaciones administrativas)
-  static const String supabaseServiceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b3FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDQ3OTUxNCwiZXhwIjoyMDc2MDU1NTE0fQ.CV7qGEl0GvReQJW8aWZ7U_0SWufzXBIW4QLhgsm9foY';
+  static const String supabaseServiceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b2FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImiYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.CV7qGEl0GvReQJW8aWZ7U_0SWufBBIW4QLHgsm9foY';
   
   // ========================================
   // CONFIGURACIÓN DE CACHÉ
