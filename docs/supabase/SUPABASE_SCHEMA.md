@@ -518,3 +518,243 @@ WHERE plate = '1234ABC';
 6. **RLS**: Seguridad a nivel de fila para multi-tenancy
 7. **Triggers**: Automatización de tareas como actualización de timestamps y invalidación de caché
 8. **Vistas**: Vistas optimizadas para consultas complejas frecuentes
+
+---
+
+## 🔐 Sistema de Permisos
+
+### Tabla: **user_roles**
+```sql
+CREATE TABLE user_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  company_id UUID REFERENCES companies(id),
+  role_name VARCHAR(20) NOT NULL CHECK (role_name IN ('superadmin', 'admin', 'operator', 'viewer')),
+  permissions JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Tabla: **permission_templates**
+```sql
+CREATE TABLE permission_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  role_name VARCHAR(20) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,
+  actions JSONB NOT NULL,
+  conditions JSONB DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+### Tabla: **audit_logs**
+```sql
+CREATE TABLE audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  action TEXT NOT NULL,
+  resource_type TEXT NOT NULL,
+  resource_id UUID,
+  old_values JSONB,
+  new_values JSONB,
+  ip_address INET,
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+## 📊 Vistas Optimizadas
+
+### Vista: **v_company_complete**
+- Empresa con toda su configuración y estadísticas
+- Incluye: payment_config, accessibility_config, invoice_config
+- Estadísticas: operadores, zonas, kioscos, sesiones activas
+
+### Vista: **v_zones_with_company**
+- Zonas con información de empresa y estadísticas
+- Incluye: sesiones activas, ingresos del día, promedio de precios
+
+### Vista: **v_active_sessions_details**
+- Sesiones activas con detalles completos
+- Incluye: cálculos de tiempo, estado, tipo de sesión
+
+### Vista: **v_kiosks_status**
+- Estado completo de kioscos
+- Incluye: estado de conexión, estadísticas del día
+
+### Vista: **v_company_stats**
+- Estadísticas agregadas por empresa
+- Incluye: estadísticas de operadores, zonas, kioscos, sesiones
+
+### Vista: **v_daily_income_summary**
+- Resumen de ingresos por día y empresa
+- Incluye: sesiones por método de pago, sesiones extendidas
+
+### Vista: **v_top_zones_by_income**
+- Top zonas ordenadas por ingresos
+- Incluye: estadísticas de hoy, semana, mes
+
+### Vista: **v_operators_with_stats**
+- Operadores con sus estadísticas
+- Incluye: kiosco asignado, sesiones gestionadas
+
+### Vista: **v_ui_config_by_company**
+- Configuración completa de UI por empresa
+- Incluye: textos, elementos, caché de traducciones
+
+## ⚡ Edge Functions
+
+### 1. **manage-sessions**
+- Gestión completa de sesiones de estacionamiento
+- Acciones: add, search, extend, update, remove
+- Endpoint: `/functions/v1/manage-sessions`
+
+### 2. **generate-invoice**
+- Generación de facturas electrónicas
+- Crea PDFs y los almacena en Supabase Storage
+- Endpoint: `/functions/v1/generate-invoice`
+
+### 3. **dashboard-api**
+- API para dashboard y estadísticas
+- Proporciona datos agregados en tiempo real
+- Endpoint: `/functions/v1/dashboard-api`
+
+### 4. **control-center**
+- API para Centro de Control
+- Acciones: get_company_stats, create_company, sync_company_data
+- Endpoint: `/functions/v1/control-center`
+
+## 🔧 Funciones de Utilidad
+
+### 1. **check_permission(user_id, resource_type, action, resource_company_id)**
+- Verifica permisos de usuario para un recurso específico
+- Retorna: BOOLEAN
+
+### 2. **get_current_user_info()**
+- Obtiene información del usuario actual
+- Retorna: user_id, role_name, company_id, company_name
+
+### 3. **update_updated_at()**
+- Actualiza automáticamente el campo updated_at
+- Se ejecuta en triggers
+
+### 4. **invalidate_translations_cache()**
+- Invalida caché de traducciones cuando cambian ui_texts
+- Se ejecuta en triggers
+
+## 📋 Ejemplos de Uso
+
+### Crear Nueva Empresa
+```sql
+-- 1. Crear empresa
+INSERT INTO companies (id, name, primary_color, is_active)
+VALUES ('nueva-empresa', 'Mi Nueva Empresa', '#00FF00', true);
+
+-- 2. Crear operador admin
+INSERT INTO operators (company_id, name, username, password_hash, role)
+VALUES ('nueva-empresa', 'Admin', 'admin', '$2b$10$...', 'admin');
+
+-- 3. Crear zona
+INSERT INTO zones (company_id, name, price_per_hour, is_active)
+VALUES ('nueva-empresa', 'Zona Centro', 2.50, true);
+
+-- 4. Crear configuraciones
+INSERT INTO payment_config (company_id, currency, currency_symbol)
+VALUES ('nueva-empresa', 'EUR', '€');
+```
+
+### Cambiar Tarifa de Zona
+```sql
+UPDATE zones 
+SET price_per_hour = 3.00 
+WHERE id = 'zona-1';
+-- El cambio se aplica automáticamente en la app en < 2 segundos
+```
+
+### Personalizar Texto de Botón
+```sql
+UPDATE ui_texts 
+SET text_value = 'Procesar Pago' 
+WHERE company_id = 'mowiz' 
+  AND screen = 'payment' 
+  AND element = 'pay_button' 
+  AND language = 'es-ES';
+-- El texto se actualiza automáticamente en la app
+```
+
+### Deshabilitar Botón
+```sql
+UPDATE ui_elements_config 
+SET is_enabled = false 
+WHERE company_id = 'mowiz' 
+  AND screen = 'home' 
+  AND element_key = 'accessibility_button';
+-- El botón desaparece de la pantalla
+```
+
+### Obtener Estadísticas de Empresa
+```sql
+SELECT * FROM v_company_stats WHERE company_id = 'mowiz';
+```
+
+### Ver Sesiones Activas
+```sql
+SELECT * FROM v_active_sessions_details WHERE company_id = 'mowiz';
+```
+
+### Exportar Datos de Empresa
+```sql
+-- Usar Edge Function control-center
+POST /functions/v1/control-center
+{
+  "action": "export_company_data",
+  "data": { "company_id": "mowiz" }
+}
+```
+
+## 🚀 Scripts de Utilidad
+
+### 1. **test_realtime_sync.dart**
+- Prueba sincronización en tiempo real
+- Verifica cambios de tarifas, textos, colores
+
+### 2. **test_offline_mode.dart**
+- Prueba funcionamiento sin conexión
+- Verifica datos en caché local
+
+### 3. **test_edge_functions.dart**
+- Prueba todas las Edge Functions
+- Verifica salud del sistema
+
+### 4. **backup_supabase.dart**
+- Hace backup completo de datos
+- Exporta todas las tablas a JSON
+
+### 5. **sync_translations.dart**
+- Sincroniza traducciones entre empresas
+- Regenera caché de traducciones
+
+## 📊 Monitoreo y Logs
+
+### Logs de Aplicación
+- **API**: Llamadas a la base de datos
+- **Auth**: Autenticación de usuarios
+- **Edge Functions**: Funciones del servidor
+- **Realtime**: Sincronización en tiempo real
+
+### Métricas del Dashboard
+- **Active Users**: Usuarios activos
+- **API Requests**: Peticiones a la API
+- **Database Size**: Tamaño de la base de datos
+- **Storage**: Uso de almacenamiento
+
+### Auditoría
+- Todos los cambios se registran en `audit_logs`
+- Incluye: usuario, acción, recurso, valores antiguos/nuevos
+- Timestamp y información de sesión
+
+---
+
+**¡El esquema está listo para el Centro de Control!** 🎯

@@ -445,6 +445,83 @@ Si tienes problemas:
 
 ---
 
+## 🧪 Testing y Validación
+
+### Ejecutar Tests de Sincronización
+
+```bash
+# Test de sincronización en tiempo real
+dart run scripts/test_realtime_sync.dart
+
+# Test de modo offline
+dart run scripts/test_offline_mode.dart
+
+# Test de Edge Functions
+dart run scripts/test_edge_functions.dart
+```
+
+### Verificar Estado del Sistema
+
+```sql
+-- Ver todas las empresas activas
+SELECT id, name, is_active FROM companies WHERE is_active = true;
+
+-- Ver todas las zonas con sus precios
+SELECT z.name, z.price_per_hour, c.name as company_name
+FROM zones z
+JOIN companies c ON z.company_id = c.id
+WHERE z.is_active = true;
+
+-- Ver operadores activos
+SELECT o.name, o.username, c.name as company_name
+FROM operators o
+JOIN companies c ON o.company_id = c.id
+WHERE o.is_active = true;
+
+-- Ver sesiones activas
+SELECT plate, zone_id, start_time, total_price
+FROM active_sessions
+WHERE end_time > NOW();
+```
+
+---
+
+## 🔧 Troubleshooting Avanzado
+
+### Problema: No veo los cambios en la app
+
+**Solución:**
+1. Verifica que la app esté conectada a internet
+2. Revisa los logs de Supabase para errores
+3. Reinicia la app si es necesario
+4. Verifica que los datos se guardaron correctamente en Supabase
+
+### Problema: Error de conexión a Supabase
+
+**Solución:**
+1. Verifica que las API keys sean correctas
+2. Revisa que el proyecto esté activo
+3. Verifica la configuración de RLS
+4. Revisa los logs de autenticación
+
+### Problema: Edge Functions no responden
+
+**Solución:**
+1. Ve a **Edge Functions** en el dashboard
+2. Verifica que las funciones estén desplegadas
+3. Revisa los logs de las funciones
+4. Verifica que las funciones tengan los permisos correctos
+
+### Problema: Datos no se sincronizan en tiempo real
+
+**Solución:**
+1. Verifica que Realtime esté habilitado
+2. Revisa la configuración de suscripciones
+3. Verifica que no haya errores de red
+4. Revisa los logs de Realtime
+
+---
+
 ## 🎉 ¡Felicidades!
 
 Ahora puedes gestionar **TODA** la configuración de MEYPARK desde Supabase sin tocar código. Los cambios se aplican en tiempo real y cada empresa puede tener su configuración personalizada.
