@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../i18n/strings.dart';
 import '../data/models.dart';
 import '../services/local_storage_service.dart';
@@ -39,14 +40,33 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Operator? getOperatorByCredentials(String username, String password) {
+  Future<Operator?> getOperatorByCredentials(String username, String password) async {
     try {
+      // Consultar operador directamente desde Supabase
+      final supabase = Supabase.instance.client;
+      
+      final response = await supabase
+        .from('operators')
+        .select('*')
+        .eq('username', username)
+        .eq('is_active', true)
+        .maybeSingle();
+      
+      if (response == null) {
+        print('❌ Operador no encontrado: $username');
+        return null;
+      }
+      
       // TODO: Implementar verificación de hash con bcrypt
       // Por ahora, usar comparación directa para desarrollo
-      return AppState.operators.values.firstWhere(
-        (op) => op.username == username && op.passwordHash == password,
-      );
+      if (response['password_hash'] == password) {
+        return Operator.fromJson(response);
+      } else {
+        print('❌ Contraseña incorrecta para: $username');
+        return null;
+      }
     } catch (e) {
+      print('❌ Error al consultar operador: $e');
       return null;
     }
   }
@@ -69,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // Simular delay de autenticación
     await Future.delayed(const Duration(milliseconds: 800));
 
-    final operator = getOperatorByCredentials(
+    final operator = await getOperatorByCredentials(
       _usernameController.text.trim(),
       _passwordController.text.trim(),
     );
@@ -81,31 +101,39 @@ class _LoginScreenState extends State<LoginScreen> {
         AppState.setCurrentCompany(AppState.companies[operatorCompany]!);
       }
 
-      // 🔄 CARGAR DATOS DEL BACKEND DESPUÉS DEL LOGIN
-      print('🔄 Cargando datos del backend para empresa: ${operatorCompany}');
+      // 🔄 CARGAR ZONAS DESDE SUPABASE DESPUÉS DEL LOGIN
+      print('🔄 Cargando zonas desde Supabase para empresa: ${operatorCompany}');
       
-      // Solicitar datos completos del backend
-      CentralizedWebSocketService.sendMessage({
-        'type': 'get_data',
-        'company_id': operatorCompany,
-      });
-      
-      // Esperar a que lleguen los datos del backend
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      // Verificar que se cargaron las zonas
-      final zones = AppState.getZonesForCompany(operatorCompany);
-      print('📍 Zonas cargadas: ${zones.length}');
-      zones.forEach((zone) {
-        print('  - ${zone.name}: ${zone.pricePerHour}€/h');
-      });
+      int zonesLoaded = 0;
+      try {
+        // Cargar zonas directamente desde Supabase
+        final supabase = Supabase.instance.client;
+        final zonesResponse = await supabase
+          .from('zones')
+          .select('*')
+          .eq('company_id', operatorCompany);
+        
+        // Convertir a objetos Zone y cargar en AppState
+        final zones = zonesResponse.map((zoneData) => Zone.fromJson(zoneData)).toList();
+        for (final zone in zones) {
+          AppState.zones[zone.id] = zone;
+        }
+        
+        zonesLoaded = zones.length;
+        print('📍 Zonas cargadas: ${zones.length}');
+        zones.forEach((zone) {
+          print('  - ${zone.name}: ${zone.pricePerHour}€/h');
+        });
+      } catch (e) {
+        print('❌ Error cargando zonas: $e');
+      }
 
       await LocalStorageService.saveConfig();
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${DynamicTranslationsService.instance.t('login.welcome', defaultValue: 'Bienvenido')} ${operator.name}! Zonas cargadas: ${zones.length}'),
+            content: Text('${DynamicTranslationsService.instance.t('login.welcome', defaultValue: 'Bienvenido')} ${operator.username}! Zonas cargadas: $zonesLoaded'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),

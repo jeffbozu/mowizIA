@@ -87,8 +87,11 @@ class AppRouter {
             isExtend: extra?['extend'] ?? false,
             plate: extra?['matricula'] ?? '',
             zoneId: extra?['zonaId'] ?? '',
+            zoneName: extra?['zonaNombre'] ?? '',
             minutes: extra?['minutos'] ?? extra?['minutosExtra'] ?? 0,
             price: extra?['precio'] ?? extra?['precioExtra'] ?? 0.0,
+            startTime: extra?['startTime'] ?? DateTime.now(),
+            endTime: extra?['endTime'] ?? DateTime.now().add(Duration(minutes: extra?['minutos'] ?? extra?['minutosExtra'] ?? 0)),
           );
         },
       ),

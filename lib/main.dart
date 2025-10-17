@@ -32,6 +32,10 @@ void main() async {
     await SupabaseRealtimeService.instance.initialize();
     print('✅ Supabase Realtime inicializado correctamente');
     
+    // Suscribirse a todas las tablas para sincronización en tiempo real
+    await SupabaseRealtimeService.instance.subscribeToAllTables();
+    print('✅ Suscripciones de Realtime activadas');
+    
     // Inicializar servicio de traducciones dinámicas
     await DynamicTranslationsService.instance.initialize();
     print('✅ Traducciones dinámicas inicializadas correctamente');

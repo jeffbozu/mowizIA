@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/models.dart';
+import '../config/supabase_config.dart';
 
 class ElectronicInvoiceService {
-  static const String _baseUrl = 'http://localhost:3002'; // URL del servidor demo
   static final Map<String, ElectronicInvoiceTransaction> _transactions = {};
   
   /// Genera un ID único para la transacción
@@ -18,11 +19,15 @@ class ElectronicInvoiceService {
   static Future<ElectronicInvoiceTransaction> createTransaction({
     required String plate,
     required String zoneId,
+    required String zoneName,
+    required String companyId,
     required double amount,
     required String paymentMethod,
     required String kioscoId,
     required bool isExtend,
     required int minutes,
+    required DateTime startTime,
+    required DateTime endTime,
   }) async {
     final transaction = ElectronicInvoiceTransaction(
       id: _generateTransactionId(),
@@ -39,38 +44,48 @@ class ElectronicInvoiceService {
     // Guardar en memoria local
     _transactions[transaction.id] = transaction;
     
-    // Registrar en el servidor de facturación
+    // Registrar en Supabase
     try {
-      await _registerTransactionInServer(transaction);
-      print('🧾 Transacción de facturación registrada en servidor: ${transaction.id}');
+      await _registerTransactionInSupabase(
+        transaction: transaction,
+        zoneName: zoneName,
+        companyId: companyId,
+        startTime: startTime,
+        endTime: endTime,
+      );
+      print('🧾 Transacción de facturación registrada en Supabase: ${transaction.id}');
     } catch (e) {
-      print('⚠️ Error registrando transacción en servidor: $e');
+      print('⚠️ Error registrando transacción en Supabase: $e');
     }
     
     return transaction;
   }
 
-  /// Registra la transacción en el servidor de facturación
-  static Future<void> _registerTransactionInServer(ElectronicInvoiceTransaction transaction) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/api/register-transaction'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'id': transaction.id,
-        'plate': transaction.plate,
-        'zoneId': transaction.zoneId,
-        'timestamp': transaction.timestamp.toIso8601String(),
-        'amount': transaction.amount,
-        'paymentMethod': transaction.paymentMethod,
-        'kioscoId': transaction.kioscoId,
-        'isExtend': transaction.isExtend,
-        'minutes': transaction.minutes,
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Error registrando transacción: ${response.statusCode}');
-    }
+  /// Registra la transacción en Supabase
+  static Future<void> _registerTransactionInSupabase({
+    required ElectronicInvoiceTransaction transaction,
+    required String zoneName,
+    required String companyId,
+    required DateTime startTime,
+    required DateTime endTime,
+  }) async {
+    final supabase = Supabase.instance.client;
+    
+    await supabase.from('invoices').insert({
+      'ticket_id': transaction.id,
+      'company_id': companyId,
+      'zone_id': transaction.zoneId,
+      'zone_name': zoneName,
+      'plate': transaction.plate,
+      'amount': transaction.amount,
+      'payment_method': transaction.paymentMethod,
+      'duration_minutes': transaction.minutes,
+      'start_time': startTime.toIso8601String(),
+      'end_time': endTime.toIso8601String(),
+      'kiosco_id': transaction.kioscoId,
+      'is_extend': transaction.isExtend,
+      'status': 'pending',
+    });
   }
   
   /// Obtiene una transacción por ID
@@ -90,7 +105,8 @@ class ElectronicInvoiceService {
   
   /// Genera la URL del portal de facturación con el ID de transacción
   static String generateInvoicePortalUrl(String transactionId) {
-    return '$_baseUrl/facturacion.html?transactionId=$transactionId';
+    // URL de Vercel deployment
+    return 'https://facturacion-fxjxw9214-jeffreys-projects-3d123ebc.vercel.app?transaction=$transactionId';
   }
   
   /// Genera un QR code data para la facturación
@@ -99,28 +115,38 @@ class ElectronicInvoiceService {
     return url;
   }
   
-  /// Envía solicitud de factura al servidor backend
+  /// Envía solicitud de factura (ahora solo actualiza estado en Supabase)
   static Future<InvoiceResponse> requestInvoice(InvoiceRequest request) async {
     try {
-      print('🧾 Enviando solicitud de factura para transacción: ${request.transactionId}');
+      print('🧾 Actualizando estado de factura para transacción: ${request.transactionId}');
       
-      final response = await http.post(
-        Uri.parse('$_baseUrl/api/generate-invoice'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(request.toJson()),
-      );
+      final supabase = Supabase.instance.client;
       
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return InvoiceResponse.fromJson(data);
-      } else {
+      final response = await supabase
+        .from('invoices')
+        .update({
+          'status': 'pending',
+          'fiscal_name': request.companyName,
+          'fiscal_nif': request.nif,
+          'fiscal_address': request.address,
+          'fiscal_city': request.city,
+          'fiscal_postal_code': request.postalCode,
+          'fiscal_email': request.email,
+          'fiscal_phone': request.phone,
+        })
+        .eq('ticket_id', request.transactionId);
+      
+      if (response.hasError) {
         return InvoiceResponse(
           success: false,
-          errorMessage: 'Error del servidor: ${response.statusCode}',
+          errorMessage: 'Error al actualizar factura: ${response.error?.message}',
         );
       }
+      
+      return InvoiceResponse(
+        success: true,
+        invoiceId: request.transactionId,
+      );
     } catch (e) {
       print('❌ Error al solicitar factura: $e');
       return InvoiceResponse(
@@ -130,22 +156,30 @@ class ElectronicInvoiceService {
     }
   }
   
-  /// Obtiene el estado de una factura
+  /// Obtiene el estado de una factura desde Supabase
   static Future<InvoiceResponse> getInvoiceStatus(String transactionId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/api/invoice-status/$transactionId'),
-      );
+      final supabase = Supabase.instance.client;
       
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return InvoiceResponse.fromJson(data);
-      } else {
+      final response = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('ticket_id', transactionId)
+        .maybeSingle();
+      
+      if (response == null) {
         return InvoiceResponse(
           success: false,
-          errorMessage: 'Error al obtener estado de la factura',
+          errorMessage: 'Factura no encontrada',
         );
       }
+      
+      final invoice = response;
+      return InvoiceResponse(
+        success: true,
+        invoiceId: transactionId,
+        invoiceUrl: invoice['invoice_pdf_url'],
+      );
     } catch (e) {
       print('❌ Error al obtener estado de factura: $e');
       return InvoiceResponse(

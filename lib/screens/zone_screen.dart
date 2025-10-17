@@ -34,17 +34,57 @@ class _ZoneScreenState extends State<ZoneScreen> {
   @override
   void initState() {
     super.initState();
-    // Enviar datos de pantalla al dashboard
-    WebSocketService.sendScreenUpdate('zone', 
-      user: AppState.currentOperator?.username ?? 'Sin usuario',
-      action: 'Seleccionando zona de estacionamiento'
-    );
+    
+    // Debug: Verificar estado inicial
+    print('🔍 INIT ZONE SCREEN:');
+    print('  - currentCompany: ${AppState.currentCompany?.name}');
+    print('  - AppState.zones.length: ${AppState.zones.length}');
+    
+    // Recargar zonas desde Supabase para obtener datos actualizados
+    _reloadZonesFromSupabase();
     
     // Registrar acción para IA adaptativa
     AdaptiveAIService.recordAction('zone_screen_visited');
     
     // Reproducir guía por voz si está habilitada
     _playVoiceGuide();
+  }
+  
+  /// Recargar zonas desde Supabase
+  Future<void> _reloadZonesFromSupabase() async {
+    if (AppState.currentCompany == null) return;
+    
+    try {
+      print('🔄 Recargando zonas desde Supabase para empresa: ${AppState.currentCompany!.id}');
+      
+      final supabase = Supabase.instance.client;
+      final zonesResponse = await supabase
+          .from('zones')
+          .select('*')
+          .eq('company_id', AppState.currentCompany!.id);
+      
+      // Limpiar zonas existentes de la empresa
+      AppState.zones.removeWhere((id, zone) => zone.companyId == AppState.currentCompany!.id);
+      
+      // Cargar nuevas zonas
+      final zones = zonesResponse.map((zoneData) => Zone.fromJson(zoneData)).toList();
+      for (final zone in zones) {
+        AppState.zones[zone.id] = zone;
+      }
+      
+      print('📍 Zonas recargadas: ${zones.length}');
+      zones.forEach((zone) {
+        print('  - ${zone.name}: ${zone.pricePerHour}€/h');
+      });
+      
+      // Notificar cambios
+      if (mounted) {
+        setState(() {});
+      }
+      
+    } catch (e) {
+      print('❌ Error recargando zonas: $e');
+    }
   }
   
   void _playVoiceGuide() {
@@ -68,6 +108,15 @@ class _ZoneScreenState extends State<ZoneScreen> {
         final zones = AppState.currentCompany != null 
             ? AppState.getZonesForCompany(AppState.currentCompany!.id)
             : <Zone>[];
+
+        // Debug: Verificar qué está pasando
+        print('🔍 DEBUG ZONE SCREEN:');
+        print('  - currentCompany: ${AppState.currentCompany?.name} (${AppState.currentCompany?.id})');
+        print('  - AppState.zones.length: ${AppState.zones.length}');
+        print('  - zones found: ${zones.length}');
+        AppState.zones.forEach((id, zone) {
+          print('    - Zone: ${zone.name} (company: ${zone.companyId})');
+        });
 
         return _buildContent(zones);
       },

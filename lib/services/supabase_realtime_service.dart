@@ -150,10 +150,12 @@ class SupabaseRealtimeService {
   Future<void> subscribeToAllTables({String? companyId}) async {
     try {
       for (final tableName in SupabaseConfig.realtimeChannels) {
-        await subscribeToTable(tableName, filter: companyId);
+        // Suscribirse sin filtro para recibir todos los cambios
+        await subscribeToTable(tableName);
+        print('📡 Suscrito a tabla: $tableName');
       }
       
-      print('📡 Suscrito a todas las tablas principales${companyId != null ? ' para empresa $companyId' : ''}');
+      print('✅ Suscripciones de Realtime activadas para todas las tablas');
       
     } catch (e) {
       print('❌ Error suscribiéndose a todas las tablas: $e');
@@ -300,21 +302,18 @@ class SupabaseRealtimeService {
           if (zoneData != null) {
             final zone = Zone.fromJson(zoneData);
             
-            // TODO: Implementar manejo de zonas en AppState
             // Actualizar en AppState
-            // if (AppState.zones.any((z) => z.id == zone.id)) {
-            //   AppState.zones.removeWhere((z) => z.id == zone.id);
-            // }
-            // AppState.zones.add(zone);
+            AppState.zones[zone.id] = zone;
             
+            print('🔄 Zona actualizada en tiempo real: ${zone.name} - ${zone.pricePerHour}€/h');
             AppState.notifyListeners();
           }
           break;
         case PostgresChangeEvent.delete:
           final zoneId = payload.oldRecord?['id'];
           if (zoneId != null) {
-            // TODO: Implementar manejo de zonas en AppState
-            // AppState.zones.removeWhere((z) => z.id == zoneId);
+            AppState.zones.remove(zoneId);
+            print('🗑️ Zona eliminada en tiempo real: $zoneId');
             AppState.notifyListeners();
           }
           break;

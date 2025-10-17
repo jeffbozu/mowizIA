@@ -42,10 +42,16 @@ class CentralizedWebSocketService {
   // Instancia del servicio de Edge Functions
   static final SupabaseEdgeFunctionsService _edgeFunctions = SupabaseEdgeFunctionsService();
   
-  // Conectar al backend centralizado
+  // Conectar al backend centralizado (DESHABILITADO - USAR SUPABASE)
   static Future<void> connect(String clientId, {String serverUrl = 'ws://localhost:8082'}) async {
     try {
       _clientId = clientId;
+      
+      // 🚨 MIGRACIÓN A SUPABASE: WebSocket local deshabilitado
+      print('⚠️ WebSocket local deshabilitado - usando Supabase Edge Functions');
+      _isConnected = true; // Simular conexión para compatibilidad
+      _connectionController.add(true);
+      return;
       
       // Usar el WebSocket correcto según la plataforma
       if (kIsWeb) {
@@ -567,6 +573,10 @@ class CentralizedWebSocketService {
   
   // Programar reconexión
   static void _scheduleReconnect() {
+    // 🚨 MIGRACIÓN A SUPABASE: Reconexión WebSocket deshabilitada
+    print('⚠️ Reconexión WebSocket deshabilitada - usando Supabase');
+    return;
+    
     if (_reconnectTimer != null) return;
     
     _reconnectTimer = Timer(Duration(seconds: 5), () {

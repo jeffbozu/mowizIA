@@ -134,13 +134,13 @@ class Zone {
       name: json['name'] ?? '',
       color: json['color'] ?? '#2196F3',
       pricePerHour: (json['price_per_hour'] ?? 0.0).toDouble(), // Supabase usa snake_case
-      maxDuration: json['max_duration'] ?? 240, // Supabase usa snake_case
+      maxDuration: int.tryParse(json['max_duration']?.toString() ?? '240') ?? 240, // Supabase usa snake_case
       description: json['description'] ?? '',
       isActive: json['is_active'] ?? true, // Supabase usa snake_case
       createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()), // Supabase usa snake_case
-      timeOptions: (json['time_options'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [15, 30, 60, 120, 180, 240], // Supabase usa snake_case
-      timeIncrement: json['time_increment'] ?? 15, // Supabase usa snake_case
-      minTime: json['min_time'] ?? 15, // Supabase usa snake_case
+      timeOptions: (json['time_options'] as List<dynamic>?)?.map((e) => int.tryParse(e.toString()) ?? 15).toList() ?? [15, 30, 60, 120, 180, 240], // Supabase usa snake_case
+      timeIncrement: int.tryParse(json['time_increment']?.toString() ?? '15') ?? 15, // Supabase usa snake_case
+      minTime: int.tryParse(json['min_time']?.toString() ?? '15') ?? 15, // Supabase usa snake_case
     );
   }
 

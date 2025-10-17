@@ -23,7 +23,7 @@ class _TimeScreenState extends State<TimeScreen> {
   void initState() {
     super.initState();
     final zoneId = AppState.selectedZoneId;
-    _selectedZone = MockData.getZoneById(zoneId!)!;
+    _selectedZone = AppState.zones[zoneId!]!;
   }
 
   void _selectTime(int minutes) {
@@ -53,7 +53,7 @@ class _TimeScreenState extends State<TimeScreen> {
   }
 
   void _pay() {
-    final price = MockData.calculatePrice(_selectedZone.pricePerHour, _selectedMinutes);
+    final price = _selectedZone.pricePerHour * (_selectedMinutes / 60.0);
     final plate = AppState.currentPlate ?? 'SIN_MATRICULA';
     print('🚗 Usando matrícula para pago: $plate');
     
@@ -273,7 +273,7 @@ class _TimeScreenState extends State<TimeScreen> {
                           ),
                         ),
                         Text(
-                          '${MockData.calculatePrice(_selectedZone.pricePerHour, _selectedMinutes).toStringAsFixed(2)} €',
+                          '${(_selectedZone.pricePerHour * (_selectedMinutes / 60.0)).toStringAsFixed(2)} €',
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,

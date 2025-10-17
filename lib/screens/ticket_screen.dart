@@ -19,16 +19,22 @@ class TicketScreen extends StatefulWidget {
   final bool isExtend;
   final String plate;
   final String zoneId;
+  final String zoneName;
   final int minutes;
   final double price;
+  final DateTime startTime;
+  final DateTime endTime;
 
   const TicketScreen({
     super.key,
     required this.isExtend,
     required this.plate,
     required this.zoneId,
+    required this.zoneName,
     required this.minutes,
     required this.price,
+    required this.startTime,
+    required this.endTime,
   });
 
   @override
@@ -152,11 +158,15 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
     _invoiceTransaction = await ElectronicInvoiceService.createTransaction(
       plate: widget.plate,
       zoneId: widget.zoneId,
+      zoneName: widget.zoneName,
+      companyId: AppState.currentCompany?.id ?? '550e8400-e29b-41d4-a716-446655440000',
       amount: widget.price,
       paymentMethod: AppState.currentPayment?.paymentMethod ?? 'cash',
       kioscoId: AppState.kioscoId ?? 'DEMO_KIOSCO',
       isExtend: widget.isExtend,
       minutes: widget.minutes,
+      startTime: widget.startTime,
+      endTime: widget.endTime,
     );
     
     _qrData = ElectronicInvoiceService.generateQRData(_invoiceTransaction!.id);
