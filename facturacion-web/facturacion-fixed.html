@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facturación Electrónica - MEYPARK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .lookup-form {
+            background: var(--gray-50);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 2px dashed var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .lookup-form:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .transaction-info {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--success);
+            display: none;
+        }
+
+        .transaction-info.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .transaction-info h3 {
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .transaction-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: var(--gray-800);
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        .invoice-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .invoice-form.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .invoice-form h3 {
+            color: var(--gray-800);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .download-section {
+            background: var(--success);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+        }
+
+        .download-section.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .download-btn {
+            background: white;
+            color: var(--success);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-invoice"></i> Facturación Electrónica</h1>
+            <p>MEYPARK - Sistema de Gestión de Aparcamientos</p>
+        </div>
+
+        <div class="content">
+            <!-- Alerta de mensajes -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Formulario de búsqueda -->
+            <div class="lookup-form">
+                <h3><i class="fas fa-search"></i> Buscar Transacción</h3>
+                <div class="form-group">
+                    <label for="transactionIdInput">ID de Transacción</label>
+                    <input type="text" id="transactionIdInput" placeholder="Ej: TXN_1234567890_1234" />
+                </div>
+                <button class="btn" id="searchBtn" onclick="searchTransaction()">
+                    <i class="fas fa-search"></i>
+                    Buscar
+                </button>
+            </div>
+
+            <!-- Información de la transacción -->
+            <div class="transaction-info" id="transactionInfo">
+                <h3>
+                    <i class="fas fa-ticket-alt"></i>
+                    Información del Ticket
+                </h3>
+                <div class="transaction-details" id="transactionDetails">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Formulario de facturación -->
+            <div class="invoice-form" id="invoiceForm">
+                <h3>
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Datos Fiscales para la Factura
+                </h3>
+                <form id="fiscalForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nif">NIF/CIF *</label>
+                            <input type="text" id="nif" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="companyName">Razón Social *</label>
+                            <input type="text" id="companyName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Dirección *</label>
+                            <input type="text" id="address" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="city">Ciudad *</label>
+                            <input type="text" id="city" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Código Postal *</label>
+                            <input type="text" id="postalCode" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono</label>
+                            <input type="tel" id="phone" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn" id="generateBtn">
+                        <i class="fas fa-file-pdf"></i>
+                        Generar Factura PDF
+                    </button>
+                </form>
+            </div>
+
+            <!-- Sección de descarga -->
+            <div class="download-section" id="downloadSection">
+                <h3><i class="fas fa-check-circle"></i> Factura Generada Correctamente</h3>
+                <p>Tu factura electrónica ha sido generada y está lista para descargar.</p>
+                <button class="download-btn" id="downloadBtn" onclick="downloadPDF()">
+                    <i class="fas fa-download"></i>
+                    Descargar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://thfmuoqcrkhxduxuygro.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZm11b3FjcmtoeGR1eHV5Z3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0Nzk1MTQsImV4cCI6MjA3NjA1NTUxNH0.5n3YqmCV1t39aoDZDLfvKG432o9M79WkM6wQu9JTmFc';
+        
+        // Cliente Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Variables globales
+        let currentTransaction = null;
+        let currentPDFUrl = null;
+
+        // Elementos del DOM
+        const elements = {
+            alert: document.getElementById('alert'),
+            transactionIdInput: document.getElementById('transactionIdInput'),
+            searchBtn: document.getElementById('searchBtn'),
+            transactionInfo: document.getElementById('transactionInfo'),
+            transactionDetails: document.getElementById('transactionDetails'),
+            invoiceForm: document.getElementById('invoiceForm'),
+            fiscalForm: document.getElementById('fiscalForm'),
+            generateBtn: document.getElementById('generateBtn'),
+            downloadSection: document.getElementById('downloadSection'),
+            downloadBtn: document.getElementById('downloadBtn')
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener ID de transacción de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const transactionId = urlParams.get('transaction');
+            
+            if (transactionId) {
+                elements.transactionIdInput.value = transactionId;
+                setTimeout(() => {
+                    searchTransaction();
+                }, 100);
+            }
+
+            // Event listeners
+            elements.fiscalForm.addEventListener('submit', generateInvoice);
+            elements.transactionIdInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchTransaction();
+                }
+            });
+        });
+
+        // Buscar transacción
+        async function searchTransaction() {
+            const transactionId = elements.transactionIdInput.value.trim();
+            
+            if (!transactionId) {
+                showAlert('Por favor, introduce un ID de transacción válido', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                // Buscar en Supabase tabla invoices
+                const { data: invoice, error } = await supabase
+                    .from('invoices')
+                    .select(`
+                        *,
+                        companies(name, primary_color, contact_email, contact_phone, address),
+                        zones(name, price_per_hour)
+                    `)
+                    .eq('ticket_id', transactionId)
+                    .single();
+                
+                if (error) {
+                    throw new Error('Transacción no encontrada');
+                }
+                
+                if (invoice) {
+                    currentTransaction = invoice;
+                    displayTransactionInfo(invoice);
+                    showAlert('Transacción encontrada correctamente', 'success');
+                } else {
+                    showAlert('Transacción no encontrada', 'error');
+                }
+            } catch (error) {
+                console.error('Error buscando transacción:', error);
+                showAlert('Error al buscar la transacción: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Mostrar información de la transacción
+        function displayTransactionInfo(invoice) {
+            const details = elements.transactionDetails;
+            details.innerHTML = `
+                <div class="detail-item">
+                    <div class="detail-label">ID de Transacción</div>
+                    <div class="detail-value">${invoice.ticket_id}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Matrícula</div>
+                    <div class="detail-value">${invoice.plate}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Zona</div>
+                    <div class="detail-value">${invoice.zones?.name || invoice.zone_name || 'N/A'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Duración</div>
+                    <div class="detail-value">${invoice.duration_minutes || 0} minutos</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Importe</div>
+                    <div class="detail-value">${invoice.amount.toFixed(2)} €</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Método de Pago</div>
+                    <div class="detail-value">${getPaymentMethodName(invoice.payment_method)}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Fecha</div>
+                    <div class="detail-value">${new Date(invoice.created_at).toLocaleDateString('es-ES')}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Empresa</div>
+                    <div class="detail-value">${invoice.companies?.name || 'N/A'}</div>
+                </div>
+            `;
+            
+            elements.transactionInfo.classList.add('show');
+            elements.invoiceForm.classList.add('show');
+        }
+
+        // Generar factura
+        async function generateInvoice(e) {
+            e.preventDefault();
+            
+            if (!currentTransaction) {
+                showAlert('No hay transacción seleccionada', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                
+                // Recopilar datos del formulario
+                const formData = {
+                    nif: document.getElementById('nif').value,
+                    companyName: document.getElementById('companyName').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    postalCode: document.getElementById('postalCode').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+
+                // Crear objeto de factura con datos fiscales
+                const invoiceData = {
+                    ...currentTransaction,
+                    fiscal_name: formData.companyName,
+                    fiscal_nif: formData.nif,
+                    fiscal_address: formData.address,
+                    fiscal_city: formData.city,
+                    fiscal_postal_code: formData.postalCode,
+                    fiscal_email: formData.email,
+                    fiscal_phone: formData.phone,
+                    status: 'completed'
+                };
+
+                // Generar PDF directamente sin actualizar la base de datos
+                const pdfUrl = await generatePDF(invoiceData);
+
+                currentPDFUrl = pdfUrl;
+                elements.downloadSection.classList.add('show');
+                showAlert('Factura generada correctamente', 'success');
+                
+            } catch (error) {
+                console.error('Error generando factura:', error);
+                showAlert('Error al generar la factura: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Generar PDF usando jsPDF
+        async function generatePDF(invoice) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Configurar página A4 (210x297mm)
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const margin = 20;
+            const contentWidth = pageWidth - (margin * 2);
+            
+            // Colores corporativos
+            const primaryColor = [33, 150, 243]; // Azul MEYPARK
+            const secondaryColor = [76, 175, 80]; // Verde
+            const textColor = [33, 33, 33]; // Gris oscuro
+            const lightGray = [245, 245, 245];
+            
+            // === ENCABEZADO ===
+            // Fondo del encabezado
+            doc.setFillColor(...lightGray);
+            doc.rect(0, 0, pageWidth, 45, 'F');
+            
+            // Logo/Texto de la empresa
+            doc.setTextColor(...primaryColor);
+            doc.setFontSize(24);
+            doc.setFont('helvetica', 'bold');
+            doc.text('MEYPARK', margin, 20);
+            
+            // Subtítulo
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text('Sistema de Gestión de Aparcamientos', margin, 28);
+            
+            // Número de factura y fecha (esquina superior derecha)
+            doc.setTextColor(...textColor);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('FACTURA ELECTRÓNICA', pageWidth - margin - 60, 15);
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            const invoiceNumber = `FAC-${invoice.ticket_id}`;
+            doc.text(`Nº: ${invoiceNumber}`, pageWidth - margin - 60, 25);
+            doc.text(`Fecha: ${new Date(invoice.created_at).toLocaleDateString('es-ES')}`, pageWidth - margin - 60, 32);
+            
+            // Línea separadora
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(0.8);
+            doc.line(margin, 50, pageWidth - margin, 50);
+            
+            // === DATOS DEL EMISOR ===
+            let yPos = 65;
+            doc.setTextColor(...textColor);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DATOS DEL EMISOR', margin, yPos);
+            
+            yPos += 8;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(invoice.companies?.name || 'MEYPARK S.L.', margin, yPos);
+            yPos += 5;
+            doc.text('CIF: B12345678', margin, yPos);
+            yPos += 5;
+            doc.text('Calle Principal 123, 28001 Madrid', margin, yPos);
+            yPos += 5;
+            doc.text('Tel: +34 91 123 45 67 | Email: info@meypark.com', margin, yPos);
+            
+            // === DATOS DEL RECEPTOR ===
+            yPos += 15;
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DATOS DEL RECEPTOR', margin, yPos);
+            
+            yPos += 8;
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(invoice.fiscal_name, margin, yPos);
+            yPos += 5;
+            doc.text(`CIF/NIF: ${invoice.fiscal_nif}`, margin, yPos);
+            yPos += 5;
+            doc.text(invoice.fiscal_address, margin, yPos);
+            yPos += 5;
+            doc.text(`${invoice.fiscal_postal_code} ${invoice.fiscal_city}`, margin, yPos);
+            yPos += 5;
+            doc.text(`Email: ${invoice.fiscal_email}`, margin, yPos);
+            if (invoice.fiscal_phone) {
+                yPos += 5;
+                doc.text(`Tel: ${invoice.fiscal_phone}`, margin, yPos);
+            }
+            
+            // === DETALLE DE LA FACTURA ===
+            yPos += 20;
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DETALLE DE LA FACTURA', margin, yPos);
+            
+            // Tabla de servicios
+            yPos += 10;
+            const tableTop = yPos;
+            
+            // Encabezados de la tabla
+            doc.setFillColor(...primaryColor);
+            doc.rect(margin, tableTop - 5, contentWidth, 8, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('DESCRIPCIÓN', margin + 2, tableTop);
+            doc.text('CANTIDAD', margin + 80, tableTop);
+            doc.text('PRECIO UNIT.', margin + 110, tableTop);
+            doc.text('TOTAL', margin + 150, tableTop);
+            
+            // Contenido de la tabla
+            yPos = tableTop + 8;
+            doc.setTextColor(...textColor);
+            doc.setFont('helvetica', 'normal');
+            
+            // Servicio de aparcamiento
+            const serviceDesc = `Servicio de aparcamiento - ${invoice.zones?.name || invoice.zone_name || 'Zona'}`;
+            const quantity = 1;
+            const unitPrice = invoice.amount;
+            const total = invoice.amount;
+            
+            // Fila del servicio
+            doc.setFillColor(255, 255, 255);
+            doc.rect(margin, yPos - 5, contentWidth, 8, 'F');
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.1);
+            doc.line(margin, yPos - 5, pageWidth - margin, yPos - 5);
+            doc.line(margin, yPos + 3, pageWidth - margin, yPos + 3);
+            
+            doc.text(serviceDesc, margin + 2, yPos);
+            doc.text(quantity.toString(), margin + 80, yPos);
+            doc.text(`${unitPrice.toFixed(2)} €`, margin + 110, yPos);
+            doc.text(`${total.toFixed(2)} €`, margin + 150, yPos);
+            
+            // Información adicional del ticket
+            yPos += 12;
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`ID Ticket: ${invoice.ticket_id}`, margin + 2, yPos);
+            doc.text(`Matrícula: ${invoice.plate}`, margin + 2, yPos + 4);
+            doc.text(`Duración: ${invoice.duration_minutes || 0} minutos`, margin + 2, yPos + 8);
+            doc.text(`Método de pago: ${getPaymentMethodName(invoice.payment_method)}`, margin + 2, yPos + 12);
+            
+            // === TOTALES ===
+            yPos += 25;
+            const totalsX = pageWidth - margin - 60;
+            
+            // Base imponible
+            doc.setTextColor(...textColor);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Base Imponible:', totalsX - 40, yPos);
+            doc.text(`${invoice.amount.toFixed(2)} €`, totalsX, yPos);
+            
+            // IVA (21%)
+            yPos += 6;
+            const ivaRate = 0.21;
+            const ivaAmount = invoice.amount * ivaRate;
+            doc.text('IVA (21%):', totalsX - 40, yPos);
+            doc.text(`${ivaAmount.toFixed(2)} €`, totalsX, yPos);
+            
+            // Total
+            yPos += 8;
+            const totalWithVat = invoice.amount + ivaAmount;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(12);
+            doc.text('TOTAL:', totalsX - 40, yPos);
+            doc.text(`${totalWithVat.toFixed(2)} €`, totalsX, yPos);
+            
+            // Línea separadora antes del total
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(0.5);
+            doc.line(totalsX - 40, yPos - 3, totalsX + 20, yPos - 3);
+            
+            // === INFORMACIÓN ADICIONAL ===
+            yPos += 20;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            
+            // Fecha de vencimiento
+            const dueDate = new Date();
+            dueDate.setDate(dueDate.getDate() + 30);
+            doc.text(`Fecha de vencimiento: ${dueDate.toLocaleDateString('es-ES')}`, margin, yPos);
+            
+            // Forma de pago
+            yPos += 5;
+            doc.text('Forma de pago: Transferencia bancaria o tarjeta', margin, yPos);
+            
+            // Datos bancarios
+            yPos += 5;
+            doc.text('Datos bancarios: ES12 1234 5678 9012 3456 7890', margin, yPos);
+            
+            // === PIE DE PÁGINA ===
+            const footerY = pageHeight - 30;
+            
+            // Línea separadora
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
+            
+            // Texto del pie
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Esta factura ha sido generada electrónicamente y es válida sin firma manuscrita.', margin, footerY);
+            doc.text(`Generado el ${new Date().toLocaleString('es-ES')} por MEYPARK`, margin, footerY + 5);
+            doc.text('www.meypark.com | info@meypark.com', margin, footerY + 10);
+            
+            // QR Code placeholder (opcional)
+            doc.setFontSize(6);
+            doc.text('Código QR de verificación', pageWidth - margin - 30, footerY);
+            doc.rect(pageWidth - margin - 25, footerY - 15, 20, 20);
+            doc.text('QR', pageWidth - margin - 20, footerY - 8);
+            
+            // Generar blob y crear URL para descarga directa
+            const pdfBlob = doc.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            
+            return pdfUrl;
+        }
+
+        // Descargar PDF
+        function downloadPDF() {
+            if (currentPDFUrl) {
+                const link = document.createElement('a');
+                link.href = currentPDFUrl;
+                link.download = `factura_${currentTransaction.ticket_id}.pdf`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Utilidades
+        function showAlert(message, type) {
+            elements.alert.textContent = message;
+            elements.alert.className = `alert ${type} show`;
+            setTimeout(() => {
+                elements.alert.classList.remove('show');
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            if (show) {
+                elements.searchBtn.disabled = true;
+                elements.searchBtn.innerHTML = '<div class="loading-spinner"></div> Buscando...';
+                elements.generateBtn.disabled = true;
+                elements.generateBtn.innerHTML = '<div class="loading-spinner"></div> Generando...';
+            } else {
+                elements.searchBtn.disabled = false;
+                elements.searchBtn.innerHTML = '<i class="fas fa-search"></i> Buscar';
+                elements.generateBtn.disabled = false;
+                elements.generateBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Generar Factura PDF';
+            }
+        }
+
+        function getPaymentMethodName(method) {
+            const methods = {
+                'cash': 'Efectivo',
+                'card': 'Tarjeta',
+                'chip': 'Chip+PIN',
+                'contactless': 'Contactless'
+            };
+            return methods[method] || method;
+        }
+    </script>
+</body>
+</html>
