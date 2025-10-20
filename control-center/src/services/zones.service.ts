@@ -78,22 +78,20 @@ export class ZonesService {
   }
 
   static async update(id: string, updates: ZoneUpdate): Promise<Zone> {
-    const { data, error } = await supabase
-      .from('zones')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select(`
-        *,
-        companies!inner(name)
-      `)
-      .single()
+    // Enviar a Edge Function control-center
+    const { data, error } = await supabase.functions.invoke('control-center', {
+      body: {
+        action: 'update_zone',
+        data: { id, updates }
+      }
+    })
 
-    if (error) {
-      console.error('Error updating zone:', error)
+    if (error || !data?.success) {
+      console.error('Error updating zone via function:', error || data)
       throw new Error('Error al actualizar zona')
     }
 
-    return data
+    return data.data as Zone
   }
 
   static async delete(id: string): Promise<void> {

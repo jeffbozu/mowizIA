@@ -51,6 +51,9 @@ serve(async (req) => {
       case 'import_company_data':
         return await importCompanyData(supabaseClient, data)
       
+      case 'update_zone':
+        return await updateZone(supabaseClient, data)
+      
       default:
         return new Response(
           JSON.stringify({ error: 'Acción no reconocida' }),
@@ -171,6 +174,78 @@ async function getDashboardData(supabase: any, data: any) {
     { 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     }
+  )
+}
+
+// Actualizar zona (usa service role para evitar problemas de RLS; validar inputs y permisos en producción)
+async function updateZone(supabase: any, data: any) {
+  const { id, updates } = data || {}
+
+  if (!id || !updates) {
+    return new Response(
+      JSON.stringify({ error: 'Parámetros inválidos' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  // Cliente con service role para mutaciones administrativas
+  const adminKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const supabaseAdmin = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    adminKey
+  )
+
+  // Normalización básica de tipos permitidos
+  const safeUpdates: Record<string, any> = {}
+  const allowedFields = new Set([
+    'name',
+    'company_id',
+    'color',
+    'price_per_hour',
+    'max_duration',
+    'description',
+    'time_options',
+    'time_increment',
+    'min_time',
+    'is_active',
+  ])
+
+  for (const [key, value] of Object.entries(updates)) {
+    if (!allowedFields.has(key)) continue
+    if (key === 'price_per_hour') {
+      safeUpdates[key] = typeof value === 'string' ? parseFloat(value) : value
+      continue
+    }
+    if (key === 'time_options' && Array.isArray(value)) {
+      safeUpdates[key] = value.map((v: any) => (typeof v === 'string' ? parseInt(v) : v))
+      continue
+    }
+    if (['time_increment', 'min_time', 'max_duration'].includes(key)) {
+      safeUpdates[key] = typeof value === 'string' ? parseInt(value) : value
+      continue
+    }
+    safeUpdates[key] = value
+  }
+
+  safeUpdates['updated_at'] = new Date().toISOString()
+
+  const { data: updated, error } = await supabaseAdmin
+    .from('zones')
+    .update(safeUpdates)
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  return new Response(
+    JSON.stringify({ success: true, data: updated }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
 }
 
