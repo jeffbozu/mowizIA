@@ -289,7 +289,7 @@ class _TicketScreenState extends State<TicketScreen> with TickerProviderStateMix
 
   Future<void> _openElectronicInvoice() async {
     if (_invoiceTransaction?.id != null) {
-      final url = 'http://localhost:3002/facturacion-fixed.html?transaction=${_invoiceTransaction!.id}';
+      final url = 'https://facturacion-web-one.vercel.app?transaction=${_invoiceTransaction!.id}';
       final uri = Uri.parse(url);
       
       try {
